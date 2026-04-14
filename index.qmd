@@ -1,0 +1,52 @@
+---
+title: "caladaptR"
+subtitle: "Native R Access to Cal-Adapt Climate Projections"
+---
+
+`caladaptR` reads downscaled CMIP6 climate data from California's
+[Cal-Adapt Analytics Engine](https://analytics.cal-adapt.org/) directly into R.
+No Python, no API key, no authentication -- just GDAL reading Zarr stores
+from AWS S3.
+
+## Available Data
+
+| Dataset | Resolution | Temporal | GCMs | SSPs | Period |
+|---------|-----------|----------|------|------|--------|
+| WRF CMIP6 (WUS-D3) | 45 / 9 / 3 km | Hourly | 8 models | SSP3-7.0 (all); SSP2-4.5, SSP5-8.5 (CESM2) | 1980--2100 |
+| LOCA2-Hybrid | 3 km | Daily | 15 models | SSP2-4.5, SSP3-7.0, SSP5-8.5 | 1950--2100 |
+
+## Quick Start
+
+```r
+library(caladaptR)
+
+# What's available?
+ca_models(activity = "WRF")
+ca_variables(activity = "WRF", timescale = "1hr")
+
+# Read hourly temperature, 45 km grid, one day
+t2 <- ca_fetch("t2", model = "CESM2", scenario = "ssp370",
+               n_timesteps = 24)
+
+# Extract time series at a point
+ts <- ca_fetch_point("t2", model = "CESM2", scenario = "ssp370",
+                     lon = -119.77, lat = 36.75,
+                     n_timesteps = 24)
+```
+
+## Guides
+
+| Vignette | Description |
+|----------|-------------|
+| [Getting Started](vignettes/getting_started.qmd) | Catalog queries, fetching gridded data, point extraction, visualization |
+| [SIPNET Met Drivers](vignettes/sipnet_met_drivers.qmd) | Build CF-standard NetCDF met drivers for SIPNET from WRF projections |
+
+## Installation
+
+```r
+remotes::install_github("lebauerapproach/caladaptR")
+```
+
+## License
+
+BSD 3-Clause

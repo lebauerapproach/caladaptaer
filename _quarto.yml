@@ -1,0 +1,45 @@
+project:
+  type: website
+  output-dir: _site
+  preview:
+    watch-inputs: true
+  render:
+    - index.qmd
+    - vignettes/*.qmd
+
+website:
+  title: "caladaptR"
+  search: true
+  sidebar:
+    style: docked
+    collapse-level: 1
+    contents:
+      - href: index.qmd
+        text: Home
+      - section: Guides
+        contents:
+          - href: vignettes/getting_started.qmd
+            text: Getting Started
+      - section: Advanced
+        contents:
+          - href: vignettes/sipnet_met_drivers.qmd
+            text: SIPNET Met Drivers
+    tools:
+      - icon: github
+        href: https://github.com/lebauerapproach/caladaptR
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    self-contained: false
+    df-print: paged
+
+execute:
+  echo: true
+  warning: false
+  message: false
+  freeze: auto
+
+author: "Akash B V and David LeBauer"
+date: today
