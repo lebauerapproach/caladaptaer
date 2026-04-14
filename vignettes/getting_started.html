@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.313">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Akash B V and David LeBauer">
+<meta name="dcterms.date" content="2026-04-14">
+
+<title>caladaptR - Getting Started with caladaptR</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<link href="../site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="../site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+
+</head>
+
+<body class="nav-sidebar docked">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Getting Started with caladaptR</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">caladaptR</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/lebauerapproach/caladaptR" title="" class="sidebar-tool px-1"><i class="bi bi-github"></i></a>
+</div>
+    </div>
+      </div>
+      <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">Home</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Guides</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../vignettes/getting_started.html" class="sidebar-item-text sidebar-link active">Getting Started</a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false">Advanced</a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../vignettes/sipnet_met_drivers.html" class="sidebar-item-text sidebar-link">SIPNET Met Drivers</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-cal-adapt-analytics-engine" id="toc-the-cal-adapt-analytics-engine" class="nav-link active" data-scroll-target="#the-cal-adapt-analytics-engine">The Cal-Adapt Analytics Engine</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#sec-catalog" id="toc-sec-catalog" class="nav-link" data-scroll-target="#sec-catalog">Exploring the catalog</a>
+  <ul class="collapse">
+  <li><a href="#data-availability" id="toc-data-availability" class="nav-link" data-scroll-target="#data-availability">Data availability</a></li>
+  <li><a href="#searching-the-catalog" id="toc-searching-the-catalog" class="nav-link" data-scroll-target="#searching-the-catalog">Searching the catalog</a></li>
+  </ul></li>
+  <li><a href="#sec-fetch" id="toc-sec-fetch" class="nav-link" data-scroll-target="#sec-fetch">Fetching gridded data</a>
+  <ul class="collapse">
+  <li><a href="#mapping-temperature-over-the-western-us" id="toc-mapping-temperature-over-the-western-us" class="nav-link" data-scroll-target="#mapping-temperature-over-the-western-us">Mapping temperature over the western US</a></li>
+  <li><a href="#shortwave-radiation" id="toc-shortwave-radiation" class="nav-link" data-scroll-target="#shortwave-radiation">Shortwave radiation</a></li>
+  <li><a href="#surface-pressure" id="toc-surface-pressure" class="nav-link" data-scroll-target="#surface-pressure">Surface pressure</a></li>
+  </ul></li>
+  <li><a href="#sec-point" id="toc-sec-point" class="nav-link" data-scroll-target="#sec-point">Point extraction</a></li>
+  <li><a href="#sec-multimodel" id="toc-sec-multimodel" class="nav-link" data-scroll-target="#sec-multimodel">Multi-model comparison</a></li>
+  <li><a href="#sec-met" id="toc-sec-met" class="nav-link" data-scroll-target="#sec-met">Multiple meteorological variables</a></li>
+  <li><a href="#whats-next" id="toc-whats-next" class="nav-link" data-scroll-target="#whats-next">What’s next</a></li>
+  <li><a href="#requirements" id="toc-requirements" class="nav-link" data-scroll-target="#requirements">Requirements</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Getting Started with caladaptR</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Akash B V and David LeBauer </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">April 14, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+What you will learn
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>What climate data is available on the Cal-Adapt Analytics Engine and how the CADCAT catalog organizes it</li>
+<li>How to query the catalog to find datasets by model, scenario, variable, and resolution</li>
+<li>How to read gridded Zarr data from AWS S3 directly into R as a <code>stars</code> object</li>
+<li>How to produce California climate maps comparable to the official Python notebooks</li>
+<li>How to extract and visualize time series at specific locations</li>
+</ul>
+</div>
+</div>
+<section id="the-cal-adapt-analytics-engine" class="level2">
+<h2 class="anchored" data-anchor-id="the-cal-adapt-analytics-engine">The Cal-Adapt Analytics Engine</h2>
+<p>The <a href="https://analytics.cal-adapt.org/">Cal-Adapt Analytics Engine</a> hosts roughly 1 PB of downscaled CMIP6 climate projections for California and the western US, produced for the state’s Fifth Climate Change Assessment. The data lives in cloud-optimized <a href="https://zarr.dev/">Zarr</a> stores on AWS S3, publicly accessible with no credentials required.</p>
+<p>Two downscaling products are available:</p>
+<p><strong>WRF CMIP6 (WUS-D3)</strong> – dynamically downscaled by UCLA’s Center for Climate Science (Rahimi et al.&nbsp;2024). The Weather Research and Forecasting model produces hourly output at three nested resolutions: 45 km (d01, western US), 9 km (d02, California + surroundings), and 3 km (d03, California). Eight GCMs are downscaled, primarily under SSP3-7.0, with CESM2 also available for SSP2-4.5 and SSP5-8.5. The WRF output includes the full surface meteorology – temperature, pressure, precipitation, humidity, radiation, and wind components.</p>
+<p><strong>LOCA2-Hybrid</strong> – statistically downscaled by Scripps/UCSD (Pierce et al.). Daily output at 3 km for 15 GCMs across three SSPs (SSP2-4.5, SSP3-7.0, SSP5-8.5), covering 1950–2100. LOCA2-Hybrid uses a hybrid analog approach that substitutes WRF-derived weather patterns for end-of-century conditions where the historical analog library runs thin.</p>
+<p>The official Python interface is <a href="https://github.com/cal-adapt/climakitae">climakitae</a>. <code>caladaptR</code> provides the same data access natively in R, reading Zarr stores via GDAL’s <code>/vsis3/</code> virtual filesystem. No Python, no API key, no authentication.</p>
+</section>
+<section id="setup" class="level2">
+<h2 class="anchored" data-anchor-id="setup">Setup</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caladaptR)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stars)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(maps)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Check that GDAL supports Zarr (version 3.4+):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sf<span class="sc">::</span><span class="fu">sf_extSoftVersion</span>()[<span class="st">"GDAL"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="sec-catalog" class="level2">
+<h2 class="anchored" data-anchor-id="sec-catalog">Exploring the catalog</h2>
+<p>The CADCAT catalog is a CSV index of every Zarr store on S3. Each row is one variable from one model/scenario/resolution combination. <code>ca_catalog()</code> downloads the table once per session and caches it.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>cat <span class="ot">&lt;-</span> <span class="fu">ca_catalog</span>()</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(cat)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(cat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The catalog follows CMIP6 naming conventions:</p>
+<table class="table">
+<colgroup>
+<col style="width: 26%">
+<col style="width: 43%">
+<col style="width: 30%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Description</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>activity_id</code></td>
+<td>Downscaling method</td>
+<td>WRF, LOCA2</td>
+</tr>
+<tr class="even">
+<td><code>source_id</code></td>
+<td>Parent GCM</td>
+<td>CESM2, MIROC6, EC-Earth3</td>
+</tr>
+<tr class="odd">
+<td><code>experiment_id</code></td>
+<td>Scenario</td>
+<td>ssp370, ssp245, historical</td>
+</tr>
+<tr class="even">
+<td><code>table_id</code></td>
+<td>Temporal resolution</td>
+<td>1hr, day, mon</td>
+</tr>
+<tr class="odd">
+<td><code>variable_id</code></td>
+<td>Variable short name</td>
+<td>t2, prec, pr, tasmax</td>
+</tr>
+<tr class="even">
+<td><code>grid_label</code></td>
+<td>Spatial resolution</td>
+<td>d01 (45 km), d02 (9 km), d03 (3 km)</td>
+</tr>
+<tr class="odd">
+<td><code>member_id</code></td>
+<td>Ensemble member</td>
+<td>r1i1p1f1</td>
+</tr>
+<tr class="even">
+<td><code>path</code></td>
+<td>S3 Zarr store path</td>
+<td>s3://cadcat/wrf/ucla/cesm2/…</td>
+</tr>
+</tbody>
+</table>
+<section id="data-availability" class="level3">
+<h3 class="anchored" data-anchor-id="data-availability">Data availability</h3>
+<p>The WRF and LOCA2 datasets differ in their model/scenario coverage. Use the convenience functions to see what’s available:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># WRF GCMs -- 8 models dynamically downscaled</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ca_models</span>(<span class="at">activity =</span> <span class="st">"WRF"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># LOCA2 GCMs -- 15 models statistically downscaled</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ca_models</span>(<span class="at">activity =</span> <span class="st">"LOCA2"</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># CESM2 has the broadest scenario coverage in WRF</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ca_scenarios</span>(<span class="at">activity =</span> <span class="st">"WRF"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># hourly WRF variables</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ca_variables</span>(<span class="at">activity =</span> <span class="st">"WRF"</span>, <span class="at">timescale =</span> <span class="st">"1hr"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Here’s the full picture of what’s on S3 for the WRF hourly data at 45 km:</p>
+<div id="fig-catalog" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="figures/fig07_catalog_overview.png" class="img-fluid figure-img" style="width:90.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;1: WRF data availability across GCMs and scenarios. CESM2 has the broadest coverage with three SSPs; all other models have SSP3-7.0 and historical.</figcaption><p></p>
+</figure>
+</div>
+<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+WRF vs LOCA2 – when to use which
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use <strong>WRF</strong> when you need hourly data, process-based meteorology (radiation, humidity, pressure), or when you care about mesoscale features like orographic precipitation or sea breeze effects. Use <strong>LOCA2</strong> when you need more GCMs, more SSPs, or daily temperature/precipitation extremes at the finest available resolution (3 km).</p>
+</div>
+</div>
+</section>
+<section id="searching-the-catalog" class="level3">
+<h3 class="anchored" data-anchor-id="searching-the-catalog">Searching the catalog</h3>
+<p><code>ca_search()</code> filters by any combination of fields. All filters are ANDed.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># all hourly CESM2 temperature at 45 km</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ca_search</span>(<span class="at">activity =</span> <span class="st">"WRF"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">variable =</span> <span class="st">"t2"</span>, <span class="at">timescale =</span> <span class="st">"1hr"</span>, <span class="at">resolution =</span> <span class="st">"d01"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="sec-fetch" class="level2">
+<h2 class="anchored" data-anchor-id="sec-fetch">Fetching gridded data</h2>
+<p><code>ca_fetch()</code> reads a Zarr store from S3 and returns a <code>stars</code> object. Start with <code>n_timesteps = 1</code> to keep the initial read small – a single 45 km timestep is about 0.3 MB.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>t2 <span class="ot">&lt;-</span> <span class="fu">ca_fetch</span>(<span class="st">"t2"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">n_timesteps =</span> <span class="dv">1</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>t2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The result has three dimensions: x and y in the WRF Lambert Conformal Conic projection, and time in UTC. The values are 2-meter air temperature in Kelvin.</p>
+<section id="mapping-temperature-over-the-western-us" class="level3">
+<h3 class="anchored" data-anchor-id="mapping-temperature-over-the-western-us">Mapping temperature over the western US</h3>
+<p>The 45 km WRF domain covers most of western North America. Overlay state boundaries to orient the map – this is the R equivalent of what the Cal-Adapt Python notebooks do with cartopy.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># state boundaries for overlay</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>ca_sf <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(<span class="fu">map</span>(<span class="st">"state"</span>, <span class="st">"california"</span>, <span class="at">plot =</span> <span class="cn">FALSE</span>, <span class="at">fill =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>western_sf <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map</span>(<span class="st">"state"</span>, <span class="fu">c</span>(<span class="st">"california"</span>, <span class="st">"oregon"</span>, <span class="st">"washington"</span>, <span class="st">"nevada"</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"arizona"</span>, <span class="st">"utah"</span>, <span class="st">"idaho"</span>, <span class="st">"montana"</span>, <span class="st">"wyoming"</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"colorado"</span>, <span class="st">"new mexico"</span>), <span class="at">plot =</span> <span class="cn">FALSE</span>, <span class="at">fill =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># transform boundaries to the WRF projection</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>ca_wrf <span class="ot">&lt;-</span> <span class="fu">st_transform</span>(ca_sf, <span class="fu">st_crs</span>(t2))</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>ws_wrf <span class="ot">&lt;-</span> <span class="fu">st_transform</span>(western_sf, <span class="fu">st_crs</span>(t2))</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co"># convert to Celsius and plot</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>t2_c <span class="ot">&lt;-</span> t2</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>t2_c[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> units<span class="sc">::</span><span class="fu">drop_units</span>(t2[[<span class="dv">1</span>]]) <span class="sc">-</span> <span class="fl">273.15</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(t2_c, <span class="at">main =</span> <span class="st">""</span>, <span class="at">axes =</span> <span class="cn">TRUE</span>, <span class="at">reset =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">hcl.colors</span>(<span class="dv">100</span>, <span class="st">"YlOrRd"</span>, <span class="at">rev =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>     <span class="at">key.pos =</span> <span class="dv">4</span>, <span class="at">key.width =</span> <span class="fu">lcm</span>(<span class="fl">1.5</span>), <span class="at">key.length =</span> <span class="fl">0.8</span>)</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">st_geometry</span>(ws_wrf), <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">border =</span> <span class="st">"grey30"</span>, <span class="at">lwd =</span> <span class="fl">0.6</span>)</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">st_geometry</span>(ca_wrf), <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">border =</span> <span class="st">"black"</span>, <span class="at">lwd =</span> <span class="fl">1.5</span>)</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="fu">title</span>(<span class="st">"2-meter Air Temperature (C)</span><span class="sc">\n</span><span class="st">CESM2 SSP3-7.0, WRF 45 km"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="fig-t2-map" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="figures/fig01_wrf_t2_western_us.png" class="img-fluid figure-img" style="width:80.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;2: WRF 2-meter air temperature over the western US at 45 km resolution. The spatial pattern shows expected features – cool mountain temperatures in the Sierra Nevada and Cascades, warm desert conditions in the Southwest, and a maritime gradient along the Pacific coast. California boundary shown in black.</figcaption><p></p>
+</figure>
+</div>
+</section>
+<section id="shortwave-radiation" class="level3">
+<h3 class="anchored" data-anchor-id="shortwave-radiation">Shortwave radiation</h3>
+<p>Surface downwelling shortwave radiation drives photosynthesis in ecosystem models and solar generation in energy applications. The WRF field captures the diurnal solar cycle and cloud effects:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sw <span class="ot">&lt;-</span> <span class="fu">ca_fetch</span>(<span class="st">"swdnb"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">n_timesteps =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="fig-sw" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="figures/fig03_wrf_swdown.png" class="img-fluid figure-img" style="width:80.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;3: Shortwave radiation at the surface. The day-night terminator is visible as a sharp gradient. Desert regions receive the highest clear-sky irradiance. Cloud shadows appear as dark patches in otherwise sunny areas.</figcaption><p></p>
+</figure>
+</div>
+</section>
+<section id="surface-pressure" class="level3">
+<h3 class="anchored" data-anchor-id="surface-pressure">Surface pressure</h3>
+<p>Surface pressure is a required input for ecosystem models and reveals the topographic structure of the domain:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>psfc <span class="ot">&lt;-</span> <span class="fu">ca_fetch</span>(<span class="st">"psfc"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">n_timesteps =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="fig-psfc" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="figures/fig04_wrf_psfc.png" class="img-fluid figure-img" style="width:80.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;4: Surface pressure (hPa) over the western US. The topographic imprint is immediately visible – low pressure over the Rocky Mountains, Sierra Nevada, and Cascades where elevation reduces the overlying atmospheric column, and higher pressure over the Central Valley and coastal lowlands. This is one of the 7 meteorological variables SIPNET needs for carbon flux simulations.</figcaption><p></p>
+</figure>
+</div>
+</section>
+</section>
+<section id="sec-point" class="level2">
+<h2 class="anchored" data-anchor-id="sec-point">Point extraction</h2>
+<p>For single-site analysis, <code>ca_fetch_point()</code> reads the grid and extracts the time series at the nearest grid cell to a lon/lat coordinate. CRS transformation from WGS84 to the WRF Lambert grid is handled automatically.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 24 hours of temperature at Fresno, CA</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>ts <span class="ot">&lt;-</span> <span class="fu">ca_fetch_point</span>(<span class="st">"t2"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">lon =</span> <span class="sc">-</span><span class="fl">119.77</span>, <span class="at">lat =</span> <span class="fl">36.75</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">n_timesteps =</span> <span class="dv">24</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(ts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>ts<span class="sc">$</span>temp_c <span class="ot">&lt;-</span> ts<span class="sc">$</span>value <span class="sc">-</span> <span class="fl">273.15</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ts<span class="sc">$</span>time, ts<span class="sc">$</span>temp_c, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#D62728"</span>,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Time (UTC)"</span>, <span class="at">ylab =</span> <span class="st">"Temperature (C)"</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Diurnal Temperature -- Fresno, CA"</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(ts<span class="sc">$</span>time, ts<span class="sc">$</span>temp_c, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.6</span>, <span class="at">col =</span> <span class="st">"#D62728"</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="fu">grid</span>(<span class="at">col =</span> <span class="st">"grey85"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="fig-diurnal" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="figures/fig02_fresno_diurnal.png" class="img-fluid figure-img" style="width:80.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;5: Diurnal temperature cycle at Fresno extracted from the CESM2 SSP3-7.0 WRF simulation. The Central Valley in September shows cool overnight lows near 12 C and afternoon highs above 30 C – a reasonable diurnal range for the location and season.</figcaption><p></p>
+</figure>
+</div>
+</section>
+<section id="sec-multimodel" class="level2">
+<h2 class="anchored" data-anchor-id="sec-multimodel">Multi-model comparison</h2>
+<p>One of the strengths of the Cal-Adapt dataset is that multiple GCMs are available under the same downscaling framework. Comparing models at the same location reveals inter-model spread – a measure of structural uncertainty in the projections.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get all WRF models with SSP3-7.0 (excluding ERA5 reanalysis)</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>wrf_models <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(<span class="fu">ca_models</span>(<span class="at">activity =</span> <span class="st">"WRF"</span>), <span class="st">"ERA5"</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>models_370 <span class="ot">&lt;-</span> <span class="fu">character</span>(<span class="dv">0</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (m <span class="cf">in</span> wrf_models) {</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="st">"ssp370"</span> <span class="sc">%in%</span> <span class="fu">ca_scenarios</span>(<span class="at">activity =</span> <span class="st">"WRF"</span>, <span class="at">model =</span> m))</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    models_370 <span class="ot">&lt;-</span> <span class="fu">c</span>(models_370, m)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co"># extract 24-hour temperature at Fresno from each model</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>model_ts <span class="ot">&lt;-</span> <span class="fu">lapply</span>(models_370, <span class="cf">function</span>(m) {</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  d <span class="ot">&lt;-</span> <span class="fu">ca_fetch_point</span>(<span class="st">"t2"</span>, <span class="at">model =</span> m, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>                      <span class="at">lon =</span> <span class="sc">-</span><span class="fl">119.77</span>, <span class="at">lat =</span> <span class="fl">36.75</span>, <span class="at">n_timesteps =</span> <span class="dv">24</span>)</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  d<span class="sc">$</span>model <span class="ot">&lt;-</span> m</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  d<span class="sc">$</span>temp_c <span class="ot">&lt;-</span> d<span class="sc">$</span>value <span class="sc">-</span> <span class="fl">273.15</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  d</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>model_ts <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, model_ts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="fig-multimodel" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="figures/fig06_multimodel_fresno.png" class="img-fluid figure-img" style="width:90.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;6: Diurnal temperature from all WRF GCMs at Fresno under SSP3-7.0. The models agree on the general shape – cool night, warm afternoon – but differ by 2–5 C in the absolute magnitude. This spread reflects structural differences in how each GCM represents the large-scale circulation that drives the WRF boundary conditions.</figcaption><p></p>
+</figure>
+</div>
+</section>
+<section id="sec-met" class="level2">
+<h2 class="anchored" data-anchor-id="sec-met">Multiple meteorological variables</h2>
+<p>Ecosystem models and energy system models typically need several meteorological inputs. The WRF hourly dataset includes the full surface meteorology. Here we extract all 7 SIPNET-required variables at a point:</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th>WRF name</th>
+<th>Description</th>
+<th>Units</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>t2</code></td>
+<td>2-meter air temperature</td>
+<td>K</td>
+</tr>
+<tr class="even">
+<td><code>psfc</code></td>
+<td>Surface pressure</td>
+<td>Pa</td>
+</tr>
+<tr class="odd">
+<td><code>prec</code></td>
+<td>Accumulated precipitation</td>
+<td>mm/timestep</td>
+</tr>
+<tr class="even">
+<td><code>q2</code></td>
+<td>Water vapor mixing ratio</td>
+<td>kg/kg</td>
+</tr>
+<tr class="odd">
+<td><code>swdnb</code></td>
+<td>Downward shortwave radiation</td>
+<td>W/m2</td>
+</tr>
+<tr class="even">
+<td><code>u10</code></td>
+<td>10-meter eastward wind</td>
+<td>m/s</td>
+</tr>
+<tr class="odd">
+<td><code>v10</code></td>
+<td>10-meter northward wind</td>
+<td>m/s</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"t2"</span>, <span class="st">"swdnb"</span>, <span class="st">"prec"</span>, <span class="st">"q2"</span>, <span class="st">"psfc"</span>, <span class="st">"u10"</span>, <span class="st">"v10"</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>pts <span class="ot">&lt;-</span> <span class="fu">lapply</span>(vars, <span class="cf">function</span>(v) {</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ca_fetch_point</span>(v, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">lon =</span> <span class="sc">-</span><span class="fl">119.77</span>, <span class="at">lat =</span> <span class="fl">36.75</span>, <span class="at">n_timesteps =</span> <span class="dv">24</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(pts) <span class="ot">&lt;-</span> vars</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="fig-met" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="figures/fig05_met_panel_fresno.png" class="img-fluid figure-img" style="width:95.0%"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;7: Six-panel display of hourly meteorological variables at Fresno, CA from the CESM2 SSP3-7.0 WRF simulation. Top row: air temperature (C) and surface shortwave radiation (W/m2). Middle row: precipitation flux (kg/m2/s, converted from mm/timestep) and specific humidity (g/kg, converted from mixing ratio). Bottom row: wind speed (m/s, computed from U and V components) and surface pressure (hPa). The diurnal signatures are physically consistent – peak radiation drives peak temperature with a lag, humidity drops as temperature rises, and pressure follows a semidiurnal tide.</figcaption><p></p>
+</figure>
+</div>
+</section>
+<section id="whats-next" class="level2">
+<h2 class="anchored" data-anchor-id="whats-next">What’s next</h2>
+<ul>
+<li><p><strong>Writing CF-standard NetCDF:</strong> See the <a href="../vignettes/sipnet_met_drivers.html">SIPNET Met Drivers</a> vignette for the full pipeline from raw WRF variables to CF-compliant met files.</p></li>
+<li><p><strong>LOCA2 daily data:</strong> The same <code>ca_fetch()</code> interface works for LOCA2 – just specify <code>timescale = "day"</code> and a LOCA2 model name (e.g.&nbsp;<code>"EC-Earth3"</code>).</p></li>
+<li><p><strong>Spatial subsetting:</strong> For California-only analysis at 9 or 3 km, use <code>resolution = "d02"</code> or <code>"d03"</code>, but watch memory – a single 3 km timestep is ~150 MB.</p></li>
+</ul>
+</section>
+<section id="requirements" class="level2">
+<h2 class="anchored" data-anchor-id="requirements">Requirements</h2>
+<ul>
+<li><strong>R &gt;= 4.1</strong> (native pipe support)</li>
+<li><strong>GDAL &gt;= 3.4</strong> (Zarr driver). Check with <code>sf::sf_extSoftVersion()</code>.</li>
+<li><strong>Internet access</strong> to AWS S3 (us-west-2 region). No authentication.</li>
+<li><strong>Memory:</strong> The 45 km grid is 199 x 199. One timestep is ~0.3 MB. A full year for one variable is ~2.6 GB.</li>
+</ul>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<ul>
+<li>Rahimi, S. et al.&nbsp;(2024). An overview of the Western United States Dynamically Downscaled Dataset (WUS-D3). <em>Geoscientific Model Development</em>, 17, 2265–2286. <a href="https://doi.org/10.5194/gmd-17-2265-2024">doi:10.5194/gmd-17-2265-2024</a></li>
+<li>Pierce, D. W. et al.&nbsp;Statistical downscaling using Localized Constructed Analogs (LOCA). <em>Journal of Hydrometeorology</em>, 15(6), 2558–2585.</li>
+<li>Krantz, W. et al.&nbsp;(2022). GCM skill evaluation for the Fifth California Climate Assessment.</li>
+<li>Cal-Adapt Analytics Engine: <a href="https://analytics.cal-adapt.org/" class="uri">https://analytics.cal-adapt.org/</a></li>
+<li>CADCAT on AWS: <a href="https://registry.opendata.aws/caladapt-coproduced-climate-data/" class="uri">https://registry.opendata.aws/caladapt-coproduced-climate-data/</a></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
