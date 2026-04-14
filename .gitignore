@@ -1,0 +1,32 @@
+# R session files
+.Rproj.user
+.Rhistory
+.Rdata
+.RData
+.Ruserdata
+.httr-oauth
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# editor files
+.vscode/
+*.swp
+*~
+
+# compiled code
+*.o
+*.so
+*.dll
+
+# R package build artifacts
+*.tar.gz
+*.Rcheck/
+
+# Quarto website output
+_site/
+_freeze/
+.quarto/
+vignettes/*_files/
+# keep vignettes/figures/ tracked -- they're pre-rendered from S3

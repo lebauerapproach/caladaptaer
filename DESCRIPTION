@@ -1,0 +1,36 @@
+Package: caladaptR
+Title: Access Cal-Adapt Climate Data from R
+Version: 0.1.0
+Authors@R: c(
+    person("Akash", "B V",
+           email = "abv1@bu.edu",
+           role = c("aut", "cre")),
+    person("David", "LeBauer",
+           email = "dlebauer@gmail.com",
+           role = "aut",
+           comment = c(ORCID = "0000-0001-7228-053X"))
+    )
+Description: Provides native R access to the Cal-Adapt Analytics Engine,
+    California's repository of downscaled CMIP6 climate projections.
+    Supports both WRF dynamically downscaled (hourly, 3/9/45 km) and
+    LOCA2-Hybrid statistically downscaled (daily, 3 km) datasets.
+    Reads cloud-optimized Zarr stores directly from AWS S3 via GDAL,
+    with no Python dependency.
+License: BSD_3_clause + file LICENSE
+URL: https://github.com/lebauerapproach/caladaptR
+BugReports: https://github.com/lebauerapproach/caladaptR/issues
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Depends:
+    R (>= 4.1.0)
+Imports:
+    stars,
+    sf,
+    ncdf4,
+    units
+Suggests:
+    terra,
+    ggplot2,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

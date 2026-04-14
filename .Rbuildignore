@@ -1,0 +1,15 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^README\.Rmd$
+^LICENSE\.md$
+^\.github$
+^_quarto\.yml$
+^_site$
+^_freeze$
+^index\.qmd$
+^_publish\.yml$
+^vignettes/render_figures\.R$
+^vignettes/figures$
+^vignettes/.*\.qmd$
+^vignettes/_quarto\.yml$
+^\.quarto$
