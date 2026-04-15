@@ -30,3 +30,5 @@ _freeze/
 .quarto/
 vignettes/*_files/
 # keep vignettes/figures/ tracked -- they're pre-rendered from S3
+
+/.quarto/
