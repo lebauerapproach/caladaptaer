@@ -57,6 +57,36 @@ test_that("ca_fetch reads LOCA2 daily data from S3", {
 })
 
 
+test_that("ca_fetch_points extracts multiple sites at once", {
+  skip_if_offline()
+  skip_on_cran()
+
+  sites <- data.frame(
+    site_id = c("fresno", "la", "sacramento"),
+    lon = c(-119.77, -118.24, -121.49),
+    lat = c(36.75, 34.05, 38.58)
+  )
+
+  ts <- ca_fetch_points("t2", model = "CESM2", scenario = "ssp370",
+                        points = sites, n_timesteps = 24)
+
+  expect_s3_class(ts, "data.frame")
+  expect_equal(nrow(ts), 3 * 24)  # 3 sites x 24 hours
+  expect_true(all(c("site_id", "time", "value") %in% names(ts)))
+  expect_equal(sort(unique(ts$site_id)), c("fresno", "la", "sacramento"))
+
+  # temperature in K, California in Sept
+  expect_true(min(ts$value) > 270)
+  expect_true(max(ts$value) < 330)
+
+  # without site_id column, should auto-number
+  sites_no_id <- sites[, c("lon", "lat")]
+  ts2 <- ca_fetch_points("t2", model = "CESM2", scenario = "ssp370",
+                         points = sites_no_id, n_timesteps = 24)
+  expect_equal(sort(unique(ts2$site_id)), 1:3)
+})
+
+
 test_that("all 7 SIPNET-required variables are readable", {
   skip_if_offline()
   skip_on_cran()

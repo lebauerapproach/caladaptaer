@@ -166,6 +166,99 @@ ca_fetch_point <- function(variable, model, scenario,
 }
 
 
+#' Extract time series at multiple points (bulk)
+#'
+#' Fetch data once and extract time series at many lon/lat locations.
+#' The grid is read from S3 only once regardless of site count, making
+#' this dramatically faster than looping over \code{ca_fetch_point()}.
+#'
+#' @inheritParams ca_fetch
+#' @param points data.frame with columns \code{lon} and \code{lat} in
+#'   WGS84 decimal degrees. An optional \code{site_id} column provides
+#'   labels; otherwise sites are numbered 1..N.
+#' @return A data.frame with columns: site_id, time, value (in native
+#'   units). One row per site per timestep.
+#' @export
+#' @examples
+#' \dontrun{
+#' # 5 sites across California
+#' sites <- data.frame(
+#'   site_id = c("fresno", "la", "sacramento", "redding", "bakersfield"),
+#'   lon = c(-119.77, -118.24, -121.49, -122.39, -119.02),
+#'   lat = c(36.75, 34.05, 38.58, 40.59, 35.37)
+#' )
+#'
+#' ts <- ca_fetch_points("t2", model = "CESM2", scenario = "ssp370",
+#'                       points = sites, n_timesteps = 24)
+#' head(ts)
+#'
+#' # works for thousands of sites -- grid is read once
+#' big <- data.frame(lon = runif(10000, -124, -114),
+#'                   lat = runif(10000, 32, 42))
+#' ts_big <- ca_fetch_points("t2", model = "CESM2", scenario = "ssp370",
+#'                           points = big, n_timesteps = 24)
+#' }
+ca_fetch_points <- function(variable, model, scenario,
+                            points,
+                            timescale = "1hr", resolution = "d01",
+                            start_time = NULL, end_time = NULL,
+                            n_timesteps = NULL) {
+
+  if (!is.data.frame(points) || !all(c("lon", "lat") %in% names(points))) {
+    stop("'points' must be a data.frame with 'lon' and 'lat' columns",
+         call. = FALSE)
+  }
+
+  n_sites <- nrow(points)
+  if (n_sites == 0) stop("'points' has zero rows", call. = FALSE)
+
+  site_ids <- if ("site_id" %in% names(points)) {
+    points$site_id
+  } else {
+    seq_len(n_sites)
+  }
+
+  # read the grid ONCE from S3
+  message("Reading grid (1 S3 fetch for all ", n_sites, " sites)")
+  grid <- ca_fetch(variable = variable, model = model,
+                   scenario = scenario, timescale = timescale,
+                   resolution = resolution, start_time = start_time,
+                   end_time = end_time, n_timesteps = n_timesteps)
+
+  # build sf points in WGS84, transform to grid CRS
+  pts_sf <- sf::st_as_sf(points, coords = c("lon", "lat"), crs = 4326)
+  pts_native <- sf::st_transform(pts_sf, sf::st_crs(grid))
+
+  # extract ALL sites in one vectorized call
+  message("Extracting ", n_sites, " sites")
+  extracted <- stars::st_extract(grid, pts_native)
+
+  # reshape to tidy data.frame
+  time_vals <- stars::st_get_dimension_values(grid, "time")
+  n_times <- length(time_vals)
+
+  vals <- extracted[[1]]
+  if (inherits(vals, "units")) vals <- units::drop_units(vals)
+  vals <- as.numeric(vals)
+
+  if (length(vals) != n_sites * n_times) {
+    stop("Unexpected extraction result: expected ", n_sites * n_times,
+         " values but got ", length(vals), call. = FALSE)
+  }
+
+  # st_extract returns [n_sites x n_times] matrix
+  # as.vector goes column-major; we want site-major output
+  mat <- matrix(vals, nrow = n_sites, ncol = n_times)
+
+  data.frame(
+    site_id = rep(site_ids, each = n_times),
+    time = rep(time_vals, times = n_sites),
+    value = as.vector(t(mat)),
+    stringsAsFactors = FALSE
+  )
+}
+
+
 # -- internal helpers --
 
 #' Detect activity_id from model name and params
