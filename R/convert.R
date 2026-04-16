@@ -7,13 +7,16 @@
 # WRF-to-CF variable mapping
 # source: WRF output conventions + CF met standard
 .wrf_cf_map <- data.frame(
-  wrf_name = c("t2", "psfc", "prec", "q2", "swdnb", "u10", "v10"),
+  wrf_name = c("t2", "psfc", "prec", "q2", "swdnb", "lwdnb", "u10", "v10"),
   cf_name = c("air_temperature", "air_pressure", "precipitation_flux",
               "specific_humidity",
               "surface_downwelling_shortwave_flux_in_air",
+              "surface_downwelling_longwave_flux_in_air",
               "eastward_wind", "northward_wind"),
-  cf_units = c("K", "Pa", "kg m-2 s-1", "1", "W m-2", "m s-1", "m s-1"),
-  wrf_units = c("K", "Pa", "mm", "kg kg-1", "W m-2", "m s-1", "m s-1"),
+  cf_units = c("K", "Pa", "kg m-2 s-1", "1", "W m-2", "W m-2", "m s-1",
+               "m s-1"),
+  wrf_units = c("K", "Pa", "mm", "kg kg-1", "W m-2", "W m-2", "m s-1",
+                "m s-1"),
   stringsAsFactors = FALSE
 )
 
@@ -79,7 +82,7 @@ ca_write_cf_netcdf <- function(var_list, outfile, dt_seconds = 3600,
          "\nSet overwrite=TRUE to replace.", call. = FALSE)
   }
 
-  required <- c("t2", "psfc", "prec", "q2", "swdnb", "u10", "v10")
+  required <- c("t2", "psfc", "prec", "q2", "swdnb", "lwdnb", "u10", "v10")
   missing <- setdiff(required, names(var_list))
   if (length(missing) > 0) {
     stop("Missing required variables: ",
@@ -115,6 +118,10 @@ ca_write_cf_netcdf <- function(var_list, outfile, dt_seconds = 3600,
   # shortwave -- already in W/m2
   converted$surface_downwelling_shortwave_flux_in_air <-
     units::drop_units(var_list$swdnb[[1]])
+
+  # longwave -- already in W/m2
+  converted$surface_downwelling_longwave_flux_in_air <-
+    units::drop_units(var_list$lwdnb[[1]])
 
   # winds -- already in m/s
   raw_u10 <- units::drop_units(var_list$u10[[1]])
