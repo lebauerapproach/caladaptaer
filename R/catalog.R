@@ -131,9 +131,9 @@ ca_search <- function(activity = NULL, model = NULL, scenario = NULL,
 }
 
 
-#' Check SIPNET variable coverage for a model/scenario
+#' Check CF-standard met variable coverage for a model/scenario
 #'
-#' Reports which of the 7 SIPNET-required variables are directly
+#' Reports which of the 8 CF-standard met variables are directly
 #' available and which need derivation (e.g. prec from rainc + rainnc).
 #'
 #' @param model character; GCM name
@@ -149,7 +149,7 @@ ca_search <- function(activity = NULL, model = NULL, scenario = NULL,
 #' }
 ca_check_variables <- function(model, scenario,
                                timescale = "1hr", resolution = "d01") {
-  sipnet_vars <- c("t2", "psfc", "prec", "q2", "swdnb", "u10", "v10")
+  sipnet_vars <- c("t2", "psfc", "prec", "q2", "swdnb", "lwdnb", "u10", "v10")
   precip_components <- c("rainc", "rainnc")
 
   cat <- ca_catalog()
