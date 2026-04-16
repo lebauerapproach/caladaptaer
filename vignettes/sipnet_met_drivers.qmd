@@ -28,7 +28,8 @@ query the catalog, read all variables, convert units, and write a NetCDF.
 
 ## Variable mapping
 
-SIPNET needs 5 meteorological inputs plus wind components:
+SIPNET needs 5 meteorological inputs plus wind components. The full
+CF-standard set also includes longwave radiation for other ecosystem models:
 
 | CF standard name | WRF name | WRF units | CF units | Conversion |
 |-----------------|----------|-----------|----------|------------|
@@ -37,6 +38,7 @@ SIPNET needs 5 meteorological inputs plus wind components:
 | `precipitation_flux` | `prec` | mm/timestep | kg/m2/s | divide by dt |
 | `specific_humidity` | `q2` | kg/kg (mixing ratio) | kg/kg (specific) | q = w/(1+w) |
 | `surface_downwelling_shortwave_flux_in_air` | `swdnb` | W/m2 | W/m2 | none |
+| `surface_downwelling_longwave_flux_in_air` | `lwdnb` | W/m2 | W/m2 | none |
 | `eastward_wind` | `u10` | m/s | m/s | none |
 | `northward_wind` | `v10` | m/s | m/s | none |
 
@@ -50,7 +52,7 @@ worth getting right.
 ```{r}
 library(caladaptR)
 
-sipnet_vars <- c("t2", "psfc", "prec", "q2", "swdnb", "u10", "v10")
+sipnet_vars <- c("t2", "psfc", "prec", "q2", "swdnb", "lwdnb", "u10", "v10")
 
 var_data <- lapply(sipnet_vars, function(v) {
   message("reading ", v)
