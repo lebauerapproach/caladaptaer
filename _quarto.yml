@@ -24,6 +24,8 @@ website:
         contents:
           - href: vignettes/sipnet_met_drivers.qmd
             text: SIPNET Met Drivers
+          - href: vignettes/bulk_met_drivers.qmd
+            text: Bulk Met Drivers
     tools:
       - icon: github
         href: https://github.com/lebauerapproach/caladaptR
