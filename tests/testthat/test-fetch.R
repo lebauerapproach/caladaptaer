@@ -87,15 +87,15 @@ test_that("ca_fetch_points extracts multiple sites at once", {
 })
 
 
-test_that("all 7 SIPNET-required variables are readable", {
+test_that("all 8 CF-standard met variables are readable", {
   skip_if_offline()
   skip_on_cran()
   # this test is slow -- each variable requires an S3 round trip
   skip_on_ci()
 
-  sipnet_vars <- c("t2", "prec", "psfc", "q2", "swdnb", "u10", "v10")
+  cf_vars <- c("t2", "prec", "psfc", "q2", "swdnb", "lwdnb", "u10", "v10")
 
-  for (v in sipnet_vars) {
+  for (v in cf_vars) {
     x <- ca_fetch(v, model = "CESM2", scenario = "ssp370",
                   n_timesteps = 1)
     expect_s3_class(x, "stars")

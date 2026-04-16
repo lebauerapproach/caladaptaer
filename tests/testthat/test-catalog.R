@@ -38,8 +38,8 @@ test_that("ca_variables returns expected WRF hourly vars", {
   skip_if_offline()
 
   vars <- ca_variables(activity = "WRF", timescale = "1hr")
-  sipnet_vars <- c("t2", "prec", "psfc", "q2", "swdnb", "u10", "v10")
-  for (v in sipnet_vars) {
+  cf_vars <- c("t2", "prec", "psfc", "q2", "swdnb", "lwdnb", "u10", "v10")
+  for (v in cf_vars) {
     expect_true(v %in% vars, info = paste("Missing variable:", v))
   }
 })
@@ -70,9 +70,9 @@ test_that("ca_search returns empty with warning on bad query", {
 test_that("ca_check_variables reports coverage correctly", {
   skip_if_offline()
 
-  # CESM2 should have all 7 directly
+  # CESM2 should have all 8 directly
   cesm <- ca_check_variables("CESM2", "ssp370")
-  expect_equal(nrow(cesm), 7)
+  expect_equal(nrow(cesm), 8)
   expect_true(all(cesm$available))
 
   # MPI-ESM1-2-HR should be missing prec but have it derivable
