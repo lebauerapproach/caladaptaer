@@ -62,6 +62,14 @@ ca_fetch <- function(variable, model, scenario,
 
 
 #' Read a single variable from S3
+#'
+#' Computes array offset/count for the requested time window, reads via
+#' GDAL's multidimensional API, then decodes the time dimension to
+#' POSIXct. Time decoding is done by reading the Zarr time/.zattrs
+#' encoding directly because stars + CFtime has a subsetting bug where
+#' CFtime's [ operator returns integer indices instead of timestamps
+#' (stars 0.7.x, CFtime 1.7.x).
+#'
 #' @keywords internal
 .fetch_single <- function(variable, activity, model, scenario,
                           timescale, resolution, start_time, end_time,
@@ -73,18 +81,37 @@ ca_fetch <- function(variable, model, scenario,
 
   vsi_path <- .s3_to_vsi(s3_path)
   .setup_s3_env()
-  count <- .build_count(n_timesteps)
+
+  # read time encoding from the zarr store metadata
+  time_enc <- .read_zarr_time_encoding(s3_path)
+
+  # compute offset and count for the time dimension
+  time_offset <- 0L
+  time_count  <- NA  # NA = read all
+
+  if (!is.null(n_timesteps)) {
+    time_count <- as.integer(n_timesteps)
+  }
+
+  if (!is.null(time_enc) && (!is.null(start_time) || !is.null(end_time))) {
+    rng <- .time_index_range(time_enc, start_time, end_time, timescale)
+    time_offset <- rng$offset
+    time_count  <- rng$count
+  }
 
   data <- tryCatch(
-    stars::read_mdim(vsi_path, count = count),
+    stars::read_mdim(vsi_path,
+                     offset = c(0, 0, time_offset),
+                     count = c(NA, NA, time_count)),
     error = function(e) {
       stop("Failed to read Zarr store at ", s3_path, "\n",
            e$message, call. = FALSE)
     }
   )
 
-  if (!is.null(start_time) || !is.null(end_time)) {
-    data <- .subset_time(data, start_time, end_time)
+  # decode time to POSIXct using the zarr encoding we read from .zattrs
+  if (!is.null(time_enc)) {
+    data <- .decode_time_dimension(data, time_enc, time_offset, timescale)
   }
 
   data
@@ -94,15 +121,20 @@ ca_fetch <- function(variable, model, scenario,
 #' Derive total precipitation from WRF components
 #'
 #' Some WRF GCMs store convective and non-convective rain separately
-#' (rainc, rainnc) instead of a pre-summed prec field. This reads
-#' both components and sums them.
+#' as accumulated totals (rainc, rainnc) instead of a pre-summed
+#' per-timestep prec field. This reads both components, sums them,
+#' and deaccumulates to get per-timestep precipitation in mm.
+#'
+#' WRF accumulation counters reset periodically (roughly annually).
+#' Resets are detected as large negative diffs and handled by using
+#' the post-reset value as the timestep increment.
 #'
 #' @keywords internal
 .fetch_derived_precip <- function(model, scenario, timescale,
                                   resolution, start_time, end_time,
                                   n_timesteps) {
   message("Model ", model, " does not have 'prec'; ",
-          "deriving from rainc + rainnc")
+          "deriving from rainc + rainnc (deaccumulating)")
 
   rainc <- .fetch_single("rainc", "WRF", model, scenario,
                          timescale, resolution, start_time,
@@ -111,10 +143,80 @@ ca_fetch <- function(variable, model, scenario,
                           timescale, resolution, start_time,
                           end_time, n_timesteps)
 
-  # sum the components
+  # sum the accumulated components
   result <- rainc
   result[[1]] <- rainc[[1]] + rainnc[[1]]
+
+  # deaccumulate: convert running total to per-timestep mm
+  result <- .deaccumulate_precip(result)
+
   result
+}
+
+
+#' Deaccumulate a stars precipitation object
+#'
+#' Converts accumulated precipitation (running total since WRF
+#' simulation start) to per-timestep increments by differencing
+#' along the time axis. Handles accumulation resets (where the
+#' counter drops back to ~0) and float precision artifacts.
+#'
+#' @param data stars object with accumulated precipitation
+#' @return stars object with per-timestep precipitation (same units)
+#' @keywords internal
+.deaccumulate_precip <- function(data) {
+  arr <- data[[1]]
+
+  # preserve units if present
+  has_units <- inherits(arr, "units")
+  if (has_units) {
+    u_str <- units::deparse_unit(arr)
+    arr <- units::drop_units(arr)
+  }
+
+  d <- dim(arr)
+  nd <- if (is.null(d)) 1L else length(d)
+
+  if (nd == 3) {
+    # grid data: [x, y, time]
+    nt <- d[3]
+    if (nt > 1) {
+      delta <- arr[,,2:nt] - arr[,,1:(nt-1)]
+      # resets: large negative diff means counter was reset to ~0
+      # and re-accumulated; the post-reset value is the increment
+      reset_mask <- delta < -0.01
+      if (any(reset_mask)) {
+        delta[reset_mask] <- arr[,,2:nt][reset_mask]
+      }
+      # clamp remaining float-precision negatives
+      delta[delta < 0] <- 0
+      arr[,,1] <- 0
+      arr[,,2:nt] <- delta
+    } else {
+      arr[] <- 0
+    }
+  } else {
+    # 1D vector (single-point extraction or flat array)
+    v <- as.vector(arr)
+    nt <- length(v)
+    if (nt > 1) {
+      delta <- diff(v)
+      reset_mask <- delta < -0.01
+      if (any(reset_mask)) {
+        delta[reset_mask] <- v[-1][reset_mask]
+      }
+      delta[delta < 0] <- 0
+      arr <- c(0, delta)
+    } else {
+      arr <- 0
+    }
+  }
+
+  if (has_units) {
+    arr <- units::set_units(arr, u_str, mode = "standard")
+  }
+  data[[1]] <- arr
+  data
 }
 
 
@@ -155,8 +257,8 @@ ca_fetch_point <- function(variable, model, scenario,
   extracted <- stars::st_extract(data, pt_native)
 
   # reshape to data.frame
-  time_vals <- stars::st_get_dimension_values(data, "time")
-  values <- as.vector(units::drop_units(extracted[[1]]))
+  time_vals <- .get_time_values(data)
+  values <- as.numeric(extracted[[1]])
 
   data.frame(
     time = time_vals,
@@ -234,7 +336,7 @@ ca_fetch_points <- function(variable, model, scenario,
   extracted <- stars::st_extract(grid, pts_native)
 
   # reshape to tidy data.frame
-  time_vals <- stars::st_get_dimension_values(grid, "time")
+  time_vals <- .get_time_values(grid)
   n_times <- length(time_vals)
 
   vals <- extracted[[1]]
@@ -305,40 +407,145 @@ ca_fetch_points <- function(variable, model, scenario,
 }
 
 
-#' Build the count argument for read_mdim
+#' Get time values from a stars object
+#'
+#' Extracts POSIXct time values from the time dimension. Uses the
+#' explicit values set by .decode_time_dimension() if available,
+#' otherwise falls back to reconstructing from offset + delta.
+#'
+#' @param data stars object with time dimension
+#' @return POSIXct vector of time values
 #' @keywords internal
-.build_count <- function(n_timesteps) {
-  if (!is.null(n_timesteps)) {
-    # NA means "read all" for spatial dims, n for time
-    return(c(NA, NA, n_timesteps))
+.get_time_values <- function(data) {
+  dims <- stars::st_dimensions(data)
+  td <- dims[["time"]]
+
+  # .decode_time_dimension stores explicit POSIXct values
+  if (!is.null(td$values) && inherits(td$values, "POSIXct")) return(td$values)
+
+  # fallback for offset + delta representation
+  n <- td$to - td$from + 1L
+  if (inherits(td$offset, "POSIXct") && !is.null(td$delta)) {
+    delta_secs <- as.numeric(td$delta, units = "secs")
+    return(td$offset + seq(0, by = delta_secs, length.out = n))
   }
-  # default: read everything (may be huge -- user should set limits)
-  NULL
+
+  # last resort
+  stars::st_get_dimension_values(data, "time")
 }
 
 
-#' Subset a stars object by time
+#' Parse time strings that may use ISO 8601 T separator
 #' @keywords internal
-.subset_time <- function(data, start_time, end_time) {
-  time_vals <- stars::st_get_dimension_values(data, "time")
+.parse_time <- function(x) {
+  if (is.null(x)) return(NULL)
+  if (inherits(x, "POSIXct")) return(x)
+  as.POSIXct(sub("T", " ", x), tz = "UTC")
+}
 
+
+#' Read Zarr time encoding from the store metadata
+#'
+#' Fetches time/.zattrs from the CADCAT S3 bucket to get the CF time
+#' units string (e.g. "seconds since 2014-09-01"). This is needed
+#' because stars + CFtime has a subsetting bug where CFtime's [ operator
+#' returns integer indices instead of timestamps (r-spatial/stars,
+#' CFtime 1.7.x). We read the encoding ourselves and compute timestamps
+#' from the array offset.
+#'
+#' @param s3_path character; the s3:// path to the zarr store
+#' @return list with unit, origin (POSIXct), calendar, raw_units;
+#'   or NULL if attributes cannot be read
+#' @keywords internal
+.read_zarr_time_encoding <- function(s3_path) {
+  https_base <- sub("^s3://([^/]+)/",
+                    "https://\\1.s3.us-west-2.amazonaws.com/", s3_path)
+  if (!grepl("/$", https_base)) https_base <- paste0(https_base, "/")
+  url <- paste0(https_base, "time/.zattrs")
+
+  attrs <- tryCatch(
+    jsonlite::fromJSON(url),
+    error = function(e) {
+      warning("Could not read Zarr time attributes from ", url,
+              ": ", e$message, call. = FALSE)
+      return(NULL)
+    }
+  )
+  if (is.null(attrs) || is.null(attrs$units)) return(NULL)
+
+  parts <- strsplit(attrs$units, " since ")[[1]]
+  if (length(parts) != 2) return(NULL)
+
+  list(
+    unit     = parts[1],
+    origin   = as.POSIXct(parts[2], tz = "UTC"),
+    calendar = if (!is.null(attrs$calendar)) attrs$calendar else "standard",
+    raw_units = attrs$units
+  )
+}
+
+
+#' Compute array index offset and count for a time window
+#'
+#' Translates a start/end time range into 0-based array indices for
+#' the read_mdim offset/count parameters.
+#'
+#' @param time_enc list from .read_zarr_time_encoding
+#' @param start_time character or POSIXct; start of window (NULL = beginning)
+#' @param end_time character or POSIXct; end of window (NULL = end)
+#' @param timescale character; "1hr" or "day"
+#' @return list with integer offset and count
+#' @keywords internal
+.time_index_range <- function(time_enc, start_time, end_time,
+                              timescale = "1hr") {
+  start_time <- .parse_time(start_time)
+  end_time   <- .parse_time(end_time)
+
+  step_secs <- switch(timescale,
+    "1hr" = 3600L, "day" = 86400L,
+    stop("Unsupported timescale for index range: ", timescale,
+         call. = FALSE))
+
+  offset <- 0L
   if (!is.null(start_time)) {
-    start_time <- as.POSIXct(start_time, tz = "UTC")
-    keep <- time_vals >= start_time
-  } else {
-    keep <- rep(TRUE, length(time_vals))
+    secs <- as.numeric(difftime(start_time, time_enc$origin, units = "secs"))
+    offset <- as.integer(round(secs / step_secs))
   }
 
+  count <- NA
   if (!is.null(end_time)) {
-    end_time <- as.POSIXct(end_time, tz = "UTC")
-    keep <- keep & time_vals <= end_time
+    secs_end <- as.numeric(difftime(end_time, time_enc$origin, units = "secs"))
+    end_idx <- as.integer(round(secs_end / step_secs))
+    count <- end_idx - offset + 1L
   }
 
-  idx <- which(keep)
-  if (length(idx) == 0) {
-    stop("No timesteps fall within the requested time window.",
-         call. = FALSE)
-  }
+  list(offset = offset, count = count)
+}
 
-  data[, , , idx]
+
+#' Decode time dimension to POSIXct
+#'
+#' stars + CFtime has a subsetting bug where CFtime's [ operator returns
+#' integer indices instead of timestamps. This computes correct POSIXct
+#' timestamps from the zarr time encoding and the array offset we used
+#' for read_mdim.
+#'
+#' @param data stars object
+#' @param time_enc list from .read_zarr_time_encoding
+#' @param time_offset integer; 0-based array offset used in read_mdim
+#' @param timescale character; "1hr" or "day"
+#' @return stars object with correct POSIXct time dimension
+#' @keywords internal
+.decode_time_dimension <- function(data, time_enc, time_offset,
+                                   timescale = "1hr") {
+  dims <- stars::st_dimensions(data)
+  time_dim <- dims[["time"]]
+
+  n <- time_dim$to - time_dim$from + 1L
+  step_secs <- switch(timescale, "1hr" = 3600L, "day" = 86400L, 3600L)
+
+  array_indices <- seq(from = time_offset, length.out = n)
+  timestamps <- time_enc$origin + array_indices * step_secs
+
+  stars::st_set_dimensions(data, "time", values = timestamps)
 }

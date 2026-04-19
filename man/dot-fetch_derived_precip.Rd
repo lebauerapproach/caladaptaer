@@ -16,7 +16,13 @@
 }
 \description{
 Some WRF GCMs store convective and non-convective rain separately
-(rainc, rainnc) instead of a pre-summed prec field. This reads
-both components and sums them.
+as accumulated totals (rainc, rainnc) instead of a pre-summed
+per-timestep prec field. This reads both components, sums them,
+and deaccumulates to get per-timestep precipitation in mm.
+}
+\details{
+WRF accumulation counters reset periodically (roughly annually).
+Resets are detected as large negative diffs and handled by using
+the post-reset value as the timestep increment.
 }
 \keyword{internal}

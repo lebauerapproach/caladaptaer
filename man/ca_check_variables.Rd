@@ -2,7 +2,7 @@
 % Please edit documentation in R/catalog.R
 \name{ca_check_variables}
 \alias{ca_check_variables}
-\title{Check SIPNET variable coverage for a model/scenario}
+\title{Check CF-standard met variable coverage for a model/scenario}
 \usage{
 ca_check_variables(model, scenario, timescale = "1hr", resolution = "d01")
 }
@@ -19,7 +19,7 @@ ca_check_variables(model, scenario, timescale = "1hr", resolution = "d01")
 A data.frame with columns: variable, available, derivable, note
 }
 \description{
-Reports which of the 7 SIPNET-required variables are directly
+Reports which of the 8 CF-standard met variables are directly
 available and which need derivation (e.g. prec from rainc + rainnc).
 }
 \examples{

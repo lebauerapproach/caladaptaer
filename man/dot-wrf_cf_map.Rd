@@ -5,7 +5,7 @@
 \alias{.wrf_cf_map}
 \title{Unit Conversion and CF Standard Formatting}
 \format{
-An object of class \code{data.frame} with 7 rows and 4 columns.
+An object of class \code{data.frame} with 8 rows and 4 columns.
 }
 \usage{
 .wrf_cf_map

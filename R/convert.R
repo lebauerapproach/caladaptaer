@@ -90,7 +90,7 @@ ca_write_cf_netcdf <- function(var_list, outfile, dt_seconds = 3600,
   }
 
   # get time info from the first variable
-  time_vals <- stars::st_get_dimension_values(var_list[[1]], "time")
+  time_vals <- .get_time_values(var_list[[1]])
   n_time <- length(time_vals)
 
   # get spatial info -- extract point values if single-point
