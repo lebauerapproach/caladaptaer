@@ -2,119 +2,189 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "caladaptR",
+    "title": "caladaptaer",
     "section": "",
-    "text": "caladaptR reads downscaled CMIP6 climate data from California’s Cal-Adapt Analytics Engine directly into R. No Python, no API key, no authentication – just GDAL reading Zarr stores from AWS S3."
+    "text": "caladaptaer reads downscaled CMIP6 climate data from California’s Cal-Adapt Analytics Engine directly into R. No Python, no API key, no authentication – just GDAL reading Zarr stores from AWS S3."
   },
   {
     "objectID": "index.html#available-data",
     "href": "index.html#available-data",
-    "title": "caladaptR",
+    "title": "caladaptaer",
     "section": "Available Data",
     "text": "Available Data\n\n\n\n\n\n\n\n\n\n\n\nDataset\nResolution\nTemporal\nGCMs\nSSPs\nPeriod\n\n\n\n\nWRF CMIP6 (WUS-D3)\n45 / 9 / 3 km\nHourly\n8 models\nSSP3-7.0 (all); SSP2-4.5, SSP5-8.5 (CESM2)\n1980–2100\n\n\nLOCA2-Hybrid\n3 km\nDaily\n15 models\nSSP2-4.5, SSP3-7.0, SSP5-8.5\n1950–2100"
   },
   {
     "objectID": "index.html#quick-start",
     "href": "index.html#quick-start",
-    "title": "caladaptR",
+    "title": "caladaptaer",
     "section": "Quick Start",
-    "text": "Quick Start\nlibrary(caladaptR)\n\n# What's available?\nca_models(activity = \"WRF\")\nca_variables(activity = \"WRF\", timescale = \"1hr\")\n\n# Read hourly temperature, 45 km grid, one day\nt2 <- ca_fetch(\"t2\", model = \"CESM2\", scenario = \"ssp370\",\n               n_timesteps = 24)\n\n# Extract time series at a point\nts <- ca_fetch_point(\"t2\", model = \"CESM2\", scenario = \"ssp370\",\n                     lon = -119.77, lat = 36.75,\n                     n_timesteps = 24)"
+    "text": "Quick Start\nlibrary(caladaptaer)\n\n# What's available?\ncae_models(activity = \"WRF\")\ncae_variables(activity = \"WRF\", timescale = \"1hr\")\n\n# Read hourly temperature, 45 km grid, one day\nt2 <- cae_fetch(\"t2\", model = \"CESM2\", scenario = \"ssp370\",\n               n_timesteps = 24)\n\n# Extract time series at a point\nts <- cae_fetch_point(\"t2\", model = \"CESM2\", scenario = \"ssp370\",\n                     lon = -119.77, lat = 36.75,\n                     n_timesteps = 24)"
   },
   {
     "objectID": "index.html#guides",
     "href": "index.html#guides",
-    "title": "caladaptR",
+    "title": "caladaptaer",
     "section": "Guides",
     "text": "Guides\n\n\n\nVignette\nDescription\n\n\n\n\nGetting Started\nCatalog queries, fetching gridded data, point extraction, visualization\n\n\nSIPNET Met Drivers\nBuild CF-standard NetCDF met drivers for SIPNET from WRF projections"
   },
   {
     "objectID": "index.html#installation",
     "href": "index.html#installation",
-    "title": "caladaptR",
+    "title": "caladaptaer",
     "section": "Installation",
-    "text": "Installation\nremotes::install_github(\"lebauerapproach/caladaptR\")"
+    "text": "Installation\nremotes::install_github(\"lebauerapproach/caladaptaer\")"
   },
   {
     "objectID": "index.html#license",
     "href": "index.html#license",
-    "title": "caladaptR",
+    "title": "caladaptaer",
     "section": "License",
     "text": "License\nBSD 3-Clause"
   },
   {
+    "objectID": "vignettes/bulk_met_drivers.html",
+    "href": "vignettes/bulk_met_drivers.html",
+    "title": "Bulk Met Driver Prep for Multi-Site Workflows",
+    "section": "",
+    "text": "What you will learn\n\n\n\n\nHow to prepare CF-standard met driver files for hundreds of sites in a single pass using cae_build_met_drivers()\nWhy the bulk approach is dramatically more efficient than looping over cae_fetch_point()\nHow to set up a sites table and configure the output for use with PEcAn or standalone ecosystem model runs"
+  },
+  {
+    "objectID": "vignettes/bulk_met_drivers.html#background",
+    "href": "vignettes/bulk_met_drivers.html#background",
+    "title": "Bulk Met Driver Prep for Multi-Site Workflows",
+    "section": "Background",
+    "text": "Background\nEcosystem modeling projects often need met drivers at many sites – the CCMMF project, for example, runs SIPNET at 198 design points across California. Preparing met files one site at a time with cae_fetch_point() is straightforward but wasteful: each call reads the entire WRF grid from S3 independently, so 198 sites x 8 variables x 20 years means 31,680 S3 requests.\ncae_build_met_drivers() solves this by calling cae_fetch_points() (plural) under the hood. The full WRF grid is read from S3 once per variable per year, and all sites are extracted from that grid in a single vectorized operation. The same 198-site, 20-year job now takes 160 S3 requests."
+  },
+  {
+    "objectID": "vignettes/bulk_met_drivers.html#preparing-the-sites-table",
+    "href": "vignettes/bulk_met_drivers.html#preparing-the-sites-table",
+    "title": "Bulk Met Driver Prep for Multi-Site Workflows",
+    "section": "Preparing the sites table",
+    "text": "Preparing the sites table\nThe input is a data.frame with three required columns: site_id, lon, and lat. Any additional columns are ignored.\n\n# read CCMMF design points\nsites <- read.csv(\"design_points.csv\")\nhead(sites)\n#>   UniqueID          site_id      lat       lon          pft\n#> 1  1301797 8773c58306e8d9a0 32.71585 -115.4716 annual crop\n#> 2  1300446 f2ce12d75f3b2cc6 32.75557 -115.4159 annual crop\n#> ...\n\n# cae_build_met_drivers needs site_id, lon, lat\n# the site_id column is already present in this table\n\nIf your sites come from PEcAn’s BETY database or another source, just make sure you have those three columns:\n\n# manual setup for a few sites\nsites <- data.frame(\n  site_id = c(\"fresno\", \"la\", \"sacramento\"),\n  lon = c(-119.77, -118.24, -121.49),\n  lat = c(36.75, 34.05, 38.58)\n)"
+  },
+  {
+    "objectID": "vignettes/bulk_met_drivers.html#building-the-drivers",
+    "href": "vignettes/bulk_met_drivers.html#building-the-drivers",
+    "title": "Bulk Met Driver Prep for Multi-Site Workflows",
+    "section": "Building the drivers",
+    "text": "Building the drivers\n\nlibrary(caladaptaer)\n\nresult <- cae_build_met_drivers(\n  sites     = sites,\n  model     = \"CESM2\",\n  scenario  = \"ssp370\",\n  start_year = 2050,\n  end_year   = 2055,\n  outdir    = \"met_drivers\"\n)\n\nProgress output looks like:\nYear 2050 (1 of 6)\n  fetching t2\nReading grid (1 S3 fetch for all 3 sites)\nExtracting 3 sites\n  fetching psfc\n  ...\n  wrote met_drivers/fresno/CESM2.ssp370.2050.nc\n  wrote met_drivers/la/CESM2.ssp370.2050.nc\n  wrote met_drivers/sacramento/CESM2.ssp370.2050.nc\nYear 2051 (2 of 6)\n  ...\nThe result is a data.frame tracking what was written:\n\nhead(result)\n#>    site_id year                                        file\n#> 1   fresno 2050   met_drivers/fresno/CESM2.ssp370.2050.nc\n#> 2       la 2050       met_drivers/la/CESM2.ssp370.2050.nc\n#> 3 sacramento 2050 met_drivers/sacramento/CESM2.ssp370.2050.nc"
+  },
+  {
+    "objectID": "vignettes/bulk_met_drivers.html#output-file-structure",
+    "href": "vignettes/bulk_met_drivers.html#output-file-structure",
+    "title": "Bulk Met Driver Prep for Multi-Site Workflows",
+    "section": "Output file structure",
+    "text": "Output file structure\nEach NetCDF file contains 9 CF-standard variables at hourly resolution for one site and one year:\n\n\n\nCF variable\nUnits\nSource\n\n\n\n\nair_temperature\nK\nt2 (direct)\n\n\nair_pressure\nPa\npsfc (direct)\n\n\nprecipitation_flux\nkg m-2 s-1\nprec / 3600\n\n\nspecific_humidity\n1\nq2 / (1 + q2)\n\n\nsurface_downwelling_shortwave_flux_in_air\nW m-2\nswdnb (direct)\n\n\nsurface_downwelling_longwave_flux_in_air\nW m-2\nlwdnb (direct)\n\n\neastward_wind\nm s-1\nu10 (direct)\n\n\nnorthward_wind\nm s-1\nv10 (direct)\n\n\nwind_speed\nm s-1\nsqrt(u10^2 + v10^2)\n\n\n\nDimensions are latitude(1), longitude(1), and time(unlimited). The time coordinate uses seconds since {year}-01-01 00:00:00."
+  },
+  {
+    "objectID": "vignettes/bulk_met_drivers.html#skipping-existing-files",
+    "href": "vignettes/bulk_met_drivers.html#skipping-existing-files",
+    "title": "Bulk Met Driver Prep for Multi-Site Workflows",
+    "section": "Skipping existing files",
+    "text": "Skipping existing files\nBy default, cae_build_met_drivers() skips sites that already have output files for a given year. If all sites in a year are complete, the S3 fetch for that year is skipped entirely. Pass overwrite = TRUE to regenerate everything.\n\n# re-run after interruption -- only missing files are written\nresult <- cae_build_met_drivers(\n  sites, model = \"CESM2\", scenario = \"ssp370\",\n  start_year = 2050, end_year = 2055,\n  outdir = \"met_drivers\"\n)"
+  },
+  {
+    "objectID": "vignettes/bulk_met_drivers.html#verifying-the-output",
+    "href": "vignettes/bulk_met_drivers.html#verifying-the-output",
+    "title": "Bulk Met Driver Prep for Multi-Site Workflows",
+    "section": "Verifying the output",
+    "text": "Verifying the output\nSpot-check a file to make sure values are physically reasonable:\n\nlibrary(ncdf4)\n\nnc <- nc_open(\"met_drivers/fresno/CESM2.ssp370.2050.nc\")\nt2 <- ncvar_get(nc, \"air_temperature\")\npr <- ncvar_get(nc, \"precipitation_flux\")\nnc_close(nc)\n\n# temperature: 200--350 K\nrange(t2)\n\n# precip flux: 0--0.01 kg/m2/s (0--36 mm/hr, reasonable max for hourly)\nrange(pr)"
+  },
+  {
+    "objectID": "vignettes/bulk_met_drivers.html#efficiency-comparison",
+    "href": "vignettes/bulk_met_drivers.html#efficiency-comparison",
+    "title": "Bulk Met Driver Prep for Multi-Site Workflows",
+    "section": "Efficiency comparison",
+    "text": "Efficiency comparison\nFor 198 sites x 8 variables x 20 years:\n\n\n\n\n\n\n\n\nApproach\nS3 requests\nDescription\n\n\n\n\ncae_fetch_point() loop\n31,680\none grid read per site per var per year\n\n\ncae_build_met_drivers()\n160\none grid read per var per year\n\n\nPEcAn download.CalAdaptWRF\n160\nsame count, uses tempdir() cache\n\n\n\nAll three produce identical output. The choice depends on whether you are working inside PEcAn (download.CalAdaptWRF) or outside it (cae_build_met_drivers)."
+  },
+  {
+    "objectID": "vignettes/bulk_met_drivers.html#multiple-models-and-scenarios",
+    "href": "vignettes/bulk_met_drivers.html#multiple-models-and-scenarios",
+    "title": "Bulk Met Driver Prep for Multi-Site Workflows",
+    "section": "Multiple models and scenarios",
+    "text": "Multiple models and scenarios\nTo build drivers for multiple GCMs or scenarios, loop over the combinations:\n\nmodels <- c(\"CESM2\", \"CNRM-ESM2-1\", \"EC-Earth3-Veg\")\n\nfor (m in models) {\n  cae_build_met_drivers(\n    sites, model = m, scenario = \"ssp370\",\n    start_year = 2050, end_year = 2069,\n    outdir = file.path(\"met_drivers\", m)\n  )\n}\n\nCESM2 supports SSP2-4.5 and SSP5-8.5 in addition to SSP3-7.0. All other GCMs have SSP3-7.0 only."
+  },
+  {
+    "objectID": "vignettes/bulk_met_drivers.html#references",
+    "href": "vignettes/bulk_met_drivers.html#references",
+    "title": "Bulk Met Driver Prep for Multi-Site Workflows",
+    "section": "References",
+    "text": "References\n\nRahimi, S. et al. (2024). An overview of the Western United States Dynamically Downscaled Dataset (WUS-D3). Geoscientific Model Development, 17, 2265–2286. doi:10.5194/gmd-17-2265-2024\nDietze, M. C. et al. (2014). A quantitative assessment of a terrestrial biosphere model’s data needs across North American biomes."
+  },
+  {
     "objectID": "vignettes/getting_started.html",
     "href": "vignettes/getting_started.html",
-    "title": "Getting Started with caladaptR",
+    "title": "Getting Started with caladaptaer",
     "section": "",
     "text": "What you will learn\n\n\n\n\nWhat climate data is available on the Cal-Adapt Analytics Engine and how the CADCAT catalog organizes it\nHow to query the catalog to find datasets by model, scenario, variable, and resolution\nHow to read gridded Zarr data from AWS S3 directly into R as a stars object\nHow to produce California climate maps comparable to the official Python notebooks\nHow to extract and visualize time series at specific locations"
   },
   {
     "objectID": "vignettes/getting_started.html#the-cal-adapt-analytics-engine",
     "href": "vignettes/getting_started.html#the-cal-adapt-analytics-engine",
-    "title": "Getting Started with caladaptR",
+    "title": "Getting Started with caladaptaer",
     "section": "The Cal-Adapt Analytics Engine",
-    "text": "The Cal-Adapt Analytics Engine\nThe Cal-Adapt Analytics Engine hosts roughly 1 PB of downscaled CMIP6 climate projections for California and the western US, produced for the state’s Fifth Climate Change Assessment. The data lives in cloud-optimized Zarr stores on AWS S3, publicly accessible with no credentials required.\nTwo downscaling products are available:\nWRF CMIP6 (WUS-D3) – dynamically downscaled by UCLA’s Center for Climate Science (Rahimi et al. 2024). The Weather Research and Forecasting model produces hourly output at three nested resolutions: 45 km (d01, western US), 9 km (d02, California + surroundings), and 3 km (d03, California). Eight GCMs are downscaled, primarily under SSP3-7.0, with CESM2 also available for SSP2-4.5 and SSP5-8.5. The WRF output includes the full surface meteorology – temperature, pressure, precipitation, humidity, radiation, and wind components.\nLOCA2-Hybrid – statistically downscaled by Scripps/UCSD (Pierce et al.). Daily output at 3 km for 15 GCMs across three SSPs (SSP2-4.5, SSP3-7.0, SSP5-8.5), covering 1950–2100. LOCA2-Hybrid uses a hybrid analog approach that substitutes WRF-derived weather patterns for end-of-century conditions where the historical analog library runs thin.\nThe official Python interface is climakitae. caladaptR provides the same data access natively in R, reading Zarr stores via GDAL’s /vsis3/ virtual filesystem. No Python, no API key, no authentication."
+    "text": "The Cal-Adapt Analytics Engine\nThe Cal-Adapt Analytics Engine hosts roughly 1 PB of downscaled CMIP6 climate projections for California and the western US, produced for the state’s Fifth Climate Change Assessment. The data lives in cloud-optimized Zarr stores on AWS S3, publicly accessible with no credentials required.\nTwo downscaling products are available:\nWRF CMIP6 (WUS-D3) – dynamically downscaled by UCLA’s Center for Climate Science (Rahimi et al. 2024). The Weather Research and Forecasting model produces hourly output at three nested resolutions: 45 km (d01, western US), 9 km (d02, California + surroundings), and 3 km (d03, California). Eight GCMs are downscaled, primarily under SSP3-7.0, with CESM2 also available for SSP2-4.5 and SSP5-8.5. The WRF output includes the full surface meteorology – temperature, pressure, precipitation, humidity, radiation, and wind components.\nLOCA2-Hybrid – statistically downscaled by Scripps/UCSD (Pierce et al.). Daily output at 3 km for 15 GCMs across three SSPs (SSP2-4.5, SSP3-7.0, SSP5-8.5), covering 1950–2100. LOCA2-Hybrid uses a hybrid analog approach that substitutes WRF-derived weather patterns for end-of-century conditions where the historical analog library runs thin.\nThe official Python interface is climakitae. caladaptaer provides the same data access natively in R, reading Zarr stores via GDAL’s /vsis3/ virtual filesystem. No Python, no API key, no authentication."
   },
   {
     "objectID": "vignettes/getting_started.html#setup",
     "href": "vignettes/getting_started.html#setup",
-    "title": "Getting Started with caladaptR",
+    "title": "Getting Started with caladaptaer",
     "section": "Setup",
-    "text": "Setup\n\nlibrary(caladaptR)\nlibrary(stars)\nlibrary(sf)\nlibrary(ggplot2)\nlibrary(maps)\n\nCheck that GDAL supports Zarr (version 3.4+):\n\nsf::sf_extSoftVersion()[\"GDAL\"]"
+    "text": "Setup\n\nlibrary(caladaptaer)\nlibrary(stars)\nlibrary(sf)\nlibrary(ggplot2)\nlibrary(maps)\n\nCheck that GDAL supports Zarr (version 3.4+):\n\nsf::sf_extSoftVersion()[\"GDAL\"]"
   },
   {
     "objectID": "vignettes/getting_started.html#sec-catalog",
     "href": "vignettes/getting_started.html#sec-catalog",
-    "title": "Getting Started with caladaptR",
+    "title": "Getting Started with caladaptaer",
     "section": "Exploring the catalog",
-    "text": "Exploring the catalog\nThe CADCAT catalog is a CSV index of every Zarr store on S3. Each row is one variable from one model/scenario/resolution combination. ca_catalog() downloads the table once per session and caches it.\n\ncat <- ca_catalog()\nnrow(cat)\nnames(cat)\n\nThe catalog follows CMIP6 naming conventions:\n\n\n\n\n\n\n\n\nColumn\nDescription\nExamples\n\n\n\n\nactivity_id\nDownscaling method\nWRF, LOCA2\n\n\nsource_id\nParent GCM\nCESM2, MIROC6, EC-Earth3\n\n\nexperiment_id\nScenario\nssp370, ssp245, historical\n\n\ntable_id\nTemporal resolution\n1hr, day, mon\n\n\nvariable_id\nVariable short name\nt2, prec, pr, tasmax\n\n\ngrid_label\nSpatial resolution\nd01 (45 km), d02 (9 km), d03 (3 km)\n\n\nmember_id\nEnsemble member\nr1i1p1f1\n\n\npath\nS3 Zarr store path\ns3://cadcat/wrf/ucla/cesm2/…\n\n\n\n\nData availability\nThe WRF and LOCA2 datasets differ in their model/scenario coverage. Use the convenience functions to see what’s available:\n\n# WRF GCMs -- 8 models dynamically downscaled\nca_models(activity = \"WRF\")\n\n# LOCA2 GCMs -- 15 models statistically downscaled\nca_models(activity = \"LOCA2\")\n\n# CESM2 has the broadest scenario coverage in WRF\nca_scenarios(activity = \"WRF\", model = \"CESM2\")\n\n# hourly WRF variables\nca_variables(activity = \"WRF\", timescale = \"1hr\")\n\nHere’s the full picture of what’s on S3 for the WRF hourly data at 45 km:\n\n\n\nFigure 1: WRF data availability across GCMs and scenarios. CESM2 has the broadest coverage with three SSPs; all other models have SSP3-7.0 and historical.\n\n\n\n\n\n\n\n\nWRF vs LOCA2 – when to use which\n\n\n\nUse WRF when you need hourly data, process-based meteorology (radiation, humidity, pressure), or when you care about mesoscale features like orographic precipitation or sea breeze effects. Use LOCA2 when you need more GCMs, more SSPs, or daily temperature/precipitation extremes at the finest available resolution (3 km).\n\n\n\n\nSearching the catalog\nca_search() filters by any combination of fields. All filters are ANDed.\n\n# all hourly CESM2 temperature at 45 km\nca_search(activity = \"WRF\", model = \"CESM2\",\n          variable = \"t2\", timescale = \"1hr\", resolution = \"d01\")"
+    "text": "Exploring the catalog\nThe CADCAT catalog is a CSV index of every Zarr store on S3. Each row is one variable from one model/scenario/resolution combination. cae_catalog() downloads the table once per session and caches it.\n\ncat <- cae_catalog()\nnrow(cat)\nnames(cat)\n\nThe catalog follows CMIP6 naming conventions:\n\n\n\n\n\n\n\n\nColumn\nDescription\nExamples\n\n\n\n\nactivity_id\nDownscaling method\nWRF, LOCA2\n\n\nsource_id\nParent GCM\nCESM2, MIROC6, EC-Earth3\n\n\nexperiment_id\nScenario\nssp370, ssp245, historical\n\n\ntable_id\nTemporal resolution\n1hr, day, mon\n\n\nvariable_id\nVariable short name\nt2, prec, pr, tasmax\n\n\ngrid_label\nSpatial resolution\nd01 (45 km), d02 (9 km), d03 (3 km)\n\n\nmember_id\nEnsemble member\nr1i1p1f1\n\n\npath\nS3 Zarr store path\ns3://cadcat/wrf/ucla/cesm2/…\n\n\n\n\nData availability\nThe WRF and LOCA2 datasets differ in their model/scenario coverage. Use the convenience functions to see what’s available:\n\n# WRF GCMs -- 8 models dynamically downscaled\ncae_models(activity = \"WRF\")\n\n# LOCA2 GCMs -- 15 models statistically downscaled\ncae_models(activity = \"LOCA2\")\n\n# CESM2 has the broadest scenario coverage in WRF\ncae_scenarios(activity = \"WRF\", model = \"CESM2\")\n\n# hourly WRF variables\ncae_variables(activity = \"WRF\", timescale = \"1hr\")\n\nHere’s the full picture of what’s on S3 for the WRF hourly data at 45 km:\n\n\n\nFigure 1: WRF data availability across GCMs and scenarios. CESM2 has the broadest coverage with three SSPs; all other models have SSP3-7.0 and historical.\n\n\n\n\n\n\n\n\nWRF vs LOCA2 – when to use which\n\n\n\nUse WRF when you need hourly data, process-based meteorology (radiation, humidity, pressure), or when you care about mesoscale features like orographic precipitation or sea breeze effects. Use LOCA2 when you need more GCMs, more SSPs, or daily temperature/precipitation extremes at the finest available resolution (3 km).\n\n\n\n\nSearching the catalog\ncae_search() filters by any combination of fields. All filters are ANDed.\n\n# all hourly CESM2 temperature at 45 km\ncae_search(activity = \"WRF\", model = \"CESM2\",\n          variable = \"t2\", timescale = \"1hr\", resolution = \"d01\")"
   },
   {
     "objectID": "vignettes/getting_started.html#sec-fetch",
     "href": "vignettes/getting_started.html#sec-fetch",
-    "title": "Getting Started with caladaptR",
+    "title": "Getting Started with caladaptaer",
     "section": "Fetching gridded data",
-    "text": "Fetching gridded data\nca_fetch() reads a Zarr store from S3 and returns a stars object. Start with n_timesteps = 1 to keep the initial read small – a single 45 km timestep is about 0.3 MB.\n\nt2 <- ca_fetch(\"t2\", model = \"CESM2\", scenario = \"ssp370\",\n               n_timesteps = 1)\nt2\n\nThe result has three dimensions: x and y in the WRF Lambert Conformal Conic projection, and time in UTC. The values are 2-meter air temperature in Kelvin.\n\nMapping temperature over the western US\nThe 45 km WRF domain covers most of western North America. Overlay state boundaries to orient the map – this is the R equivalent of what the Cal-Adapt Python notebooks do with cartopy.\n\n# state boundaries for overlay\nca_sf <- st_as_sf(map(\"state\", \"california\", plot = FALSE, fill = TRUE))\nwestern_sf <- st_as_sf(\n  map(\"state\", c(\"california\", \"oregon\", \"washington\", \"nevada\",\n                  \"arizona\", \"utah\", \"idaho\", \"montana\", \"wyoming\",\n                  \"colorado\", \"new mexico\"), plot = FALSE, fill = TRUE)\n)\n\n# transform boundaries to the WRF projection\nca_wrf <- st_transform(ca_sf, st_crs(t2))\nws_wrf <- st_transform(western_sf, st_crs(t2))\n\n# convert to Celsius and plot\nt2_c <- t2\nt2_c[[1]] <- units::drop_units(t2[[1]]) - 273.15\n\nplot(t2_c, main = \"\", axes = TRUE, reset = FALSE,\n     col = hcl.colors(100, \"YlOrRd\", rev = TRUE),\n     key.pos = 4, key.width = lcm(1.5), key.length = 0.8)\nplot(st_geometry(ws_wrf), add = TRUE, border = \"grey30\", lwd = 0.6)\nplot(st_geometry(ca_wrf), add = TRUE, border = \"black\", lwd = 1.5)\ntitle(\"2-meter Air Temperature (C)\\nCESM2 SSP3-7.0, WRF 45 km\")\n\n\n\n\nFigure 2: WRF 2-meter air temperature over the western US at 45 km resolution. The spatial pattern shows expected features – cool mountain temperatures in the Sierra Nevada and Cascades, warm desert conditions in the Southwest, and a maritime gradient along the Pacific coast. California boundary shown in black.\n\n\n\n\nShortwave radiation\nSurface downwelling shortwave radiation drives photosynthesis in ecosystem models and solar generation in energy applications. The WRF field captures the diurnal solar cycle and cloud effects:\n\nsw <- ca_fetch(\"swdnb\", model = \"CESM2\", scenario = \"ssp370\",\n               n_timesteps = 1)\n\n\n\n\nFigure 3: Shortwave radiation at the surface. The day-night terminator is visible as a sharp gradient. Desert regions receive the highest clear-sky irradiance. Cloud shadows appear as dark patches in otherwise sunny areas.\n\n\n\n\nSurface pressure\nSurface pressure is a required input for ecosystem models and reveals the topographic structure of the domain:\n\npsfc <- ca_fetch(\"psfc\", model = \"CESM2\", scenario = \"ssp370\",\n                 n_timesteps = 1)\n\n\n\n\nFigure 4: Surface pressure (hPa) over the western US. The topographic imprint is immediately visible – low pressure over the Rocky Mountains, Sierra Nevada, and Cascades where elevation reduces the overlying atmospheric column, and higher pressure over the Central Valley and coastal lowlands. This is one of the 7 meteorological variables SIPNET needs for carbon flux simulations."
+    "text": "Fetching gridded data\ncae_fetch() reads a Zarr store from S3 and returns a stars object. Start with n_timesteps = 1 to keep the initial read small – a single 45 km timestep is about 0.3 MB.\n\nt2 <- cae_fetch(\"t2\", model = \"CESM2\", scenario = \"ssp370\",\n               n_timesteps = 1)\nt2\n\nThe result has three dimensions: x and y in the WRF Lambert Conformal Conic projection, and time in UTC. The values are 2-meter air temperature in Kelvin.\n\nMapping temperature over the western US\nThe 45 km WRF domain covers most of western North America. Overlay state boundaries to orient the map – this is the R equivalent of what the Cal-Adapt Python notebooks do with cartopy.\n\n# state boundaries for overlay\nca_sf <- st_as_sf(map(\"state\", \"california\", plot = FALSE, fill = TRUE))\nwestern_sf <- st_as_sf(\n  map(\"state\", c(\"california\", \"oregon\", \"washington\", \"nevada\",\n                  \"arizona\", \"utah\", \"idaho\", \"montana\", \"wyoming\",\n                  \"colorado\", \"new mexico\"), plot = FALSE, fill = TRUE)\n)\n\n# transform boundaries to the WRF projection\nca_wrf <- st_transform(ca_sf, st_crs(t2))\nws_wrf <- st_transform(western_sf, st_crs(t2))\n\n# convert to Celsius and plot\nt2_c <- t2\nt2_c[[1]] <- units::drop_units(t2[[1]]) - 273.15\n\nplot(t2_c, main = \"\", axes = TRUE, reset = FALSE,\n     col = hcl.colors(100, \"YlOrRd\", rev = TRUE),\n     key.pos = 4, key.width = lcm(1.5), key.length = 0.8)\nplot(st_geometry(ws_wrf), add = TRUE, border = \"grey30\", lwd = 0.6)\nplot(st_geometry(ca_wrf), add = TRUE, border = \"black\", lwd = 1.5)\ntitle(\"2-meter Air Temperature (C)\\nCESM2 SSP3-7.0, WRF 45 km\")\n\n\n\n\nFigure 2: WRF 2-meter air temperature over the western US at 45 km resolution. The spatial pattern shows expected features – cool mountain temperatures in the Sierra Nevada and Cascades, warm desert conditions in the Southwest, and a maritime gradient along the Pacific coast. California boundary shown in black.\n\n\n\n\nShortwave radiation\nSurface downwelling shortwave radiation drives photosynthesis in ecosystem models and solar generation in energy applications. The WRF field captures the diurnal solar cycle and cloud effects:\n\nsw <- cae_fetch(\"swdnb\", model = \"CESM2\", scenario = \"ssp370\",\n               n_timesteps = 1)\n\n\n\n\nFigure 3: Shortwave radiation at the surface. The day-night terminator is visible as a sharp gradient. Desert regions receive the highest clear-sky irradiance. Cloud shadows appear as dark patches in otherwise sunny areas.\n\n\n\n\nSurface pressure\nSurface pressure is a required input for ecosystem models and reveals the topographic structure of the domain:\n\npsfc <- cae_fetch(\"psfc\", model = \"CESM2\", scenario = \"ssp370\",\n                 n_timesteps = 1)\n\n\n\n\nFigure 4: Surface pressure (hPa) over the western US. The topographic imprint is immediately visible – low pressure over the Rocky Mountains, Sierra Nevada, and Cascades where elevation reduces the overlying atmospheric column, and higher pressure over the Central Valley and coastal lowlands. This is one of the 7 meteorological variables SIPNET needs for carbon flux simulations."
   },
   {
     "objectID": "vignettes/getting_started.html#sec-point",
     "href": "vignettes/getting_started.html#sec-point",
-    "title": "Getting Started with caladaptR",
+    "title": "Getting Started with caladaptaer",
     "section": "Point extraction",
-    "text": "Point extraction\nFor single-site analysis, ca_fetch_point() reads the grid and extracts the time series at the nearest grid cell to a lon/lat coordinate. CRS transformation from WGS84 to the WRF Lambert grid is handled automatically.\n\n# 24 hours of temperature at Fresno, CA\nts <- ca_fetch_point(\"t2\", model = \"CESM2\", scenario = \"ssp370\",\n                     lon = -119.77, lat = 36.75,\n                     n_timesteps = 24)\nhead(ts)\n\n\nts$temp_c <- ts$value - 273.15\nplot(ts$time, ts$temp_c, type = \"l\", lwd = 2, col = \"#D62728\",\n     xlab = \"Time (UTC)\", ylab = \"Temperature (C)\",\n     main = \"Diurnal Temperature -- Fresno, CA\")\npoints(ts$time, ts$temp_c, pch = 16, cex = 0.6, col = \"#D62728\")\ngrid(col = \"grey85\")\n\n\n\n\nFigure 5: Diurnal temperature cycle at Fresno extracted from the CESM2 SSP3-7.0 WRF simulation. The Central Valley in September shows cool overnight lows near 12 C and afternoon highs above 30 C – a reasonable diurnal range for the location and season."
+    "text": "Point extraction\nFor single-site analysis, cae_fetch_point() reads the grid and extracts the time series at the nearest grid cell to a lon/lat coordinate. CRS transformation from WGS84 to the WRF Lambert grid is handled automatically.\n\n# 24 hours of temperature at Fresno, CA\nts <- cae_fetch_point(\"t2\", model = \"CESM2\", scenario = \"ssp370\",\n                     lon = -119.77, lat = 36.75,\n                     n_timesteps = 24)\nhead(ts)\n\n\nts$temp_c <- ts$value - 273.15\nplot(ts$time, ts$temp_c, type = \"l\", lwd = 2, col = \"#D62728\",\n     xlab = \"Time (UTC)\", ylab = \"Temperature (C)\",\n     main = \"Diurnal Temperature -- Fresno, CA\")\npoints(ts$time, ts$temp_c, pch = 16, cex = 0.6, col = \"#D62728\")\ngrid(col = \"grey85\")\n\n\n\n\nFigure 5: Diurnal temperature cycle at Fresno extracted from the CESM2 SSP3-7.0 WRF simulation. The Central Valley in September shows cool overnight lows near 12 C and afternoon highs above 30 C – a reasonable diurnal range for the location and season."
   },
   {
     "objectID": "vignettes/getting_started.html#sec-multimodel",
     "href": "vignettes/getting_started.html#sec-multimodel",
-    "title": "Getting Started with caladaptR",
+    "title": "Getting Started with caladaptaer",
     "section": "Multi-model comparison",
-    "text": "Multi-model comparison\nOne of the strengths of the Cal-Adapt dataset is that multiple GCMs are available under the same downscaling framework. Comparing models at the same location reveals inter-model spread – a measure of structural uncertainty in the projections.\n\n# get all WRF models with SSP3-7.0 (excluding ERA5 reanalysis)\nwrf_models <- setdiff(ca_models(activity = \"WRF\"), \"ERA5\")\nmodels_370 <- character(0)\nfor (m in wrf_models) {\n  if (\"ssp370\" %in% ca_scenarios(activity = \"WRF\", model = m))\n    models_370 <- c(models_370, m)\n}\n\n# extract 24-hour temperature at Fresno from each model\nmodel_ts <- lapply(models_370, function(m) {\n  d <- ca_fetch_point(\"t2\", model = m, scenario = \"ssp370\",\n                      lon = -119.77, lat = 36.75, n_timesteps = 24)\n  d$model <- m\n  d$temp_c <- d$value - 273.15\n  d\n})\nmodel_ts <- do.call(rbind, model_ts)\n\n\n\n\nFigure 6: Diurnal temperature from all WRF GCMs at Fresno under SSP3-7.0. The models agree on the general shape – cool night, warm afternoon – but differ by 2–5 C in the absolute magnitude. This spread reflects structural differences in how each GCM represents the large-scale circulation that drives the WRF boundary conditions."
+    "text": "Multi-model comparison\nOne of the strengths of the Cal-Adapt dataset is that multiple GCMs are available under the same downscaling framework. Comparing models at the same location reveals inter-model spread – a measure of structural uncertainty in the projections.\n\n# get all WRF models with SSP3-7.0 (excluding ERA5 reanalysis)\nwrf_models <- setdiff(cae_models(activity = \"WRF\"), \"ERA5\")\nmodels_370 <- character(0)\nfor (m in wrf_models) {\n  if (\"ssp370\" %in% cae_scenarios(activity = \"WRF\", model = m))\n    models_370 <- c(models_370, m)\n}\n\n# extract 24-hour temperature at Fresno from each model\nmodel_ts <- lapply(models_370, function(m) {\n  d <- cae_fetch_point(\"t2\", model = m, scenario = \"ssp370\",\n                      lon = -119.77, lat = 36.75, n_timesteps = 24)\n  d$model <- m\n  d$temp_c <- d$value - 273.15\n  d\n})\nmodel_ts <- do.call(rbind, model_ts)\n\n\n\n\nFigure 6: Diurnal temperature from all WRF GCMs at Fresno under SSP3-7.0. The models agree on the general shape – cool night, warm afternoon – but differ by 2–5 C in the absolute magnitude. This spread reflects structural differences in how each GCM represents the large-scale circulation that drives the WRF boundary conditions."
   },
   {
     "objectID": "vignettes/getting_started.html#sec-met",
     "href": "vignettes/getting_started.html#sec-met",
-    "title": "Getting Started with caladaptR",
+    "title": "Getting Started with caladaptaer",
     "section": "Multiple meteorological variables",
-    "text": "Multiple meteorological variables\nEcosystem models and energy system models typically need several meteorological inputs. The WRF hourly dataset includes the full surface meteorology. Here we extract all 7 SIPNET-required variables at a point:\n\n\n\nWRF name\nDescription\nUnits\n\n\n\n\nt2\n2-meter air temperature\nK\n\n\npsfc\nSurface pressure\nPa\n\n\nprec\nAccumulated precipitation\nmm/timestep\n\n\nq2\nWater vapor mixing ratio\nkg/kg\n\n\nswdnb\nDownward shortwave radiation\nW/m2\n\n\nu10\n10-meter eastward wind\nm/s\n\n\nv10\n10-meter northward wind\nm/s\n\n\n\n\nvars <- c(\"t2\", \"swdnb\", \"prec\", \"q2\", \"psfc\", \"u10\", \"v10\")\npts <- lapply(vars, function(v) {\n  ca_fetch_point(v, model = \"CESM2\", scenario = \"ssp370\",\n                 lon = -119.77, lat = 36.75, n_timesteps = 24)\n})\nnames(pts) <- vars\n\n\n\n\nFigure 7: Six-panel display of hourly meteorological variables at Fresno, CA from the CESM2 SSP3-7.0 WRF simulation. Top row: air temperature (C) and surface shortwave radiation (W/m2). Middle row: precipitation flux (kg/m2/s, converted from mm/timestep) and specific humidity (g/kg, converted from mixing ratio). Bottom row: wind speed (m/s, computed from U and V components) and surface pressure (hPa). The diurnal signatures are physically consistent – peak radiation drives peak temperature with a lag, humidity drops as temperature rises, and pressure follows a semidiurnal tide."
+    "text": "Multiple meteorological variables\nEcosystem models and energy system models typically need several meteorological inputs. The WRF hourly dataset includes the full surface meteorology. Here we extract all 7 SIPNET-required variables at a point:\n\n\n\nWRF name\nDescription\nUnits\n\n\n\n\nt2\n2-meter air temperature\nK\n\n\npsfc\nSurface pressure\nPa\n\n\nprec\nAccumulated precipitation\nmm/timestep\n\n\nq2\nWater vapor mixing ratio\nkg/kg\n\n\nswdnb\nDownward shortwave radiation\nW/m2\n\n\nu10\n10-meter eastward wind\nm/s\n\n\nv10\n10-meter northward wind\nm/s\n\n\n\n\nvars <- c(\"t2\", \"swdnb\", \"prec\", \"q2\", \"psfc\", \"u10\", \"v10\")\npts <- lapply(vars, function(v) {\n  cae_fetch_point(v, model = \"CESM2\", scenario = \"ssp370\",\n                 lon = -119.77, lat = 36.75, n_timesteps = 24)\n})\nnames(pts) <- vars\n\n\n\n\nFigure 7: Six-panel display of hourly meteorological variables at Fresno, CA from the CESM2 SSP3-7.0 WRF simulation. Top row: air temperature (C) and surface shortwave radiation (W/m2). Middle row: precipitation flux (kg/m2/s, converted from mm/timestep) and specific humidity (g/kg, converted from mixing ratio). Bottom row: wind speed (m/s, computed from U and V components) and surface pressure (hPa). The diurnal signatures are physically consistent – peak radiation drives peak temperature with a lag, humidity drops as temperature rises, and pressure follows a semidiurnal tide."
   },
   {
     "objectID": "vignettes/getting_started.html#whats-next",
     "href": "vignettes/getting_started.html#whats-next",
-    "title": "Getting Started with caladaptR",
+    "title": "Getting Started with caladaptaer",
     "section": "What’s next",
-    "text": "What’s next\n\nWriting CF-standard NetCDF: See the SIPNET Met Drivers vignette for the full pipeline from raw WRF variables to CF-compliant met files.\nLOCA2 daily data: The same ca_fetch() interface works for LOCA2 – just specify timescale = \"day\" and a LOCA2 model name (e.g. \"EC-Earth3\").\nSpatial subsetting: For California-only analysis at 9 or 3 km, use resolution = \"d02\" or \"d03\", but watch memory – a single 3 km timestep is ~150 MB."
+    "text": "What’s next\n\nWriting CF-standard NetCDF: See the SIPNET Met Drivers vignette for the full pipeline from raw WRF variables to CF-compliant met files.\nLOCA2 daily data: The same cae_fetch() interface works for LOCA2 – just specify timescale = \"day\" and a LOCA2 model name (e.g. \"EC-Earth3\").\nSpatial subsetting: For California-only analysis at 9 or 3 km, use resolution = \"d02\" or \"d03\", but watch memory – a single 3 km timestep is ~150 MB."
   },
   {
     "objectID": "vignettes/getting_started.html#requirements",
     "href": "vignettes/getting_started.html#requirements",
-    "title": "Getting Started with caladaptR",
+    "title": "Getting Started with caladaptaer",
     "section": "Requirements",
     "text": "Requirements\n\nR >= 4.1 (native pipe support)\nGDAL >= 3.4 (Zarr driver). Check with sf::sf_extSoftVersion().\nInternet access to AWS S3 (us-west-2 region). No authentication.\nMemory: The 45 km grid is 199 x 199. One timestep is ~0.3 MB. A full year for one variable is ~2.6 GB."
   },
   {
     "objectID": "vignettes/getting_started.html#references",
     "href": "vignettes/getting_started.html#references",
-    "title": "Getting Started with caladaptR",
+    "title": "Getting Started with caladaptaer",
     "section": "References",
     "text": "References\n\nRahimi, S. et al. (2024). An overview of the Western United States Dynamically Downscaled Dataset (WUS-D3). Geoscientific Model Development, 17, 2265–2286. doi:10.5194/gmd-17-2265-2024\nPierce, D. W. et al. Statistical downscaling using Localized Constructed Analogs (LOCA). Journal of Hydrometeorology, 15(6), 2558–2585.\nKrantz, W. et al. (2022). GCM skill evaluation for the Fifth California Climate Assessment.\nCal-Adapt Analytics Engine: https://analytics.cal-adapt.org/\nCADCAT on AWS: https://registry.opendata.aws/caladapt-coproduced-climate-data/"
   },
@@ -137,14 +207,14 @@
     "href": "vignettes/sipnet_met_drivers.html#variable-mapping",
     "title": "Building SIPNET Met Drivers from WRF Projections",
     "section": "Variable mapping",
-    "text": "Variable mapping\nSIPNET needs 5 meteorological inputs plus wind components:\n\n\n\n\n\n\n\n\n\n\nCF standard name\nWRF name\nWRF units\nCF units\nConversion\n\n\n\n\nair_temperature\nt2\nK\nK\nnone\n\n\nair_pressure\npsfc\nPa\nPa\nnone\n\n\nprecipitation_flux\nprec\nmm/timestep\nkg/m2/s\ndivide by dt\n\n\nspecific_humidity\nq2\nkg/kg (mixing ratio)\nkg/kg (specific)\nq = w/(1+w)\n\n\nsurface_downwelling_shortwave_flux_in_air\nswdnb\nW/m2\nW/m2\nnone\n\n\neastward_wind\nu10\nm/s\nm/s\nnone\n\n\nnorthward_wind\nv10\nm/s\nm/s\nnone\n\n\n\nMost need no conversion. Precipitation goes from accumulated mm per timestep to an instantaneous flux rate (dividing by 3600 for hourly data). Humidity goes from mixing ratio to specific humidity – the difference is small but worth getting right."
+    "text": "Variable mapping\nSIPNET needs 5 meteorological inputs plus wind components. The full CF-standard set also includes longwave radiation for other ecosystem models:\n\n\n\n\n\n\n\n\n\n\nCF standard name\nWRF name\nWRF units\nCF units\nConversion\n\n\n\n\nair_temperature\nt2\nK\nK\nnone\n\n\nair_pressure\npsfc\nPa\nPa\nnone\n\n\nprecipitation_flux\nprec\nmm/timestep\nkg/m2/s\ndivide by dt\n\n\nspecific_humidity\nq2\nkg/kg (mixing ratio)\nkg/kg (specific)\nq = w/(1+w)\n\n\nsurface_downwelling_shortwave_flux_in_air\nswdnb\nW/m2\nW/m2\nnone\n\n\nsurface_downwelling_longwave_flux_in_air\nlwdnb\nW/m2\nW/m2\nnone\n\n\neastward_wind\nu10\nm/s\nm/s\nnone\n\n\nnorthward_wind\nv10\nm/s\nm/s\nnone\n\n\n\nMost need no conversion. Precipitation goes from accumulated mm per timestep to an instantaneous flux rate (dividing by 3600 for hourly data). Humidity goes from mixing ratio to specific humidity – the difference is small but worth getting right."
   },
   {
     "objectID": "vignettes/sipnet_met_drivers.html#download-all-variables",
     "href": "vignettes/sipnet_met_drivers.html#download-all-variables",
     "title": "Building SIPNET Met Drivers from WRF Projections",
     "section": "Download all variables",
-    "text": "Download all variables\n\nlibrary(caladaptR)\n\nsipnet_vars <- c(\"t2\", \"psfc\", \"prec\", \"q2\", \"swdnb\", \"u10\", \"v10\")\n\nvar_data <- lapply(sipnet_vars, function(v) {\n  message(\"reading \", v)\n  ca_fetch(v, model = \"CESM2\", scenario = \"ssp370\", n_timesteps = 24)\n})\nnames(var_data) <- sipnet_vars"
+    "text": "Download all variables\n\nlibrary(caladaptaer)\n\nsipnet_vars <- c(\"t2\", \"psfc\", \"prec\", \"q2\", \"swdnb\", \"lwdnb\", \"u10\", \"v10\")\n\nvar_data <- lapply(sipnet_vars, function(v) {\n  message(\"reading \", v)\n  cae_fetch(v, model = \"CESM2\", scenario = \"ssp370\", n_timesteps = 24)\n})\nnames(var_data) <- sipnet_vars"
   },
   {
     "objectID": "vignettes/sipnet_met_drivers.html#inspect-the-data",
@@ -158,14 +228,14 @@
     "href": "vignettes/sipnet_met_drivers.html#write-cf-standard-netcdf",
     "title": "Building SIPNET Met Drivers from WRF Projections",
     "section": "Write CF-standard NetCDF",
-    "text": "Write CF-standard NetCDF\nca_write_cf_netcdf() handles unit conversion and CF metadata in one call:\n\nca_write_cf_netcdf(\n  var_list = var_data,\n  outfile = \"CESM2.ssp370.2014-09-01.cf.nc\",\n  dt_seconds = 3600,\n  overwrite = TRUE\n)\n\nThe output includes CF-1.8 global attributes, standard variable names, and computed wind speed. The output is ready for SIPNET ensemble runs."
+    "text": "Write CF-standard NetCDF\ncae_write_cf_netcdf() handles unit conversion and CF metadata in one call:\n\ncae_write_cf_netcdf(\n  var_list = var_data,\n  outfile = \"CESM2.ssp370.2014-09-01.cf.nc\",\n  dt_seconds = 3600,\n  overwrite = TRUE\n)\n\nThe output includes CF-1.8 global attributes, standard variable names, and computed wind speed. The output is ready for SIPNET ensemble runs."
   },
   {
     "objectID": "vignettes/sipnet_met_drivers.html#point-extraction-alternative",
     "href": "vignettes/sipnet_met_drivers.html#point-extraction-alternative",
     "title": "Building SIPNET Met Drivers from WRF Projections",
     "section": "Point extraction alternative",
-    "text": "Point extraction alternative\nFor single-site runs, extract time series at a specific location instead of writing the full grid:\n\npts <- lapply(sipnet_vars, function(v) {\n  ca_fetch_point(v, model = \"CESM2\", scenario = \"ssp370\",\n                 lon = -119.77, lat = 36.75, n_timesteps = 24)\n})\nnames(pts) <- sipnet_vars\n\n\n\n\nFigure 1: Hourly meteorological variables at Fresno, CA from the CESM2 SSP3-7.0 WRF simulation. These are the inputs SIPNET needs for a single-site carbon flux simulation. The diurnal signatures are physically consistent – peak radiation drives peak temperature with a lag, humidity drops as temperature rises, and pressure follows a semidiurnal tide."
+    "text": "Point extraction alternative\nFor single-site runs, extract time series at a specific location instead of writing the full grid:\n\npts <- lapply(sipnet_vars, function(v) {\n  cae_fetch_point(v, model = \"CESM2\", scenario = \"ssp370\",\n                 lon = -119.77, lat = 36.75, n_timesteps = 24)\n})\nnames(pts) <- sipnet_vars\n\n\n\n\nFigure 1: Hourly meteorological variables at Fresno, CA from the CESM2 SSP3-7.0 WRF simulation. These are the inputs SIPNET needs for a single-site carbon flux simulation. The diurnal signatures are physically consistent – peak radiation drives peak temperature with a lag, humidity drops as temperature rises, and pressure follows a semidiurnal tide."
   },
   {
     "objectID": "vignettes/sipnet_met_drivers.html#references",

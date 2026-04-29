@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Akash B V and David LeBauer">
-<meta name="dcterms.date" content="2026-04-14">
+<meta name="dcterms.date" content="2026-04-28">
 
-<title>caladaptR - Getting Started with caladaptR</title>
+<title>caladaptaer - Getting Started with caladaptaer</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -136,7 +136,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <header id="quarto-header" class="headroom fixed-top">
   <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
     <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">Getting Started with caladaptR</h1>
+      <h1 class="quarto-secondary-nav-title">Getting Started with caladaptaer</h1>
       <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
         <i class="bi bi-chevron-right"></i>
       </button>
@@ -149,9 +149,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="../">caladaptR</a> 
+      <a href="../">caladaptaer</a> 
         <div class="sidebar-tools-main">
-    <a href="https://github.com/lebauerapproach/caladaptR" title="" class="sidebar-tool px-1"><i class="bi bi-github"></i></a>
+    <a href="https://github.com/lebauerapproach/caladaptaer" title="" class="sidebar-tool px-1"><i class="bi bi-github"></i></a>
 </div>
     </div>
       </div>
@@ -195,6 +195,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <a href="../vignettes/sipnet_met_drivers.html" class="sidebar-item-text sidebar-link">SIPNET Met Drivers</a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../vignettes/bulk_met_drivers.html" class="sidebar-item-text sidebar-link">Bulk Met Drivers</a>
+  </div>
+</li>
       </ul>
   </li>
     </ul>
@@ -233,7 +238,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block">Getting Started with caladaptR</h1>
+<h1 class="title d-none d-lg-block">Getting Started with caladaptaer</h1>
 </div>
 
 
@@ -250,7 +255,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">April 14, 2026</p>
+      <p class="date">April 28, 2026</p>
     </div>
   </div>
   
@@ -285,12 +290,12 @@ What you will learn
 <p>Two downscaling products are available:</p>
 <p><strong>WRF CMIP6 (WUS-D3)</strong> – dynamically downscaled by UCLA’s Center for Climate Science (Rahimi et al.&nbsp;2024). The Weather Research and Forecasting model produces hourly output at three nested resolutions: 45 km (d01, western US), 9 km (d02, California + surroundings), and 3 km (d03, California). Eight GCMs are downscaled, primarily under SSP3-7.0, with CESM2 also available for SSP2-4.5 and SSP5-8.5. The WRF output includes the full surface meteorology – temperature, pressure, precipitation, humidity, radiation, and wind components.</p>
 <p><strong>LOCA2-Hybrid</strong> – statistically downscaled by Scripps/UCSD (Pierce et al.). Daily output at 3 km for 15 GCMs across three SSPs (SSP2-4.5, SSP3-7.0, SSP5-8.5), covering 1950–2100. LOCA2-Hybrid uses a hybrid analog approach that substitutes WRF-derived weather patterns for end-of-century conditions where the historical analog library runs thin.</p>
-<p>The official Python interface is <a href="https://github.com/cal-adapt/climakitae">climakitae</a>. <code>caladaptR</code> provides the same data access natively in R, reading Zarr stores via GDAL’s <code>/vsis3/</code> virtual filesystem. No Python, no API key, no authentication.</p>
+<p>The official Python interface is <a href="https://github.com/cal-adapt/climakitae">climakitae</a>. <code>caladaptaer</code> provides the same data access natively in R, reading Zarr stores via GDAL’s <code>/vsis3/</code> virtual filesystem. No Python, no API key, no authentication.</p>
 </section>
 <section id="setup" class="level2">
 <h2 class="anchored" data-anchor-id="setup">Setup</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caladaptR)</span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caladaptaer)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stars)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
@@ -303,9 +308,9 @@ What you will learn
 </section>
 <section id="sec-catalog" class="level2">
 <h2 class="anchored" data-anchor-id="sec-catalog">Exploring the catalog</h2>
-<p>The CADCAT catalog is a CSV index of every Zarr store on S3. Each row is one variable from one model/scenario/resolution combination. <code>ca_catalog()</code> downloads the table once per session and caches it.</p>
+<p>The CADCAT catalog is a CSV index of every Zarr store on S3. Each row is one variable from one model/scenario/resolution combination. <code>cae_catalog()</code> downloads the table once per session and caches it.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>cat <span class="ot">&lt;-</span> <span class="fu">ca_catalog</span>()</span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>cat <span class="ot">&lt;-</span> <span class="fu">cae_catalog</span>()</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(cat)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(cat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -371,16 +376,16 @@ What you will learn
 <p>The WRF and LOCA2 datasets differ in their model/scenario coverage. Use the convenience functions to see what’s available:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># WRF GCMs -- 8 models dynamically downscaled</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ca_models</span>(<span class="at">activity =</span> <span class="st">"WRF"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cae_models</span>(<span class="at">activity =</span> <span class="st">"WRF"</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># LOCA2 GCMs -- 15 models statistically downscaled</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ca_models</span>(<span class="at">activity =</span> <span class="st">"LOCA2"</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cae_models</span>(<span class="at">activity =</span> <span class="st">"LOCA2"</span>)</span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># CESM2 has the broadest scenario coverage in WRF</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ca_scenarios</span>(<span class="at">activity =</span> <span class="st">"WRF"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">cae_scenarios</span>(<span class="at">activity =</span> <span class="st">"WRF"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>)</span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># hourly WRF variables</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ca_variables</span>(<span class="at">activity =</span> <span class="st">"WRF"</span>, <span class="at">timescale =</span> <span class="st">"1hr"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">cae_variables</span>(<span class="at">activity =</span> <span class="st">"WRF"</span>, <span class="at">timescale =</span> <span class="st">"1hr"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Here’s the full picture of what’s on S3 for the WRF hourly data at 45 km:</p>
 <div id="fig-catalog" class="quarto-figure quarto-figure-center anchored">
@@ -405,19 +410,19 @@ WRF vs LOCA2 – when to use which
 </section>
 <section id="searching-the-catalog" class="level3">
 <h3 class="anchored" data-anchor-id="searching-the-catalog">Searching the catalog</h3>
-<p><code>ca_search()</code> filters by any combination of fields. All filters are ANDed.</p>
+<p><code>cae_search()</code> filters by any combination of fields. All filters are ANDed.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># all hourly CESM2 temperature at 45 km</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ca_search</span>(<span class="at">activity =</span> <span class="st">"WRF"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>,</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cae_search</span>(<span class="at">activity =</span> <span class="st">"WRF"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">variable =</span> <span class="st">"t2"</span>, <span class="at">timescale =</span> <span class="st">"1hr"</span>, <span class="at">resolution =</span> <span class="st">"d01"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
 <section id="sec-fetch" class="level2">
 <h2 class="anchored" data-anchor-id="sec-fetch">Fetching gridded data</h2>
-<p><code>ca_fetch()</code> reads a Zarr store from S3 and returns a <code>stars</code> object. Start with <code>n_timesteps = 1</code> to keep the initial read small – a single 45 km timestep is about 0.3 MB.</p>
+<p><code>cae_fetch()</code> reads a Zarr store from S3 and returns a <code>stars</code> object. Start with <code>n_timesteps = 1</code> to keep the initial read small – a single 45 km timestep is about 0.3 MB.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>t2 <span class="ot">&lt;-</span> <span class="fu">ca_fetch</span>(<span class="st">"t2"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>t2 <span class="ot">&lt;-</span> <span class="fu">cae_fetch</span>(<span class="st">"t2"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">n_timesteps =</span> <span class="dv">1</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>t2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -460,7 +465,7 @@ WRF vs LOCA2 – when to use which
 <h3 class="anchored" data-anchor-id="shortwave-radiation">Shortwave radiation</h3>
 <p>Surface downwelling shortwave radiation drives photosynthesis in ecosystem models and solar generation in energy applications. The WRF field captures the diurnal solar cycle and cloud effects:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sw <span class="ot">&lt;-</span> <span class="fu">ca_fetch</span>(<span class="st">"swdnb"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sw <span class="ot">&lt;-</span> <span class="fu">cae_fetch</span>(<span class="st">"swdnb"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">n_timesteps =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="fig-sw" class="quarto-figure quarto-figure-center anchored">
@@ -474,7 +479,7 @@ WRF vs LOCA2 – when to use which
 <h3 class="anchored" data-anchor-id="surface-pressure">Surface pressure</h3>
 <p>Surface pressure is a required input for ecosystem models and reveals the topographic structure of the domain:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>psfc <span class="ot">&lt;-</span> <span class="fu">ca_fetch</span>(<span class="st">"psfc"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>psfc <span class="ot">&lt;-</span> <span class="fu">cae_fetch</span>(<span class="st">"psfc"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">n_timesteps =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="fig-psfc" class="quarto-figure quarto-figure-center anchored">
@@ -487,10 +492,10 @@ WRF vs LOCA2 – when to use which
 </section>
 <section id="sec-point" class="level2">
 <h2 class="anchored" data-anchor-id="sec-point">Point extraction</h2>
-<p>For single-site analysis, <code>ca_fetch_point()</code> reads the grid and extracts the time series at the nearest grid cell to a lon/lat coordinate. CRS transformation from WGS84 to the WRF Lambert grid is handled automatically.</p>
+<p>For single-site analysis, <code>cae_fetch_point()</code> reads the grid and extracts the time series at the nearest grid cell to a lon/lat coordinate. CRS transformation from WGS84 to the WRF Lambert grid is handled automatically.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 24 hours of temperature at Fresno, CA</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>ts <span class="ot">&lt;-</span> <span class="fu">ca_fetch_point</span>(<span class="st">"t2"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>ts <span class="ot">&lt;-</span> <span class="fu">cae_fetch_point</span>(<span class="st">"t2"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">lon =</span> <span class="sc">-</span><span class="fl">119.77</span>, <span class="at">lat =</span> <span class="fl">36.75</span>,</span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">n_timesteps =</span> <span class="dv">24</span>)</span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(ts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -515,16 +520,16 @@ WRF vs LOCA2 – when to use which
 <p>One of the strengths of the Cal-Adapt dataset is that multiple GCMs are available under the same downscaling framework. Comparing models at the same location reveals inter-model spread – a measure of structural uncertainty in the projections.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get all WRF models with SSP3-7.0 (excluding ERA5 reanalysis)</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>wrf_models <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(<span class="fu">ca_models</span>(<span class="at">activity =</span> <span class="st">"WRF"</span>), <span class="st">"ERA5"</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>wrf_models <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(<span class="fu">cae_models</span>(<span class="at">activity =</span> <span class="st">"WRF"</span>), <span class="st">"ERA5"</span>)</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>models_370 <span class="ot">&lt;-</span> <span class="fu">character</span>(<span class="dv">0</span>)</span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (m <span class="cf">in</span> wrf_models) {</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="st">"ssp370"</span> <span class="sc">%in%</span> <span class="fu">ca_scenarios</span>(<span class="at">activity =</span> <span class="st">"WRF"</span>, <span class="at">model =</span> m))</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="st">"ssp370"</span> <span class="sc">%in%</span> <span class="fu">cae_scenarios</span>(<span class="at">activity =</span> <span class="st">"WRF"</span>, <span class="at">model =</span> m))</span>
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    models_370 <span class="ot">&lt;-</span> <span class="fu">c</span>(models_370, m)</span>
 <span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co"># extract 24-hour temperature at Fresno from each model</span></span>
 <span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>model_ts <span class="ot">&lt;-</span> <span class="fu">lapply</span>(models_370, <span class="cf">function</span>(m) {</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  d <span class="ot">&lt;-</span> <span class="fu">ca_fetch_point</span>(<span class="st">"t2"</span>, <span class="at">model =</span> m, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  d <span class="ot">&lt;-</span> <span class="fu">cae_fetch_point</span>(<span class="st">"t2"</span>, <span class="at">model =</span> m, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
 <span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>                      <span class="at">lon =</span> <span class="sc">-</span><span class="fl">119.77</span>, <span class="at">lat =</span> <span class="fl">36.75</span>, <span class="at">n_timesteps =</span> <span class="dv">24</span>)</span>
 <span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  d<span class="sc">$</span>model <span class="ot">&lt;-</span> m</span>
 <span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  d<span class="sc">$</span>temp_c <span class="ot">&lt;-</span> d<span class="sc">$</span>value <span class="sc">-</span> <span class="fl">273.15</span></span>
@@ -591,7 +596,7 @@ WRF vs LOCA2 – when to use which
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"t2"</span>, <span class="st">"swdnb"</span>, <span class="st">"prec"</span>, <span class="st">"q2"</span>, <span class="st">"psfc"</span>, <span class="st">"u10"</span>, <span class="st">"v10"</span>)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>pts <span class="ot">&lt;-</span> <span class="fu">lapply</span>(vars, <span class="cf">function</span>(v) {</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ca_fetch_point</span>(v, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cae_fetch_point</span>(v, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">lon =</span> <span class="sc">-</span><span class="fl">119.77</span>, <span class="at">lat =</span> <span class="fl">36.75</span>, <span class="at">n_timesteps =</span> <span class="dv">24</span>)</span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>})</span>
 <span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(pts) <span class="ot">&lt;-</span> vars</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -607,7 +612,7 @@ WRF vs LOCA2 – when to use which
 <h2 class="anchored" data-anchor-id="whats-next">What’s next</h2>
 <ul>
 <li><p><strong>Writing CF-standard NetCDF:</strong> See the <a href="../vignettes/sipnet_met_drivers.html">SIPNET Met Drivers</a> vignette for the full pipeline from raw WRF variables to CF-compliant met files.</p></li>
-<li><p><strong>LOCA2 daily data:</strong> The same <code>ca_fetch()</code> interface works for LOCA2 – just specify <code>timescale = "day"</code> and a LOCA2 model name (e.g.&nbsp;<code>"EC-Earth3"</code>).</p></li>
+<li><p><strong>LOCA2 daily data:</strong> The same <code>cae_fetch()</code> interface works for LOCA2 – just specify <code>timescale = "day"</code> and a LOCA2 model name (e.g.&nbsp;<code>"EC-Earth3"</code>).</p></li>
 <li><p><strong>Spatial subsetting:</strong> For California-only analysis at 9 or 3 km, use <code>resolution = "d02"</code> or <code>"d03"</code>, but watch memory – a single 3 km timestep is ~150 MB.</p></li>
 </ul>
 </section>

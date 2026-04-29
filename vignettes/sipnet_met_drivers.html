@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Akash B V and David LeBauer">
-<meta name="dcterms.date" content="2026-04-14">
+<meta name="dcterms.date" content="2026-04-28">
 
-<title>caladaptR - Building SIPNET Met Drivers from WRF Projections</title>
+<title>caladaptaer - Building SIPNET Met Drivers from WRF Projections</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -149,9 +149,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="../">caladaptR</a> 
+      <a href="../">caladaptaer</a> 
         <div class="sidebar-tools-main">
-    <a href="https://github.com/lebauerapproach/caladaptR" title="" class="sidebar-tool px-1"><i class="bi bi-github"></i></a>
+    <a href="https://github.com/lebauerapproach/caladaptaer" title="" class="sidebar-tool px-1"><i class="bi bi-github"></i></a>
 </div>
     </div>
       </div>
@@ -193,6 +193,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../vignettes/sipnet_met_drivers.html" class="sidebar-item-text sidebar-link active">SIPNET Met Drivers</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../vignettes/bulk_met_drivers.html" class="sidebar-item-text sidebar-link">Bulk Met Drivers</a>
   </div>
 </li>
       </ul>
@@ -238,7 +243,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">April 14, 2026</p>
+      <p class="date">April 28, 2026</p>
     </div>
   </div>
   
@@ -272,7 +277,7 @@ What you will learn
 </section>
 <section id="variable-mapping" class="level2">
 <h2 class="anchored" data-anchor-id="variable-mapping">Variable mapping</h2>
-<p>SIPNET needs 5 meteorological inputs plus wind components:</p>
+<p>SIPNET needs 5 meteorological inputs plus wind components. The full CF-standard set also includes longwave radiation for other ecosystem models:</p>
 <table class="table">
 <colgroup>
 <col style="width: 28%">
@@ -327,13 +332,20 @@ What you will learn
 <td>none</td>
 </tr>
 <tr class="even">
+<td><code>surface_downwelling_longwave_flux_in_air</code></td>
+<td><code>lwdnb</code></td>
+<td>W/m2</td>
+<td>W/m2</td>
+<td>none</td>
+</tr>
+<tr class="odd">
 <td><code>eastward_wind</code></td>
 <td><code>u10</code></td>
 <td>m/s</td>
 <td>m/s</td>
 <td>none</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>northward_wind</code></td>
 <td><code>v10</code></td>
 <td>m/s</td>
@@ -347,13 +359,13 @@ What you will learn
 <section id="download-all-variables" class="level2">
 <h2 class="anchored" data-anchor-id="download-all-variables">Download all variables</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caladaptR)</span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caladaptaer)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>sipnet_vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"t2"</span>, <span class="st">"psfc"</span>, <span class="st">"prec"</span>, <span class="st">"q2"</span>, <span class="st">"swdnb"</span>, <span class="st">"u10"</span>, <span class="st">"v10"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>sipnet_vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"t2"</span>, <span class="st">"psfc"</span>, <span class="st">"prec"</span>, <span class="st">"q2"</span>, <span class="st">"swdnb"</span>, <span class="st">"lwdnb"</span>, <span class="st">"u10"</span>, <span class="st">"v10"</span>)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>var_data <span class="ot">&lt;-</span> <span class="fu">lapply</span>(sipnet_vars, <span class="cf">function</span>(v) {</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">message</span>(<span class="st">"reading "</span>, v)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ca_fetch</span>(v, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>, <span class="at">n_timesteps =</span> <span class="dv">24</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cae_fetch</span>(v, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>, <span class="at">n_timesteps =</span> <span class="dv">24</span>)</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>})</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(var_data) <span class="ot">&lt;-</span> sipnet_vars</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -387,9 +399,9 @@ Sanity checks
 </section>
 <section id="write-cf-standard-netcdf" class="level2">
 <h2 class="anchored" data-anchor-id="write-cf-standard-netcdf">Write CF-standard NetCDF</h2>
-<p><code>ca_write_cf_netcdf()</code> handles unit conversion and CF metadata in one call:</p>
+<p><code>cae_write_cf_netcdf()</code> handles unit conversion and CF metadata in one call:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ca_write_cf_netcdf</span>(</span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cae_write_cf_netcdf</span>(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">var_list =</span> var_data,</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">outfile =</span> <span class="st">"CESM2.ssp370.2014-09-01.cf.nc"</span>,</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">dt_seconds =</span> <span class="dv">3600</span>,</span>
@@ -403,7 +415,7 @@ Sanity checks
 <p>For single-site runs, extract time series at a specific location instead of writing the full grid:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pts <span class="ot">&lt;-</span> <span class="fu">lapply</span>(sipnet_vars, <span class="cf">function</span>(v) {</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ca_fetch_point</span>(v, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cae_fetch_point</span>(v, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">lon =</span> <span class="sc">-</span><span class="fl">119.77</span>, <span class="at">lat =</span> <span class="fl">36.75</span>, <span class="at">n_timesteps =</span> <span class="dv">24</span>)</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>})</span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(pts) <span class="ot">&lt;-</span> sipnet_vars</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
