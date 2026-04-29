@@ -1,9 +1,9 @@
-test_that("ca_fetch reads WRF hourly data from S3", {
+test_that("cae_fetch reads WRF hourly data from S3", {
   skip_if_offline()
   skip_on_cran()
 
   # read 1 timestep of temperature at 45km
-  x <- ca_fetch("t2", model = "CESM2", scenario = "ssp370",
+  x <- cae_fetch("t2", model = "CESM2", scenario = "ssp370",
                 n_timesteps = 1)
 
   expect_s3_class(x, "stars")
@@ -19,12 +19,12 @@ test_that("ca_fetch reads WRF hourly data from S3", {
 })
 
 
-test_that("ca_fetch_point extracts a time series", {
+test_that("cae_fetch_point extracts a time series", {
   skip_if_offline()
   skip_on_cran()
 
   # Fresno, CA -- 24 hours
-  ts <- ca_fetch_point("t2", model = "CESM2", scenario = "ssp370",
+  ts <- cae_fetch_point("t2", model = "CESM2", scenario = "ssp370",
                        lon = -119.77, lat = 36.75,
                        n_timesteps = 24)
 
@@ -38,11 +38,11 @@ test_that("ca_fetch_point extracts a time series", {
 })
 
 
-test_that("ca_fetch reads LOCA2 daily data from S3", {
+test_that("cae_fetch reads LOCA2 daily data from S3", {
   skip_if_offline()
   skip_on_cran()
 
-  x <- ca_fetch("pr", model = "EC-Earth3", scenario = "ssp370",
+  x <- cae_fetch("pr", model = "EC-Earth3", scenario = "ssp370",
                 timescale = "day", resolution = "d03",
                 n_timesteps = 1)
 
@@ -57,7 +57,7 @@ test_that("ca_fetch reads LOCA2 daily data from S3", {
 })
 
 
-test_that("ca_fetch_points extracts multiple sites at once", {
+test_that("cae_fetch_points extracts multiple sites at once", {
   skip_if_offline()
   skip_on_cran()
 
@@ -67,7 +67,7 @@ test_that("ca_fetch_points extracts multiple sites at once", {
     lat = c(36.75, 34.05, 38.58)
   )
 
-  ts <- ca_fetch_points("t2", model = "CESM2", scenario = "ssp370",
+  ts <- cae_fetch_points("t2", model = "CESM2", scenario = "ssp370",
                         points = sites, n_timesteps = 24)
 
   expect_s3_class(ts, "data.frame")
@@ -81,7 +81,7 @@ test_that("ca_fetch_points extracts multiple sites at once", {
 
   # without site_id column, should auto-number
   sites_no_id <- sites[, c("lon", "lat")]
-  ts2 <- ca_fetch_points("t2", model = "CESM2", scenario = "ssp370",
+  ts2 <- cae_fetch_points("t2", model = "CESM2", scenario = "ssp370",
                          points = sites_no_id, n_timesteps = 24)
   expect_equal(sort(unique(ts2$site_id)), 1:3)
 })
@@ -96,7 +96,7 @@ test_that("all 8 CF-standard met variables are readable", {
   cf_vars <- c("t2", "prec", "psfc", "q2", "swdnb", "lwdnb", "u10", "v10")
 
   for (v in cf_vars) {
-    x <- ca_fetch(v, model = "CESM2", scenario = "ssp370",
+    x <- cae_fetch(v, model = "CESM2", scenario = "ssp370",
                   n_timesteps = 1)
     expect_s3_class(x, "stars")
   }

@@ -50,13 +50,13 @@ worth getting right.
 ## Download all variables
 
 ```{r}
-library(caladaptR)
+library(caladaptaer)
 
 sipnet_vars <- c("t2", "psfc", "prec", "q2", "swdnb", "lwdnb", "u10", "v10")
 
 var_data <- lapply(sipnet_vars, function(v) {
   message("reading ", v)
-  ca_fetch(v, model = "CESM2", scenario = "ssp370", n_timesteps = 24)
+  cae_fetch(v, model = "CESM2", scenario = "ssp370", n_timesteps = 24)
 })
 names(var_data) <- sipnet_vars
 ```
@@ -87,10 +87,10 @@ don't pass those through to the model.
 
 ## Write CF-standard NetCDF
 
-`ca_write_cf_netcdf()` handles unit conversion and CF metadata in one call:
+`cae_write_cf_netcdf()` handles unit conversion and CF metadata in one call:
 
 ```{r}
-ca_write_cf_netcdf(
+cae_write_cf_netcdf(
   var_list = var_data,
   outfile = "CESM2.ssp370.2014-09-01.cf.nc",
   dt_seconds = 3600,
@@ -108,7 +108,7 @@ writing the full grid:
 
 ```{r}
 pts <- lapply(sipnet_vars, function(v) {
-  ca_fetch_point(v, model = "CESM2", scenario = "ssp370",
+  cae_fetch_point(v, model = "CESM2", scenario = "ssp370",
                  lon = -119.77, lat = 36.75, n_timesteps = 24)
 })
 names(pts) <- sipnet_vars

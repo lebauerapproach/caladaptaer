@@ -5,11 +5,11 @@
 #' optionally clipped to a spatial extent and/or time window.
 
 #' @param variable character; variable name (e.g. "t2", "prec", "psfc").
-#'   Use ca_variables() to see what's available.
+#'   Use cae_variables() to see what's available.
 #' @param model character; GCM name (e.g. "CESM2", "MPI-ESM1-2-HR").
-#'   Use ca_models() to see options.
+#'   Use cae_models() to see options.
 #' @param scenario character; SSP experiment (e.g. "ssp370", "ssp245",
-#'   "historical"). Use ca_scenarios() to see options.
+#'   "historical"). Use cae_scenarios() to see options.
 #' @param timescale character; temporal resolution. One of "1hr", "day", "mon".
 #'   Default "1hr".
 #' @param resolution character; spatial grid. One of "d01" (45km),
@@ -25,15 +25,15 @@
 #' @examples
 #' \dontrun{
 #' # Read 24 hours of temperature data at 45km
-#' t2 <- ca_fetch("t2", model = "CESM2", scenario = "ssp370",
+#' t2 <- cae_fetch("t2", model = "CESM2", scenario = "ssp370",
 #'                n_timesteps = 24)
 #'
 #' # Read a month of daily precipitation from LOCA2
-#' pr <- ca_fetch("pr", model = "EC-Earth3", scenario = "ssp370",
+#' pr <- cae_fetch("pr", model = "EC-Earth3", scenario = "ssp370",
 #'                timescale = "day", resolution = "d03",
 #'                start_time = "2050-01-01", end_time = "2050-01-31")
 #' }
-ca_fetch <- function(variable, model, scenario,
+cae_fetch <- function(variable, model, scenario,
                      timescale = "1hr", resolution = "d01",
                      start_time = NULL, end_time = NULL,
                      n_timesteps = NULL) {
@@ -45,7 +45,7 @@ ca_fetch <- function(variable, model, scenario,
   # separately (MPI-ESM1-2-HR, MIROC6, TaiESM1 have rainc/rainnc
   # instead of prec)
   if (variable == "prec" && activity == "WRF") {
-    has_prec <- nrow(ca_search(activity = "WRF", model = model,
+    has_prec <- nrow(cae_search(activity = "WRF", model = model,
                                scenario = scenario, variable = "prec",
                                timescale = timescale,
                                resolution = resolution)) > 0
@@ -75,7 +75,7 @@ ca_fetch <- function(variable, model, scenario,
                           timescale, resolution, start_time, end_time,
                           n_timesteps) {
 
-  s3_path <- ca_zarr_path(activity = activity, model = model,
+  s3_path <- cae_zarr_path(activity = activity, model = model,
                           scenario = scenario, variable = variable,
                           timescale = timescale, resolution = resolution)
 
@@ -226,7 +226,7 @@ ca_fetch <- function(variable, model, scenario,
 #' Handles coordinate transformation from WGS84 to the WRF Lambert
 #' Conformal grid automatically.
 #'
-#' @inheritParams ca_fetch
+#' @inheritParams cae_fetch
 #' @param lon numeric; longitude in decimal degrees (WGS84)
 #' @param lat numeric; latitude in decimal degrees (WGS84)
 #' @return A data.frame with columns: time, value (in native units)
@@ -234,17 +234,17 @@ ca_fetch <- function(variable, model, scenario,
 #' @examples
 #' \dontrun{
 #' # Get hourly temperature at Fresno for one day
-#' ts <- ca_fetch_point("t2", model = "CESM2", scenario = "ssp370",
+#' ts <- cae_fetch_point("t2", model = "CESM2", scenario = "ssp370",
 #'                      lon = -119.77, lat = 36.75, n_timesteps = 24)
 #' plot(ts$time, ts$value, type = "l")
 #' }
-ca_fetch_point <- function(variable, model, scenario,
+cae_fetch_point <- function(variable, model, scenario,
                            lon, lat,
                            timescale = "1hr", resolution = "d01",
                            start_time = NULL, end_time = NULL,
                            n_timesteps = NULL) {
 
-  data <- ca_fetch(variable = variable, model = model,
+  data <- cae_fetch(variable = variable, model = model,
                    scenario = scenario, timescale = timescale,
                    resolution = resolution, start_time = start_time,
                    end_time = end_time, n_timesteps = n_timesteps)
@@ -272,9 +272,9 @@ ca_fetch_point <- function(variable, model, scenario,
 #'
 #' Fetch data once and extract time series at many lon/lat locations.
 #' The grid is read from S3 only once regardless of site count, making
-#' this dramatically faster than looping over \code{ca_fetch_point()}.
+#' this dramatically faster than looping over \code{cae_fetch_point()}.
 #'
-#' @inheritParams ca_fetch
+#' @inheritParams cae_fetch
 #' @param points data.frame with columns \code{lon} and \code{lat} in
 #'   WGS84 decimal degrees. An optional \code{site_id} column provides
 #'   labels; otherwise sites are numbered 1..N.
@@ -290,17 +290,17 @@ ca_fetch_point <- function(variable, model, scenario,
 #'   lat = c(36.75, 34.05, 38.58, 40.59, 35.37)
 #' )
 #'
-#' ts <- ca_fetch_points("t2", model = "CESM2", scenario = "ssp370",
+#' ts <- cae_fetch_points("t2", model = "CESM2", scenario = "ssp370",
 #'                       points = sites, n_timesteps = 24)
 #' head(ts)
 #'
 #' # works for thousands of sites -- grid is read once
 #' big <- data.frame(lon = runif(10000, -124, -114),
 #'                   lat = runif(10000, 32, 42))
-#' ts_big <- ca_fetch_points("t2", model = "CESM2", scenario = "ssp370",
+#' ts_big <- cae_fetch_points("t2", model = "CESM2", scenario = "ssp370",
 #'                           points = big, n_timesteps = 24)
 #' }
-ca_fetch_points <- function(variable, model, scenario,
+cae_fetch_points <- function(variable, model, scenario,
                             points,
                             timescale = "1hr", resolution = "d01",
                             start_time = NULL, end_time = NULL,
@@ -322,7 +322,7 @@ ca_fetch_points <- function(variable, model, scenario,
 
   # read the grid ONCE from S3
   message("Reading grid (1 S3 fetch for all ", n_sites, " sites)")
-  grid <- ca_fetch(variable = variable, model = model,
+  grid <- cae_fetch(variable = variable, model = model,
                    scenario = scenario, timescale = timescale,
                    resolution = resolution, start_time = start_time,
                    end_time = end_time, n_timesteps = n_timesteps)
@@ -367,7 +367,7 @@ ca_fetch_points <- function(variable, model, scenario,
 #' @keywords internal
 .detect_activity <- function(model, timescale, resolution,
                              variable = NULL) {
-  cat <- ca_catalog()
+  cat <- cae_catalog()
 
   # filter by model, timescale, resolution
   base <- cat[cat$source_id == model &

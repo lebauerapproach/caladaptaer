@@ -1,26 +1,26 @@
-# caladaptR
+# caladaptaer
 
 Native R access to the [Cal-Adapt Analytics Engine](https://analytics.cal-adapt.org/) -- California's repository of downscaled CMIP6 climate projections.
 
 ## What it does
 
-caladaptR reads WRF dynamically downscaled (hourly, 3/9/45 km) and LOCA2-Hybrid statistically downscaled (daily, 3 km) climate data directly from AWS S3 Zarr stores. No Python dependency, no API key, no authentication.
+caladaptaer reads WRF dynamically downscaled (hourly, 3/9/45 km) and LOCA2-Hybrid statistically downscaled (daily, 3 km) climate data directly from AWS S3 Zarr stores. No Python dependency, no API key, no authentication.
 
 ## Quick start
 
 ```r
-library(caladaptR)
+library(caladaptaer)
 
 # What's available?
-ca_models(activity = "WRF")
-ca_variables(activity = "WRF", timescale = "1hr")
+cae_models(activity = "WRF")
+cae_variables(activity = "WRF", timescale = "1hr")
 
 # Read hourly temperature, 45km grid, one day
-t2 <- ca_fetch("t2", model = "CESM2", scenario = "ssp370",
+t2 <- cae_fetch("t2", model = "CESM2", scenario = "ssp370",
                n_timesteps = 24)
 
 # Extract time series at a point
-ts <- ca_fetch_point("t2", model = "CESM2", scenario = "ssp370",
+ts <- cae_fetch_point("t2", model = "CESM2", scenario = "ssp370",
                      lon = -119.77, lat = 36.75,
                      n_timesteps = 24)
 plot(ts$time, ts$value - 273.15, type = "l",
@@ -46,7 +46,7 @@ Data produced by UCLA Center for Climate Science (WRF, Rahimi et al. 2024) and S
 
 ```r
 # from GitHub
-remotes::install_github("lebauerapproach/caladaptR")
+remotes::install_github("lebauerapproach/caladaptaer")
 ```
 
 ## How it works

@@ -1,7 +1,7 @@
 test_that("catalog loads and has expected structure", {
   skip_if_offline()
 
-  cat <- ca_catalog()
+  cat <- cae_catalog()
   expect_s3_class(cat, "data.frame")
   expect_true(nrow(cat) > 1000)
 
@@ -15,29 +15,29 @@ test_that("catalog loads and has expected structure", {
 })
 
 
-test_that("ca_models returns known GCMs", {
+test_that("cae_models returns known GCMs", {
   skip_if_offline()
 
-  wrf_models <- ca_models(activity = "WRF")
+  wrf_models <- cae_models(activity = "WRF")
   expect_true("CESM2" %in% wrf_models)
   expect_true("MIROC6" %in% wrf_models)
   expect_true(length(wrf_models) >= 8)
 })
 
 
-test_that("ca_scenarios returns known SSPs", {
+test_that("cae_scenarios returns known SSPs", {
   skip_if_offline()
 
-  ssps <- ca_scenarios(activity = "WRF", model = "CESM2")
+  ssps <- cae_scenarios(activity = "WRF", model = "CESM2")
   expect_true("ssp370" %in% ssps)
   expect_true("historical" %in% ssps)
 })
 
 
-test_that("ca_variables returns expected WRF hourly vars", {
+test_that("cae_variables returns expected WRF hourly vars", {
   skip_if_offline()
 
-  vars <- ca_variables(activity = "WRF", timescale = "1hr")
+  vars <- cae_variables(activity = "WRF", timescale = "1hr")
   cf_vars <- c("t2", "prec", "psfc", "q2", "swdnb", "lwdnb", "u10", "v10")
   for (v in cf_vars) {
     expect_true(v %in% vars, info = paste("Missing variable:", v))
@@ -45,10 +45,10 @@ test_that("ca_variables returns expected WRF hourly vars", {
 })
 
 
-test_that("ca_search filters correctly", {
+test_that("cae_search filters correctly", {
   skip_if_offline()
 
-  hits <- ca_search(activity = "WRF", model = "CESM2",
+  hits <- cae_search(activity = "WRF", model = "CESM2",
                     scenario = "ssp370", variable = "t2",
                     timescale = "1hr", resolution = "d01")
   expect_equal(nrow(hits), 1)
@@ -56,27 +56,27 @@ test_that("ca_search filters correctly", {
 })
 
 
-test_that("ca_search returns empty with warning on bad query", {
+test_that("cae_search returns empty with warning on bad query", {
   skip_if_offline()
 
   expect_warning(
-    hits <- ca_search(activity = "WRF", model = "NONEXISTENT_MODEL"),
+    hits <- cae_search(activity = "WRF", model = "NONEXISTENT_MODEL"),
     "No catalog entries"
   )
   expect_equal(nrow(hits), 0)
 })
 
 
-test_that("ca_check_variables reports coverage correctly", {
+test_that("cae_check_variables reports coverage correctly", {
   skip_if_offline()
 
   # CESM2 should have all 8 directly
-  cesm <- ca_check_variables("CESM2", "ssp370")
+  cesm <- cae_check_variables("CESM2", "ssp370")
   expect_equal(nrow(cesm), 8)
   expect_true(all(cesm$available))
 
   # MPI-ESM1-2-HR should be missing prec but have it derivable
-  mpi <- ca_check_variables("MPI-ESM1-2-HR", "ssp370")
+  mpi <- cae_check_variables("MPI-ESM1-2-HR", "ssp370")
   prec_row <- mpi[mpi$variable == "prec", ]
   expect_false(prec_row$available)
   expect_true(prec_row$derivable)
@@ -86,11 +86,11 @@ test_that("ca_check_variables reports coverage correctly", {
 test_that("catalog caching works", {
   skip_if_offline()
 
-  cat1 <- ca_catalog()
-  cat2 <- ca_catalog()  # should hit cache
+  cat1 <- cae_catalog()
+  cat2 <- cae_catalog()  # should hit cache
   expect_identical(cat1, cat2)
 
   # force refresh
-  cat3 <- ca_catalog(refresh = TRUE)
+  cat3 <- cae_catalog(refresh = TRUE)
   expect_equal(nrow(cat1), nrow(cat3))
 })

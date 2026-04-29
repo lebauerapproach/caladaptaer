@@ -1,6 +1,6 @@
-Package: caladaptR
+Package: caladaptaer
 Title: Access Cal-Adapt Climate Data from R
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: c(
     person("Akash", "B V",
            email = "abv1@bu.edu",
@@ -17,8 +17,8 @@ Description: Provides native R access to the Cal-Adapt Analytics Engine,
     Reads cloud-optimized Zarr stores directly from AWS S3 via GDAL,
     with no Python dependency.
 License: BSD_3_clause + file LICENSE
-URL: https://github.com/lebauerapproach/caladaptR
-BugReports: https://github.com/lebauerapproach/caladaptR/issues
+URL: https://github.com/lebauerapproach/caladaptaer
+BugReports: https://github.com/lebauerapproach/caladaptaer/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
@@ -28,7 +28,8 @@ Imports:
     stars,
     sf,
     ncdf4,
-    units
+    units,
+    jsonlite
 Suggests:
     terra,
     ggplot2,

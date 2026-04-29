@@ -1,7 +1,7 @@
 #' Build CF-standard met driver files for multiple sites
 #'
 #' Fetches WRF data from S3 once per variable per year and extracts all
-#' sites in a single vectorized call via [ca_fetch_points()], then writes
+#' sites in a single vectorized call via [cae_fetch_points()], then writes
 #' one CF-compliant NetCDF per site per year. For N sites, 8 variables,
 #' and Y years this makes 8*Y S3 requests regardless of N.
 #'
@@ -12,9 +12,9 @@
 #' @param sites data.frame with columns `site_id`, `lon`, `lat` (WGS84
 #'   decimal degrees). See Examples.
 #' @param model character; WRF GCM name. Default `"CESM2"`.
-#'   See `ca_models(activity = "WRF")` for options.
+#'   See `cae_models(activity = "WRF")` for options.
 #' @param scenario character; SSP experiment. Default `"ssp370"`.
-#'   See `ca_scenarios()` for options.
+#'   See `cae_scenarios()` for options.
 #' @param start_year integer; first year to process
 #' @param end_year integer; last year to process
 #' @param outdir character; root output directory. Files are written to
@@ -24,8 +24,8 @@
 #' @param verbose logical; print progress messages? Default `TRUE`.
 #' @return A data.frame with columns `site_id`, `year`, `file` (invisibly).
 #' @export
-#' @seealso [ca_fetch_points()] for the underlying multi-site extraction,
-#'   [ca_write_cf_netcdf()] for the stars-based single-grid approach
+#' @seealso [cae_fetch_points()] for the underlying multi-site extraction,
+#'   [cae_write_cf_netcdf()] for the stars-based single-grid approach
 #' @examples
 #' \dontrun{
 #' sites <- data.frame(
@@ -33,14 +33,14 @@
 #'   lon = c(-119.77, -118.24, -121.49),
 #'   lat = c(36.75, 34.05, 38.58)
 #' )
-#' result <- ca_build_met_drivers(
+#' result <- cae_build_met_drivers(
 #'   sites, model = "CESM2", scenario = "ssp370",
 #'   start_year = 2050, end_year = 2051,
 #'   outdir = "met_output"
 #' )
 #' head(result)
 #' }
-ca_build_met_drivers <- function(sites, model = "CESM2", scenario = "ssp370",
+cae_build_met_drivers <- function(sites, model = "CESM2", scenario = "ssp370",
                                  start_year, end_year,
                                  outdir,
                                  resolution = "d01",
@@ -97,7 +97,7 @@ ca_build_met_drivers <- function(sites, model = "CESM2", scenario = "ssp370",
 
     for (v in wrf_vars) {
       if (verbose) message("  fetching ", v)
-      var_data[[v]] <- ca_fetch_points(
+      var_data[[v]] <- cae_fetch_points(
         variable   = v,
         model      = model,
         scenario   = scenario,
@@ -171,7 +171,7 @@ ca_build_met_drivers <- function(sites, model = "CESM2", scenario = "ssp370",
 #' Write a single-site CF-standard NetCDF file
 #'
 #' Creates a CF-1.8 compliant NetCDF with latitude, longitude, and
-#' unlimited time dimensions. Used internally by [ca_build_met_drivers()].
+#' unlimited time dimensions. Used internally by [cae_build_met_drivers()].
 #'
 #' @param converted named list of CF variable names -> numeric vectors
 #' @param time_vals POSIXct vector of timesteps
@@ -216,7 +216,7 @@ ca_build_met_drivers <- function(sites, model = "CESM2", scenario = "ssp370",
 
   ncdf4::ncatt_put(nc, 0, "Conventions", "CF-1.8")
   ncdf4::ncatt_put(nc, 0, "source", "Cal-Adapt Analytics Engine (CADCAT)")
-  ncdf4::ncatt_put(nc, 0, "created_by", "caladaptR::ca_build_met_drivers")
+  ncdf4::ncatt_put(nc, 0, "created_by", "caladaptaer::cae_build_met_drivers")
   ncdf4::ncatt_put(nc, 0, "history",
-                    paste("Created", Sys.time(), "by caladaptR"))
+                    paste("Created", Sys.time(), "by caladaptaer"))
 }

@@ -1,6 +1,6 @@
-# caladaptR Style Guide
+# caladaptaer Style Guide
 
-This guide documents the coding and documentation conventions for the `caladaptR` package.
+This guide documents the coding and documentation conventions for the `caladaptaer` package.
 
 ## R Code
 

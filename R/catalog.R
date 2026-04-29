@@ -25,10 +25,10 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' cat <- ca_catalog()
+#' cat <- cae_catalog()
 #' head(cat)
 #' }
-ca_catalog <- function(refresh = FALSE) {
+cae_catalog <- function(refresh = FALSE) {
   if (!refresh && exists("catalog", envir = .catalog_cache)) {
     return(get("catalog", envir = .catalog_cache))
   }
@@ -55,8 +55,8 @@ ca_catalog <- function(refresh = FALSE) {
 #' @param activity character; "WRF" or "LOCA2" or NULL for both.
 #' @return character vector of model names (source_id values)
 #' @export
-ca_models <- function(activity = NULL) {
-  cat <- ca_catalog()
+cae_models <- function(activity = NULL) {
+  cat <- cae_catalog()
   if (!is.null(activity)) {
     cat <- cat[cat$activity_id == activity, ]
   }
@@ -70,8 +70,8 @@ ca_models <- function(activity = NULL) {
 #' @param model character; filter to a specific GCM. NULL for all.
 #' @return character vector of experiment_id values
 #' @export
-ca_scenarios <- function(activity = NULL, model = NULL) {
-  cat <- ca_catalog()
+cae_scenarios <- function(activity = NULL, model = NULL) {
+  cat <- cae_catalog()
   if (!is.null(activity)) cat <- cat[cat$activity_id == activity, ]
   if (!is.null(model)) cat <- cat[cat$source_id == model, ]
   sort(unique(cat$experiment_id))
@@ -84,8 +84,8 @@ ca_scenarios <- function(activity = NULL, model = NULL) {
 #' @param timescale character; "1hr", "day", "mon", or NULL for all.
 #' @return character vector of variable_id values
 #' @export
-ca_variables <- function(activity = NULL, timescale = NULL) {
-  cat <- ca_catalog()
+cae_variables <- function(activity = NULL, timescale = NULL) {
+  cat <- cae_catalog()
   if (!is.null(activity)) cat <- cat[cat$activity_id == activity, ]
   if (!is.null(timescale)) cat <- cat[cat$table_id == timescale, ]
   sort(unique(cat$variable_id))
@@ -109,13 +109,13 @@ ca_variables <- function(activity = NULL, timescale = NULL) {
 #' @examples
 #' \dontrun{
 #' # Find all hourly WRF temperature data at 45km
-#' ca_search(activity = "WRF", variable = "t2",
+#' cae_search(activity = "WRF", variable = "t2",
 #'           timescale = "1hr", resolution = "d01")
 #' }
-ca_search <- function(activity = NULL, model = NULL, scenario = NULL,
+cae_search <- function(activity = NULL, model = NULL, scenario = NULL,
                       variable = NULL, timescale = NULL,
                       resolution = NULL) {
-  cat <- ca_catalog()
+  cat <- cae_catalog()
 
   if (!is.null(activity))   cat <- cat[cat$activity_id == activity, ]
   if (!is.null(model))      cat <- cat[cat$source_id == model, ]
@@ -144,15 +144,15 @@ ca_search <- function(activity = NULL, model = NULL, scenario = NULL,
 #' @export
 #' @examples
 #' \dontrun{
-#' ca_check_variables("MPI-ESM1-2-HR", "ssp370")
-#' ca_check_variables("CESM2", "ssp370")
+#' cae_check_variables("MPI-ESM1-2-HR", "ssp370")
+#' cae_check_variables("CESM2", "ssp370")
 #' }
-ca_check_variables <- function(model, scenario,
+cae_check_variables <- function(model, scenario,
                                timescale = "1hr", resolution = "d01") {
   sipnet_vars <- c("t2", "psfc", "prec", "q2", "swdnb", "lwdnb", "u10", "v10")
   precip_components <- c("rainc", "rainnc")
 
-  cat <- ca_catalog()
+  cat <- cae_catalog()
   model_vars <- cat[cat$source_id == model &
                     cat$experiment_id == scenario &
                     cat$table_id == timescale &
@@ -185,17 +185,17 @@ ca_check_variables <- function(model, scenario,
 
 #' Get the S3 Zarr path for a specific dataset
 #'
-#' Convenience wrapper around ca_search() that returns exactly one
+#' Convenience wrapper around cae_search() that returns exactly one
 #' S3 path. Errors if zero or multiple entries match.
 #'
-#' @inheritParams ca_search
+#' @inheritParams cae_search
 #' @param member character; member_id for specific ensemble member.
 #'   NULL uses the first available.
 #' @return character; the S3 path (e.g. "s3://cadcat/wrf/ucla/...")
 #' @keywords internal
-ca_zarr_path <- function(activity, model, scenario, variable,
+cae_zarr_path <- function(activity, model, scenario, variable,
                          timescale, resolution, member = NULL) {
-  hits <- ca_search(activity = activity, model = model,
+  hits <- cae_search(activity = activity, model = model,
                     scenario = scenario, variable = variable,
                     timescale = timescale, resolution = resolution)
   if (!is.null(member)) {

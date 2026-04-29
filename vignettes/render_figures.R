@@ -26,7 +26,7 @@ western_sf <- st_as_sf(
 
 # fig 1 -- WRF temperature map, western US
 message("fig01: WRF T2 map")
-t2 <- ca_fetch("t2", model = "CESM2", scenario = "ssp370", n_timesteps = 1)
+t2 <- cae_fetch("t2", model = "CESM2", scenario = "ssp370", n_timesteps = 1)
 t2_c <- t2
 t2_c[[1]] <- units::drop_units(t2[[1]]) - 273.15
 
@@ -48,7 +48,7 @@ dev.off()
 
 # fig 2 -- diurnal cycle at Fresno
 message("fig02: Fresno diurnal cycle")
-ts <- ca_fetch_point("t2", model = "CESM2", scenario = "ssp370",
+ts <- cae_fetch_point("t2", model = "CESM2", scenario = "ssp370",
                      lon = -119.77, lat = 36.75, n_timesteps = 24)
 ts$temp_c <- ts$value - 273.15
 
@@ -65,7 +65,7 @@ dev.off()
 
 # fig 3 -- shortwave radiation map
 message("fig03: shortwave radiation map")
-sw <- ca_fetch("swdnb", model = "CESM2", scenario = "ssp370", n_timesteps = 1)
+sw <- cae_fetch("swdnb", model = "CESM2", scenario = "ssp370", n_timesteps = 1)
 sw[[1]] <- units::drop_units(sw[[1]])
 
 png(file.path(fig_dir, "fig03_wrf_swdown.png"),
@@ -83,7 +83,7 @@ dev.off()
 
 # fig 4 -- surface pressure (precip is all zeros for a dry CA timestep)
 message("fig04: surface pressure map")
-psfc <- ca_fetch("psfc", model = "CESM2", scenario = "ssp370", n_timesteps = 1)
+psfc <- cae_fetch("psfc", model = "CESM2", scenario = "ssp370", n_timesteps = 1)
 psfc[[1]] <- units::drop_units(psfc[[1]]) / 100  # Pa to hPa
 
 png(file.path(fig_dir, "fig04_wrf_psfc.png"),
@@ -104,7 +104,7 @@ message("fig05: met driver panel")
 vars <- c("t2", "swdnb", "prec", "q2", "psfc", "u10", "v10")
 pts <- lapply(vars, function(v) {
   message("  ", v)
-  ca_fetch_point(v, model = "CESM2", scenario = "ssp370",
+  cae_fetch_point(v, model = "CESM2", scenario = "ssp370",
                  lon = -119.77, lat = 36.75, n_timesteps = 24)
 })
 names(pts) <- vars
@@ -153,18 +153,18 @@ dev.off()
 
 # fig 6 -- multi-model temperature comparison
 message("fig06: multi-model comparison")
-wrf_models <- ca_models(activity = "WRF")
+wrf_models <- cae_models(activity = "WRF")
 # get models with ssp370 (skip ERA5 reanalysis)
 models_370 <- character(0)
 for (m in setdiff(wrf_models, "ERA5")) {
-  ssps <- ca_scenarios(activity = "WRF", model = m)
+  ssps <- cae_scenarios(activity = "WRF", model = m)
   if ("ssp370" %in% ssps) models_370 <- c(models_370, m)
 }
 
 model_ts <- lapply(models_370, function(m) {
   message("  ", m)
   tryCatch({
-    d <- ca_fetch_point("t2", model = m, scenario = "ssp370",
+    d <- cae_fetch_point("t2", model = m, scenario = "ssp370",
                         lon = -119.77, lat = 36.75, n_timesteps = 24)
     d$model <- m
     d$temp_c <- d$value - 273.15
@@ -199,7 +199,7 @@ dev.off()
 
 # fig 7 -- catalog overview bar chart
 message("fig07: catalog overview")
-cat <- ca_catalog()
+cat <- cae_catalog()
 wrf_hr <- cat[cat$activity_id == "WRF" & cat$table_id == "1hr" &
               cat$grid_label == "d01" & cat$source_id != "ERA5", ]
 

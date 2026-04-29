@@ -21,6 +21,6 @@
 }
 \description{
 Creates a CF-1.8 compliant NetCDF with latitude, longitude, and
-unlimited time dimensions. Used internally by \code{\link[=ca_build_met_drivers]{ca_build_met_drivers()}}.
+unlimited time dimensions. Used internally by \code{\link[=cae_build_met_drivers]{cae_build_met_drivers()}}.
 }
 \keyword{internal}

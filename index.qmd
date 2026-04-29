@@ -1,9 +1,9 @@
 ---
-title: "caladaptR"
+title: "caladaptaer"
 subtitle: "Native R Access to Cal-Adapt Climate Projections"
 ---
 
-`caladaptR` reads downscaled CMIP6 climate data from California's
+`caladaptaer` reads downscaled CMIP6 climate data from California's
 [Cal-Adapt Analytics Engine](https://analytics.cal-adapt.org/) directly into R.
 No Python, no API key, no authentication -- just GDAL reading Zarr stores
 from AWS S3.
@@ -18,18 +18,18 @@ from AWS S3.
 ## Quick Start
 
 ```r
-library(caladaptR)
+library(caladaptaer)
 
 # What's available?
-ca_models(activity = "WRF")
-ca_variables(activity = "WRF", timescale = "1hr")
+cae_models(activity = "WRF")
+cae_variables(activity = "WRF", timescale = "1hr")
 
 # Read hourly temperature, 45 km grid, one day
-t2 <- ca_fetch("t2", model = "CESM2", scenario = "ssp370",
+t2 <- cae_fetch("t2", model = "CESM2", scenario = "ssp370",
                n_timesteps = 24)
 
 # Extract time series at a point
-ts <- ca_fetch_point("t2", model = "CESM2", scenario = "ssp370",
+ts <- cae_fetch_point("t2", model = "CESM2", scenario = "ssp370",
                      lon = -119.77, lat = 36.75,
                      n_timesteps = 24)
 ```
@@ -44,7 +44,7 @@ ts <- ca_fetch_point("t2", model = "CESM2", scenario = "ssp370",
 ## Installation
 
 ```r
-remotes::install_github("lebauerapproach/caladaptR")
+remotes::install_github("lebauerapproach/caladaptaer")
 ```
 
 ## License

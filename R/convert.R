@@ -74,7 +74,7 @@
 #' @param overwrite logical; overwrite existing file? Default FALSE.
 #' @return character; path to the written NetCDF file (invisibly)
 #' @export
-ca_write_cf_netcdf <- function(var_list, outfile, dt_seconds = 3600,
+cae_write_cf_netcdf <- function(var_list, outfile, dt_seconds = 3600,
                                overwrite = FALSE) {
 
   if (file.exists(outfile) && !overwrite) {
@@ -198,7 +198,7 @@ ca_write_cf_netcdf <- function(var_list, outfile, dt_seconds = 3600,
   # global attributes
   ncdf4::ncatt_put(nc, 0, "Conventions", "CF-1.8")
   ncdf4::ncatt_put(nc, 0, "source", "Cal-Adapt Analytics Engine (CADCAT)")
-  ncdf4::ncatt_put(nc, 0, "created_by", "caladaptR")
+  ncdf4::ncatt_put(nc, 0, "created_by", "caladaptaer")
   ncdf4::ncatt_put(nc, 0, "history",
-                    paste("Created", Sys.time(), "by caladaptR"))
+                    paste("Created", Sys.time(), "by caladaptaer"))
 }

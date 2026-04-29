@@ -11,9 +11,9 @@ knitr::opts_chunk$set(eval = FALSE)
 ## What you will learn
 
 - How to prepare CF-standard met driver files for hundreds of sites
-  in a single pass using `ca_build_met_drivers()`
+  in a single pass using `cae_build_met_drivers()`
 - Why the bulk approach is dramatically more efficient than looping
-  over `ca_fetch_point()`
+  over `cae_fetch_point()`
 - How to set up a sites table and configure the output for use with
   PEcAn or standalone ecosystem model runs
 :::
@@ -23,11 +23,11 @@ knitr::opts_chunk$set(eval = FALSE)
 Ecosystem modeling projects often need met drivers at many sites --
 the CCMMF project, for example, runs SIPNET at 198 design points
 across California. Preparing met files one site at a time with
-`ca_fetch_point()` is straightforward but wasteful: each call reads
+`cae_fetch_point()` is straightforward but wasteful: each call reads
 the entire WRF grid from S3 independently, so 198 sites x 8 variables
 x 20 years means 31,680 S3 requests.
 
-`ca_build_met_drivers()` solves this by calling `ca_fetch_points()`
+`cae_build_met_drivers()` solves this by calling `cae_fetch_points()`
 (plural) under the hood. The full WRF grid is read from S3 once per
 variable per year, and all sites are extracted from that grid in a
 single vectorized operation. The same 198-site, 20-year job now takes
@@ -47,7 +47,7 @@ head(sites)
 #> 2  1300446 f2ce12d75f3b2cc6 32.75557 -115.4159 annual crop
 #> ...
 
-# ca_build_met_drivers needs site_id, lon, lat
+# cae_build_met_drivers needs site_id, lon, lat
 # the site_id column is already present in this table
 ```
 
@@ -66,9 +66,9 @@ sites <- data.frame(
 ## Building the drivers
 
 ```{r}
-library(caladaptR)
+library(caladaptaer)
 
-result <- ca_build_met_drivers(
+result <- cae_build_met_drivers(
   sites     = sites,
   model     = "CESM2",
   scenario  = "ssp370",
@@ -126,14 +126,14 @@ The time coordinate uses `seconds since {year}-01-01 00:00:00`.
 
 ## Skipping existing files
 
-By default, `ca_build_met_drivers()` skips sites that already have
+By default, `cae_build_met_drivers()` skips sites that already have
 output files for a given year. If all sites in a year are complete, the
 S3 fetch for that year is skipped entirely. Pass `overwrite = TRUE` to
 regenerate everything.
 
 ```{r}
 # re-run after interruption -- only missing files are written
-result <- ca_build_met_drivers(
+result <- cae_build_met_drivers(
   sites, model = "CESM2", scenario = "ssp370",
   start_year = 2050, end_year = 2055,
   outdir = "met_drivers"
@@ -165,13 +165,13 @@ For 198 sites x 8 variables x 20 years:
 
 | Approach | S3 requests | Description |
 |----------|:-----------:|-------------|
-| `ca_fetch_point()` loop | 31,680 | one grid read per site per var per year |
-| `ca_build_met_drivers()` | 160 | one grid read per var per year |
+| `cae_fetch_point()` loop | 31,680 | one grid read per site per var per year |
+| `cae_build_met_drivers()` | 160 | one grid read per var per year |
 | PEcAn `download.CalAdaptWRF` | 160 | same count, uses tempdir() cache |
 
 All three produce identical output. The choice depends on whether you
 are working inside PEcAn (`download.CalAdaptWRF`) or outside it
-(`ca_build_met_drivers`).
+(`cae_build_met_drivers`).
 
 ## Multiple models and scenarios
 
@@ -182,7 +182,7 @@ combinations:
 models <- c("CESM2", "CNRM-ESM2-1", "EC-Earth3-Veg")
 
 for (m in models) {
-  ca_build_met_drivers(
+  cae_build_met_drivers(
     sites, model = m, scenario = "ssp370",
     start_year = 2050, end_year = 2069,
     outdir = file.path("met_drivers", m)

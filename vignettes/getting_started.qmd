@@ -1,5 +1,5 @@
 ---
-title: "Getting Started with caladaptR"
+title: "Getting Started with caladaptaer"
 ---
 
 ```{r}
@@ -46,14 +46,14 @@ that substitutes WRF-derived weather patterns for end-of-century conditions
 where the historical analog library runs thin.
 
 The official Python interface is
-[climakitae](https://github.com/cal-adapt/climakitae). `caladaptR` provides
+[climakitae](https://github.com/cal-adapt/climakitae). `caladaptaer` provides
 the same data access natively in R, reading Zarr stores via GDAL's `/vsis3/`
 virtual filesystem. No Python, no API key, no authentication.
 
 ## Setup
 
 ```{r}
-library(caladaptR)
+library(caladaptaer)
 library(stars)
 library(sf)
 library(ggplot2)
@@ -69,11 +69,11 @@ sf::sf_extSoftVersion()["GDAL"]
 ## Exploring the catalog {#sec-catalog}
 
 The CADCAT catalog is a CSV index of every Zarr store on S3. Each row is one
-variable from one model/scenario/resolution combination. `ca_catalog()`
+variable from one model/scenario/resolution combination. `cae_catalog()`
 downloads the table once per session and caches it.
 
 ```{r}
-cat <- ca_catalog()
+cat <- cae_catalog()
 nrow(cat)
 names(cat)
 ```
@@ -98,16 +98,16 @@ convenience functions to see what's available:
 
 ```{r}
 # WRF GCMs -- 8 models dynamically downscaled
-ca_models(activity = "WRF")
+cae_models(activity = "WRF")
 
 # LOCA2 GCMs -- 15 models statistically downscaled
-ca_models(activity = "LOCA2")
+cae_models(activity = "LOCA2")
 
 # CESM2 has the broadest scenario coverage in WRF
-ca_scenarios(activity = "WRF", model = "CESM2")
+cae_scenarios(activity = "WRF", model = "CESM2")
 
 # hourly WRF variables
-ca_variables(activity = "WRF", timescale = "1hr")
+cae_variables(activity = "WRF", timescale = "1hr")
 ```
 
 Here's the full picture of what's on S3 for the WRF hourly data at 45 km:
@@ -128,23 +128,23 @@ available resolution (3 km).
 
 ### Searching the catalog
 
-`ca_search()` filters by any combination of fields. All filters are ANDed.
+`cae_search()` filters by any combination of fields. All filters are ANDed.
 
 ```{r}
 # all hourly CESM2 temperature at 45 km
-ca_search(activity = "WRF", model = "CESM2",
+cae_search(activity = "WRF", model = "CESM2",
           variable = "t2", timescale = "1hr", resolution = "d01")
 ```
 
 
 ## Fetching gridded data {#sec-fetch}
 
-`ca_fetch()` reads a Zarr store from S3 and returns a `stars` object. Start
+`cae_fetch()` reads a Zarr store from S3 and returns a `stars` object. Start
 with `n_timesteps = 1` to keep the initial read small -- a single 45 km
 timestep is about 0.3 MB.
 
 ```{r}
-t2 <- ca_fetch("t2", model = "CESM2", scenario = "ssp370",
+t2 <- cae_fetch("t2", model = "CESM2", scenario = "ssp370",
                n_timesteps = 1)
 t2
 ```
@@ -197,7 +197,7 @@ models and solar generation in energy applications. The WRF field captures
 the diurnal solar cycle and cloud effects:
 
 ```{r}
-sw <- ca_fetch("swdnb", model = "CESM2", scenario = "ssp370",
+sw <- cae_fetch("swdnb", model = "CESM2", scenario = "ssp370",
                n_timesteps = 1)
 ```
 
@@ -213,7 +213,7 @@ Surface pressure is a required input for ecosystem models and reveals the
 topographic structure of the domain:
 
 ```{r}
-psfc <- ca_fetch("psfc", model = "CESM2", scenario = "ssp370",
+psfc <- cae_fetch("psfc", model = "CESM2", scenario = "ssp370",
                  n_timesteps = 1)
 ```
 
@@ -227,13 +227,13 @@ simulations.](figures/fig04_wrf_psfc.png){#fig-psfc width=80%}
 
 ## Point extraction {#sec-point}
 
-For single-site analysis, `ca_fetch_point()` reads the grid and extracts
+For single-site analysis, `cae_fetch_point()` reads the grid and extracts
 the time series at the nearest grid cell to a lon/lat coordinate. CRS
 transformation from WGS84 to the WRF Lambert grid is handled automatically.
 
 ```{r}
 # 24 hours of temperature at Fresno, CA
-ts <- ca_fetch_point("t2", model = "CESM2", scenario = "ssp370",
+ts <- cae_fetch_point("t2", model = "CESM2", scenario = "ssp370",
                      lon = -119.77, lat = 36.75,
                      n_timesteps = 24)
 head(ts)
@@ -263,16 +263,16 @@ uncertainty in the projections.
 
 ```{r}
 # get all WRF models with SSP3-7.0 (excluding ERA5 reanalysis)
-wrf_models <- setdiff(ca_models(activity = "WRF"), "ERA5")
+wrf_models <- setdiff(cae_models(activity = "WRF"), "ERA5")
 models_370 <- character(0)
 for (m in wrf_models) {
-  if ("ssp370" %in% ca_scenarios(activity = "WRF", model = m))
+  if ("ssp370" %in% cae_scenarios(activity = "WRF", model = m))
     models_370 <- c(models_370, m)
 }
 
 # extract 24-hour temperature at Fresno from each model
 model_ts <- lapply(models_370, function(m) {
-  d <- ca_fetch_point("t2", model = m, scenario = "ssp370",
+  d <- cae_fetch_point("t2", model = m, scenario = "ssp370",
                       lon = -119.77, lat = 36.75, n_timesteps = 24)
   d$model <- m
   d$temp_c <- d$value - 273.15
@@ -308,7 +308,7 @@ meteorology. Here we extract all 7 SIPNET-required variables at a point:
 ```{r}
 vars <- c("t2", "swdnb", "prec", "q2", "psfc", "u10", "v10")
 pts <- lapply(vars, function(v) {
-  ca_fetch_point(v, model = "CESM2", scenario = "ssp370",
+  cae_fetch_point(v, model = "CESM2", scenario = "ssp370",
                  lon = -119.77, lat = 36.75, n_timesteps = 24)
 })
 names(pts) <- vars
@@ -331,7 +331,7 @@ semidiurnal tide.](figures/fig05_met_panel_fresno.png){#fig-met width=95%}
   [SIPNET Met Drivers](sipnet_met_drivers.qmd) vignette for the full pipeline
   from raw WRF variables to CF-compliant met files.
 
-- **LOCA2 daily data:** The same `ca_fetch()` interface works for LOCA2 --
+- **LOCA2 daily data:** The same `cae_fetch()` interface works for LOCA2 --
   just specify `timescale = "day"` and a LOCA2 model name (e.g. `"EC-Earth3"`).
 
 - **Spatial subsetting:** For California-only analysis at 9 or 3 km, use

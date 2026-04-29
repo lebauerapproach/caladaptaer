@@ -1,5 +1,5 @@
 # This file is part of the standard testthat structure
 library(testthat)
-library(caladaptR)
+library(caladaptaer)
 
-test_check("caladaptR")
+test_check("caladaptaer")

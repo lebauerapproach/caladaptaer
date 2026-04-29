@@ -8,7 +8,7 @@ project:
     - vignettes/*.qmd
 
 website:
-  title: "caladaptR"
+  title: "caladaptaer"
   search: true
   sidebar:
     style: docked
@@ -28,7 +28,7 @@ website:
             text: Bulk Met Drivers
     tools:
       - icon: github
-        href: https://github.com/lebauerapproach/caladaptR
+        href: https://github.com/lebauerapproach/caladaptaer
 
 format:
   html:
