@@ -58,12 +58,6 @@ remotes::install_github("lebauerapproach/caladaptaer")
 
 No Python, no climakitae, no dask. Just GDAL doing what GDAL does.
 
-## Related projects
-
-- [climakitae](https://github.com/cal-adapt/climakitae) -- official Python package for the Analytics Engine
-- [caladaptr](https://github.com/ucanr-igis/caladaptr) -- R package for the legacy CMIP5 Cal-Adapt API (different data, different backend)
-
-
 ## License
 
 BSD 3-Clause
