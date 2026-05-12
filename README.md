@@ -8,6 +8,15 @@ caladaptaer reads WRF dynamically downscaled (hourly, 3/9/45 km) and LOCA2-Hybri
 
 ## Quick start
 
+**Installation**
+
+```r
+# from GitHub
+remotes::install_github("lebauerapproach/caladaptaer")
+```
+
+**Example**
+
 ```r
 library(caladaptaer)
 
@@ -41,13 +50,6 @@ Data produced by UCLA Center for Climate Science (WRF, Rahimi et al. 2024) and S
 - R >= 4.1
 - GDAL >= 3.4 (for Zarr driver -- check with `sf::sf_extSoftVersion()`)
 - Internet access to AWS S3 (us-west-2 region)
-
-## Installation
-
-```r
-# from GitHub
-remotes::install_github("lebauerapproach/caladaptaer")
-```
 
 ## How it works
 
