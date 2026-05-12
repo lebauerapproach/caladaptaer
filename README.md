@@ -56,8 +56,6 @@ remotes::install_github("lebauerapproach/caladaptaer")
 3. Reads the Zarr store from S3 via GDAL's `/vsis3/` virtual filesystem using `stars::read_mdim()`
 4. Returns a `stars` object with full spatial and temporal metadata
 
-No Python, no climakitae, no dask. Just GDAL doing what GDAL does.
-
 ## License
 
 BSD 3-Clause
