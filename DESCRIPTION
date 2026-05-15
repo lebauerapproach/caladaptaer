@@ -3,10 +3,10 @@ Title: Access Cal-Adapt Climate Data from R
 Version: 0.2.0
 Authors@R: c(
     person("Akash", "B V",
-           email = "abv1@bu.edu",
+           email = "akash@davidlebauer.com",
            role = c("aut", "cre")),
     person("David", "LeBauer",
-           email = "dlebauer@gmail.com",
+           email = "david@davidlebauer.com",
            role = "aut",
            comment = c(ORCID = "0000-0001-7228-053X"))
     )
