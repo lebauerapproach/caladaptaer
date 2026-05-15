@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+message: "If you use caladaptaer in your research, please cite it as below."
+title: "caladaptaer: Access Cal-Adapt Climate Data from R"
+abstract: >-
+  Provides native R access to the Cal-Adapt Analytics Engine, California's
+  repository of dynamically and statistically downscaled climate data.
+  Supports CMIP6 future projections (WRF hourly at 3/9/45 km, LOCA2-Hybrid
+  daily at 3 km) and the reanalysis driven WRF run (ERA5 forced) that anchors
+  the historical period. Reads cloud optimized Zarr stores directly from
+  AWS S3 via GDAL, with no Python dependency.
+type: software
+authors:
+  - given-names: Akash
+    family-names: B V
+    email: akash@davidlebauer.com
+  - given-names: David
+    family-names: LeBauer
+    email: david@davidlebauer.com
+    orcid: "https://orcid.org/0000-0001-7228-053X"
+version: 0.2.0
+date-released: 2026-04-28
+license: BSD-3-Clause
+url: "https://github.com/lebauerapproach/caladaptaer"
+repository-code: "https://github.com/lebauerapproach/caladaptaer"
+keywords:
+  - cal-adapt
+  - climate-data
+  - cmip6
+  - downscaling
+  - r-package
+  - wrf
+  - loca2
+  - era5
+  - reanalysis
+  - zarr
+  - california
+  - climate-projections
