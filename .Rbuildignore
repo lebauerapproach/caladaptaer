@@ -15,3 +15,7 @@
 ^vignettes/.*\.qmd$
 ^vignettes/_quarto\.yml$
 ^\.quarto$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^build_site\.sh$
