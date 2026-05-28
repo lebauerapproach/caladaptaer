@@ -3,6 +3,8 @@
 #' Functions for loading, caching, and querying the Cal-Adapt
 #' intake-ESM catalog. The catalog indexes all Zarr stores on the
 #' CADCAT S3 bucket with CMIP6-style metadata fields.
+#'
+#' @keywords internal
 
 ##catalog URLs
 .catalog_csv_url <- "https://cadcat.s3-us-west-2.amazonaws.com/cae-zarr.csv"
