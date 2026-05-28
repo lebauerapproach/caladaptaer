@@ -15,4 +15,4 @@ Functions for loading, caching, and querying the Cal-Adapt
 intake-ESM catalog. The catalog indexes all Zarr stores on the
 CADCAT S3 bucket with CMIP6-style metadata fields.
 }
-\keyword{datasets}
+\keyword{internal}
