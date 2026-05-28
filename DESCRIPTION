@@ -17,7 +17,8 @@ Description: Provides native R access to the Cal-Adapt Analytics Engine,
     Reads cloud-optimized Zarr stores directly from AWS S3 via GDAL,
     with no Python dependency.
 License: BSD_3_clause + file LICENSE
-URL: https://github.com/lebauerapproach/caladaptaer
+URL: https://github.com/lebauerapproach/caladaptaer,
+    https://lebauerapproach.github.io/caladaptaer
 BugReports: https://github.com/lebauerapproach/caladaptaer/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
