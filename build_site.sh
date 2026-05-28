@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Builds the docs site. Two tools: quarto does the home + guides, pkgdown does
+# Builds the docs site. two tools: quarto does the home + guides, pkgdown does
 # the function reference off the roxygen docs. Quarto wipes _site/ on every
 # render, so run it first, then drop pkgdown's reference into _site/reference.
-# Safe to copy -- pkgdown keeps its assets under deps/ and writes no search.json
+# safe to copy, pkgdown keeps its assets under deps/ and writes no search.json
 # at the root, so it doesn't clobber quarto's files.
 #
-# No quarto on PATH on the SCC, so point pkgdown at the module's quarto and the
+# no quarto on PATH on the SCC, so point pkgdown at the module's quarto and the
 # pandoc it ships with.
 #
-##TODO move to whole-site pkgdown once the callouts are gone (see TODO.md)
+##TODO move to whole site pkgdown once the callouts are gone (see TODO.md)
 
 set -euo pipefail
 cd "$(dirname "$0")"
