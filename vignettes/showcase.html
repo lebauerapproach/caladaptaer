@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.313">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Akash B V and David LeBauer">
+<meta name="dcterms.date" content="2026-05-28">
+
+<title>caladaptaer - Showcase</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Showcase</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">caladaptaer</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/lebauerapproach/caladaptaer" title="" class="sidebar-tool px-1"><i class="bi bi-github"></i></a>
+</div>
+    </div>
+      </div>
+      <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">Home</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Guides</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../vignettes/getting_started.html" class="sidebar-item-text sidebar-link">Getting Started</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../vignettes/data_access.html" class="sidebar-item-text sidebar-link">Data Access</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../vignettes/showcase.html" class="sidebar-item-text sidebar-link active">Showcase</a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false">Advanced</a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../vignettes/sipnet_met_drivers.html" class="sidebar-item-text sidebar-link">SIPNET Met Drivers</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../vignettes/bulk_met_drivers.html" class="sidebar-item-text sidebar-link">Bulk Met Drivers</a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/index.html" class="sidebar-item-text sidebar-link">Reference</a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#one-interface-two-very-different-products" id="toc-one-interface-two-very-different-products" class="nav-link active" data-scroll-target="#one-interface-two-very-different-products">One interface, two very different products</a></li>
+  <li><a href="#how-much-does-the-model-you-pick-matter" id="toc-how-much-does-the-model-you-pick-matter" class="nav-link" data-scroll-target="#how-much-does-the-model-you-pick-matter">How much does the model you pick matter</a></li>
+  <li><a href="#what-only-hourly-data-shows" id="toc-what-only-hourly-data-shows" class="nav-link" data-scroll-target="#what-only-hourly-data-shows">What only hourly data shows</a></li>
+  <li><a href="#build-a-variable-that-isnt-in-the-file" id="toc-build-a-variable-that-isnt-in-the-file" class="nav-link" data-scroll-target="#build-a-variable-that-isnt-in-the-file">Build a variable that isn’t in the file</a></li>
+  <li><a href="#zoom-out-to-the-whole-state" id="toc-zoom-out-to-the-whole-state" class="nav-link" data-scroll-target="#zoom-out-to-the-whole-state">Zoom out to the whole state</a></li>
+  <li><a href="#where-this-is-going" id="toc-where-this-is-going" class="nav-link" data-scroll-target="#where-this-is-going">Where this is going</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Showcase</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Akash B V and David LeBauer </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 28, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<p>Quick answer to “what can I actually do with this thing.” Three questions you’d really ask about California’s climate future, each one knocked out in a few lines of R straight off live Cal-Adapt data.</p>
+<p>Plots aren’t really the point. Point is, grabbing this data into R, which used to be hours of grief, is already handled, so you get to spend your time on science instead.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caladaptaer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="one-interface-two-very-different-products" class="level2">
+<h2 class="anchored" data-anchor-id="one-interface-two-very-different-products">One interface, two very different products</h2>
+<p>Analytics Engine ships two downscaled products, and they flat out don’t line up. WRF is dynamical, hourly, sits on a 45 km Lambert grid, and calls near surface air temp <code>t2</code>. LOCA2 is statistical, daily, on a 3 km lat/lon grid, and doesn’t even carry a mean temperature, just daily <code>tasmax</code> and <code>tasmin</code>. Different physics, different grid, different time step, even different variable names.</p>
+<p>caladaptaer hands you both back as one tidy <code>data.frame</code>, so you can just throw them on the same plot. Here’s the same GCM (EC-Earth3), SSP3-7.0, at Fresno, one week of July 2050, pulled from both.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># WRF: hourly t2, 45 km</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>wrf <span class="ot">&lt;-</span> <span class="fu">cae_fetch_point</span>(<span class="st">"t2"</span>, <span class="at">model =</span> <span class="st">"EC-Earth3"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">lon =</span> <span class="sc">-</span><span class="fl">119.77</span>, <span class="at">lat =</span> <span class="fl">36.75</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">start_time =</span> <span class="st">"2050-07-01T00:00:00"</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">end_time   =</span> <span class="st">"2050-07-07T23:00:00"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># LOCA2: daily tasmax and tasmin, 3 km, same model and spot</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>tmax <span class="ot">&lt;-</span> <span class="fu">cae_fetch_point</span>(<span class="st">"tasmax"</span>, <span class="at">model =</span> <span class="st">"EC-Earth3"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>                        <span class="at">lon =</span> <span class="sc">-</span><span class="fl">119.77</span>, <span class="at">lat =</span> <span class="fl">36.75</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>                        <span class="at">timescale =</span> <span class="st">"day"</span>, <span class="at">resolution =</span> <span class="st">"d03"</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>                        <span class="at">start_time =</span> <span class="st">"2050-07-01"</span>, <span class="at">end_time =</span> <span class="st">"2050-07-07"</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>tmin <span class="ot">&lt;-</span> <span class="fu">cae_fetch_point</span>(<span class="st">"tasmin"</span>, <span class="at">model =</span> <span class="st">"EC-Earth3"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>                        <span class="at">lon =</span> <span class="sc">-</span><span class="fl">119.77</span>, <span class="at">lat =</span> <span class="fl">36.75</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>                        <span class="at">timescale =</span> <span class="st">"day"</span>, <span class="at">resolution =</span> <span class="st">"d03"</span>,</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>                        <span class="at">start_time =</span> <span class="st">"2050-07-01"</span>, <span class="at">end_time =</span> <span class="st">"2050-07-07"</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(wrf, <span class="dv">3</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                  time    value</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 2050-07-01 00:00:00 311.8828</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 2050-07-01 01:00:00 311.5065</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 2050-07-01 02:00:00 311.3383</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(tmax, <span class="dv">3</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                  time    value</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 2050-06-30 12:00:00 312.8626</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 2050-07-01 12:00:00 313.3137</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 2050-07-02 12:00:00 313.4529</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Same call both times. Past the variable name, only thing that changes is <code>timescale = "day"</code> and <code>resolution = "d03"</code> to aim at LOCA2 store instead of WRF one.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># kelvin to C</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>wrf<span class="sc">$</span>c  <span class="ot">&lt;-</span> wrf<span class="sc">$</span>value  <span class="sc">-</span> <span class="fl">273.15</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>tmax<span class="sc">$</span>c <span class="ot">&lt;-</span> tmax<span class="sc">$</span>value <span class="sc">-</span> <span class="fl">273.15</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>tmin<span class="sc">$</span>c <span class="ot">&lt;-</span> tmin<span class="sc">$</span>value <span class="sc">-</span> <span class="fl">273.15</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(wrf<span class="sc">$</span>time, wrf<span class="sc">$</span>c, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"grey30"</span>,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylim =</span> <span class="fu">range</span>(<span class="fu">c</span>(wrf<span class="sc">$</span>c, tmax<span class="sc">$</span>c, tmin<span class="sc">$</span>c)),</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"time"</span>, <span class="at">ylab =</span> <span class="st">"temperature (C)"</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(tmax<span class="sc">$</span>time, tmax<span class="sc">$</span>c, <span class="at">col =</span> <span class="st">"#D62728"</span>, <span class="at">lty =</span> <span class="dv">2</span>); <span class="fu">points</span>(tmax<span class="sc">$</span>time, tmax<span class="sc">$</span>c, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">col =</span> <span class="st">"#D62728"</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(tmin<span class="sc">$</span>time, tmin<span class="sc">$</span>c, <span class="at">col =</span> <span class="st">"#1F77B4"</span>, <span class="at">lty =</span> <span class="dv">2</span>); <span class="fu">points</span>(tmin<span class="sc">$</span>time, tmin<span class="sc">$</span>c, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">col =</span> <span class="st">"#1F77B4"</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="at">bty =</span> <span class="st">"n"</span>, <span class="at">cex =</span> <span class="fl">0.8</span>,</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"WRF t2 (hourly)"</span>, <span class="st">"LOCA2 tasmax (daily)"</span>, <span class="st">"LOCA2 tasmin (daily)"</span>),</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"grey30"</span>, <span class="st">"#D62728"</span>, <span class="st">"#1F77B4"</span>),</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">1</span>), <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>), <span class="at">pch =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="dv">19</span>, <span class="dv">19</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="showcase_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" alt="EC-Earth3 air temperature at Fresno for the first week of July 2050. A grey line traces hourly WRF 2 meter temperature swinging between roughly 11 and 39 C. Red and blue dashed lines mark LOCA2 daily tasmax near 37 to 40 C and tasmin near 20 to 24 C." width="768"></p>
+</div>
+</div>
+<p>And yeah, they disagree, that’s the honest read. WRF overnight lows run cooler than LOCA2 <code>tasmin</code>. Part of it is that 45 km WRF cell smears over way more, and way more varied, ground than that little 3 km LOCA2 cell, and part of it is that dynamical and statistical downscaling are just different animals. Bottom line, which product you grab changes your number. Pulling both into R side by side is how you actually see that for yourself instead of taking somebody’s word for it.</p>
+<p>This is what we’re chasing next: one interface that lines up names, units, and time across both products, and quietly handles the known Cal-Adapt gotchas (those renamed humidity and wind variables, that precip unit fix) so you never trip over them. <a href="../index.html">Home page</a> has where that fits.</p>
+</section>
+<section id="how-much-does-the-model-you-pick-matter" class="level2">
+<h2 class="anchored" data-anchor-id="how-much-does-the-model-you-pick-matter">How much does the model you pick matter</h2>
+<p>Eight GCMs get dynamically downscaled in WRF. They all run through the same downscaling machinery, so stacking them up at one spot gives you a clean read on structural uncertainty: how much of your answer is actual climate, versus just which model spit it out.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>wrf_370 <span class="ot">&lt;-</span> <span class="fu">Filter</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">function</span>(m) <span class="st">"ssp370"</span> <span class="sc">%in%</span> <span class="fu">cae_scenarios</span>(<span class="at">activity =</span> <span class="st">"WRF"</span>, <span class="at">model =</span> m),</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">setdiff</span>(<span class="fu">cae_models</span>(<span class="at">activity =</span> <span class="st">"WRF"</span>), <span class="st">"ERA5"</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>series <span class="ot">&lt;-</span> <span class="fu">lapply</span>(wrf_370, <span class="cf">function</span>(m) {</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  d <span class="ot">&lt;-</span> <span class="fu">cae_fetch_point</span>(<span class="st">"t2"</span>, <span class="at">model =</span> m, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">lon =</span> <span class="sc">-</span><span class="fl">119.77</span>, <span class="at">lat =</span> <span class="fl">36.75</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                       <span class="at">start_time =</span> <span class="st">"2050-07-01T00:00:00"</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                       <span class="at">end_time   =</span> <span class="st">"2050-07-01T23:00:00"</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  d<span class="sc">$</span>model <span class="ot">&lt;-</span> m</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  d<span class="sc">$</span>c <span class="ot">&lt;-</span> d<span class="sc">$</span>value <span class="sc">-</span> <span class="fl">273.15</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  d</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>series <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, series)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>cols <span class="ot">&lt;-</span> <span class="fu">hcl.colors</span>(<span class="fu">length</span>(wrf_370), <span class="st">"Dark 3"</span>)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(series<span class="sc">$</span>time, series<span class="sc">$</span>c, <span class="at">type =</span> <span class="st">"n"</span>, <span class="at">xlab =</span> <span class="st">"time"</span>, <span class="at">ylab =</span> <span class="st">"temperature (C)"</span>)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(wrf_370)) {</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  d <span class="ot">&lt;-</span> series[series<span class="sc">$</span>model <span class="sc">==</span> wrf_370[i], ]</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lines</span>(d<span class="sc">$</span>time, d<span class="sc">$</span>c, <span class="at">col =</span> cols[i], <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="at">legend =</span> wrf_370, <span class="at">col =</span> cols, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">cex =</span> <span class="fl">0.7</span>, <span class="at">bty =</span> <span class="st">"n"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="showcase_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" alt="Hourly 2 meter air temperature at Fresno on 1 July 2050 from every WRF GCM under SSP3-7.0. The curves share a cool night, warm afternoon shape but fan out 10 C or more apart at the afternoon peak, with the hottest model near 44 C." width="768"></p>
+</div>
+</div>
+<p>Models agree on the shape, cool night, hot afternoon, but they fan out hard on the actual temperature, 10 C or more apart at the afternoon peak (the hottest, MPI-ESM1-2-HR, tops 44 C while the coolest sits near 30). Clock is UTC, so that midday dip is really the local overnight low. Anything you run downstream that cares about temperature, a crop model, a fire index, a building load, an ecosystem carbon flux, that spread is the error bar you’re stuck with just from picking a model. Pushing the whole ensemble through to a calibrated answer is on our roadmap. Grabbing that ensemble in one place, today, is what makes it doable.</p>
+</section>
+<section id="what-only-hourly-data-shows" class="level2">
+<h2 class="anchored" data-anchor-id="what-only-hourly-data-shows">What only hourly data shows</h2>
+<p>LOCA2 and the raw GCMs are daily at best. WRF is hourly, and that cracks open something nothing else can: the shape of the day. Heat stress, evapotranspiration, nighttime respiration, they all key off the sub daily swing, not the daily mean. So here’s that swing at three California landscapes over a summer stretch in 2050.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sites <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">name =</span> <span class="fu">c</span>(<span class="st">"Coast (San Francisco)"</span>, <span class="st">"Central Valley (Fresno)"</span>, <span class="st">"Sierra (Mammoth area)"</span>),</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">lon  =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">122.42</span>, <span class="sc">-</span><span class="fl">119.77</span>, <span class="sc">-</span><span class="fl">119.03</span>),</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">lat  =</span> <span class="fu">c</span>(  <span class="fl">37.77</span>,   <span class="fl">36.75</span>,   <span class="fl">37.63</span>),</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">col  =</span> <span class="fu">c</span>(<span class="st">"#1F77B4"</span>, <span class="st">"#D62728"</span>, <span class="st">"#2CA02C"</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>series <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">seq_len</span>(<span class="fu">nrow</span>(sites)), <span class="cf">function</span>(i) {</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  d <span class="ot">&lt;-</span> <span class="fu">cae_fetch_point</span>(<span class="st">"t2"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>                       <span class="at">lon =</span> sites<span class="sc">$</span>lon[i], <span class="at">lat =</span> sites<span class="sc">$</span>lat[i],</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>                       <span class="at">start_time =</span> <span class="st">"2050-07-01T00:00:00"</span>,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>                       <span class="at">end_time   =</span> <span class="st">"2050-07-03T23:00:00"</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  d<span class="sc">$</span>c <span class="ot">&lt;-</span> d<span class="sc">$</span>value <span class="sc">-</span> <span class="fl">273.15</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  d<span class="sc">$</span>name <span class="ot">&lt;-</span> sites<span class="sc">$</span>name[i]</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  d</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>series <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, series)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(series<span class="sc">$</span>time, series<span class="sc">$</span>c, <span class="at">type =</span> <span class="st">"n"</span>, <span class="at">xlab =</span> <span class="st">"time"</span>, <span class="at">ylab =</span> <span class="st">"temperature (C)"</span>)</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(sites))) {</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  d <span class="ot">&lt;-</span> series[series<span class="sc">$</span>name <span class="sc">==</span> sites<span class="sc">$</span>name[i], ]</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lines</span>(d<span class="sc">$</span>time, d<span class="sc">$</span>c, <span class="at">col =</span> sites<span class="sc">$</span>col[i], <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="at">legend =</span> sites<span class="sc">$</span>name, <span class="at">col =</span> sites<span class="sc">$</span>col, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">cex =</span> <span class="fl">0.8</span>, <span class="at">bty =</span> <span class="st">"n"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="showcase_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" alt="Hourly 2 meter air temperature for 1 to 3 July 2050 at three California sites under CESM2 SSP3-7.0. The coast stays in a narrow 15 to 26 C band, the Central Valley swings widely from about 12 to 31 C, and the Sierra site is coldest at roughly 4 to 17 C." width="768"></p>
+</div>
+</div>
+<p>Coast barely budges, ocean pins it in a tight band. Central Valley swings the widest. Sierra site is coldest at every hour. That’s exactly the physics you’d expect, and it drops out of three <code>cae_fetch_point()</code> calls. No daily product can show you that.</p>
+</section>
+<section id="build-a-variable-that-isnt-in-the-file" class="level2">
+<h2 class="anchored" data-anchor-id="build-a-variable-that-isnt-in-the-file">Build a variable that isn’t in the file</h2>
+<p>Cal-Adapt hands you wind as two components, eastward <code>u10</code> and northward <code>v10</code>, not as a single speed. No problem, grab both and combine them. Here’s the 10 m wind at Fresno over a couple of July days.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># eastward and northward components</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>u <span class="ot">&lt;-</span> <span class="fu">cae_fetch_point</span>(<span class="st">"u10"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>, <span class="at">lon =</span> <span class="sc">-</span><span class="fl">119.77</span>, <span class="at">lat =</span> <span class="fl">36.75</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">start_time =</span> <span class="st">"2050-07-01T00:00:00"</span>, <span class="at">end_time =</span> <span class="st">"2050-07-02T23:00:00"</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="fu">cae_fetch_point</span>(<span class="st">"v10"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>, <span class="at">lon =</span> <span class="sc">-</span><span class="fl">119.77</span>, <span class="at">lat =</span> <span class="fl">36.75</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">start_time =</span> <span class="st">"2050-07-01T00:00:00"</span>, <span class="at">end_time =</span> <span class="st">"2050-07-02T23:00:00"</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># wind speed is just the magnitude</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>ws <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">time =</span> u<span class="sc">$</span>time, <span class="at">speed =</span> <span class="fu">sqrt</span>(u<span class="sc">$</span>value<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> v<span class="sc">$</span>value<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ws<span class="sc">$</span>time, ws<span class="sc">$</span>speed, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#2C7FB8"</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"time"</span>, <span class="at">ylab =</span> <span class="st">"wind speed (m/s)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="showcase_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" alt="Hourly 10 meter wind speed at Fresno for 1 to 2 July 2050 under CESM2 SSP3-7.0, computed from the u and v components, running between about 2 and 8.5 m/s with windier afternoons." width="768"></p>
+</div>
+</div>
+<p>Same trick works for anything you can build off the raw fields, vapor pressure deficit, a heat index, reference ET. The parts are all in there.</p>
+</section>
+<section id="zoom-out-to-the-whole-state" class="level2">
+<h2 class="anchored" data-anchor-id="zoom-out-to-the-whole-state">Zoom out to the whole state</h2>
+<p>Points are one thing, but you can read the whole grid and clip it to whatever region you care about. Here’s a summer afternoon over California: pull the 45 km WRF field, clip it to the state, and you have a map and a number, the statewide average, out of the same object.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stars)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(maps)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># one 45 km timestep over the western US</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">cae_fetch</span>(<span class="st">"t2"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>, <span class="at">resolution =</span> <span class="st">"d01"</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">start_time =</span> <span class="st">"2050-07-01T00:00:00"</span>, <span class="at">end_time =</span> <span class="st">"2050-07-01T00:00:00"</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># California polygon, into the WRF grid's projection</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>ca <span class="ot">&lt;-</span> <span class="fu">st_transform</span>(<span class="fu">st_as_sf</span>(<span class="fu">map</span>(<span class="st">"state"</span>, <span class="st">"california"</span>, <span class="at">plot =</span> <span class="cn">FALSE</span>, <span class="at">fill =</span> <span class="cn">TRUE</span>)), <span class="fu">st_crs</span>(g))</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co"># clip the grid to the state, kelvin to C</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>g_ca <span class="ot">&lt;-</span> g[ca]</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>g_ca[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> units<span class="sc">::</span><span class="fu">drop_units</span>(g_ca[[<span class="dv">1</span>]]) <span class="sc">-</span> <span class="fl">273.15</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co"># statewide average out of one aggregate call</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">as.numeric</span>(<span class="fu">aggregate</span>(g, ca, <span class="at">FUN =</span> mean, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)[[<span class="dv">1</span>]])[<span class="dv">1</span>] <span class="sc">-</span> <span class="fl">273.15</span>, <span class="dv">1</span>)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 27.6</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g_ca, <span class="at">reset =</span> <span class="cn">FALSE</span>, <span class="at">axes =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="fu">hcl.colors</span>(<span class="dv">100</span>, <span class="st">"YlOrRd"</span>, <span class="at">rev =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">key.pos =</span> <span class="dv">4</span>, <span class="at">key.width =</span> <span class="fu">lcm</span>(<span class="fl">1.4</span>), <span class="at">key.length =</span> <span class="fl">0.8</span>, <span class="at">main =</span> <span class="st">""</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">st_geometry</span>(ca), <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">border =</span> <span class="st">"black"</span>, <span class="at">lwd =</span> <span class="fl">1.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="showcase_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" alt="Map of 2 meter air temperature clipped to California from the 45 km WRF grid for a summer 2050 afternoon under CESM2 SSP3-7.0. The Central Valley and southern deserts are hot, near 35 to 44 C, the coast and northern mountains cooler, near 15 to 25 C." width="576"></p>
+</div>
+</div>
+<p>That’s 45 km, so California comes out to about 191 cells, blocky but honest. The statewide mean falls out of one <code>aggregate()</code> call. Want a county or a watershed instead? Swap the polygon, everything else stays the same.</p>
+</section>
+<section id="where-this-is-going" class="level2">
+<h2 class="anchored" data-anchor-id="where-this-is-going">Where this is going</h2>
+<p>Everything up there uses only what the package does today: read a point or a grid, across both products, in a few calls. Here’s where it goes from here.</p>
+<ul>
+<li><strong>Analysis ready across products.</strong> One interface that harmonizes WRF and LOCA2 (names, units, grid, time) and applies the known Cal-Adapt data fixes automatically, so write once and run across both.</li>
+<li><strong>Provenance you can reproduce from.</strong> Every output stamped with the exact store, version, slice, model, scenario, and transform that made it, and with the Cal-Adapt citation carried through, so a file can be rerun and cited from itself.</li>
+<li><strong>The analysis layer.</strong> Spatial subsetting to counties and watersheds, temporal aggregation, derived variables, warming levels, and carrying the full ensemble through to calibrated uncertainty. <a href="../index.html">Home page</a> has the full roadmap, and <a href="../vignettes/data_access.html">Data Access</a> walks every function with live output.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
