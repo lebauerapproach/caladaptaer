@@ -43,16 +43,17 @@ data directly from AWS S3 Zarr stores via GDAL.
 Useful links:
 \itemize{
   \item \url{https://github.com/lebauerapproach/caladaptaer}
+  \item \url{https://lebauerapproach.github.io/caladaptaer}
   \item Report bugs at \url{https://github.com/lebauerapproach/caladaptaer/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Akash B V \email{abv1@bu.edu}
+\strong{Maintainer}: Akash B V \email{akash@davidlebauer.com}
 
 Authors:
 \itemize{
-  \item David LeBauer \email{dlebauer@gmail.com} (\href{https://orcid.org/0000-0001-7228-053X}{ORCID})
+  \item David LeBauer \email{david@davidlebauer.com} (\href{https://orcid.org/0000-0001-7228-053X}{ORCID})
 }
 
 }
