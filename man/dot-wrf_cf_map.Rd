@@ -15,4 +15,4 @@ Functions to convert Cal-Adapt WRF variables to CF-standard
 NetCDF format. Handles variable renaming, unit conversions, and
 metadata stamping.
 }
-\keyword{datasets}
+\keyword{internal}
