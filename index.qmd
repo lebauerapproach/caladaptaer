@@ -1,52 +1,167 @@
 ---
 title: "caladaptaer"
-subtitle: "Native R Access to Cal-Adapt Climate Projections"
+subtitle: "Cal-Adapt climate projections, straight into R"
 ---
 
-`caladaptaer` reads downscaled CMIP6 climate data from California's
-[Cal-Adapt Analytics Engine](https://analytics.cal-adapt.org/) directly into R.
-No Python, no API key, no authentication -- just GDAL reading Zarr stores
-from AWS S3.
+If you work in R and you have tried to pull California's downscaled climate
+projections off the [Cal-Adapt Analytics Engine](https://analytics.cal-adapt.org/),
+you have probably hit a wall. The data sits as cloud optimized Zarr on AWS S3,
+and until now the R side of that story basically did not exist. caladaptaer is
+the piece that was missing. You ask for a variable, a model, a scenario, and a
+time window, and it hands back a native R object, a `stars` grid or a tidy
+`data.frame`, ready to drop into the rest of your work. No Python, no API key,
+nothing to authenticate.
 
-## Available Data
+And it stays general on purpose. caladaptaer is a data gateway, not a model.
+Whatever you do in R, ecology, hydrology, ag, energy, water resources, carbon,
+you point it at the projection you need and keep working in your own tools.
 
-| Dataset | Resolution | Temporal | GCMs | SSPs | Period |
-|---------|-----------|----------|------|------|--------|
-| WRF CMIP6 (WUS-D3) | 45 / 9 / 3 km | Hourly | 8 models | SSP3-7.0 (all); SSP2-4.5, SSP5-8.5 (CESM2) | 1980--2100 |
-| LOCA2-Hybrid | 3 km | Daily | 15 models | SSP2-4.5, SSP3-7.0, SSP5-8.5 | 1950--2100 |
+## How it works
 
-## Quick Start
+```{mermaid}
+%%| echo: false
+%%| fig-align: center
+flowchart LR
+  classDef data fill:#F6A23C,stroke:#C77B1E,color:#1f1300,stroke-width:1px;
+  classDef fn fill:#BBD8EC,stroke:#3B7DB5,color:#0f3350,stroke-width:1px;
+  classDef next fill:#EAF3FB,stroke:#3B7DB5,color:#0f3350,stroke-width:1px,stroke-dasharray:5 3;
+  classDef goal fill:#ffffff,stroke:#555555,color:#111111,stroke-width:1px;
 
-```r
-library(caladaptaer)
+  subgraph DATA["Data, level by level"]
+    direction TB
+    S["Cal-Adapt on AWS S3<br/>WRF and LOCA2 Zarr stores"]:::data
+    R["native R object<br/>stars grid or data.frame,<br/>one variable"]:::data
+    A["analysis ready<br/>harmonized across<br/>WRF and LOCA2"]:::data
+    D["model drivers<br/>CF NetCDF"]:::data
+    G(["your science<br/>any domain"]):::goal
+    S --> R --> A --> D --> G
+    A --> G
+  end
 
-# What's available?
-cae_models(activity = "WRF")
-cae_variables(activity = "WRF", timescale = "1hr")
+  subgraph CODE["caladaptaer"]
+    direction TB
+    DISC["Discover<br/>cae_catalog, cae_models, cae_scenarios,<br/>cae_variables, cae_search, cae_check_variables"]:::fn
+    FETCH["Fetch, the engine<br/>cae_fetch, cae_fetch_point, cae_fetch_points"]:::fn
+    HARM["Harmonize and stamp provenance<br/>next up"]:::next
+    DRV["Drivers<br/>cae_write_cf_netcdf, cae_build_met_drivers"]:::fn
+  end
 
-# Read hourly temperature, 45 km grid, one day
-t2 <- cae_fetch("t2", model = "CESM2", scenario = "ssp370",
-               n_timesteps = 24)
-
-# Extract time series at a point
-ts <- cae_fetch_point("t2", model = "CESM2", scenario = "ssp370",
-                     lon = -119.77, lat = 36.75,
-                     n_timesteps = 24)
+  DISC -.->|"what is on S3"| S
+  FETCH -->|"GDAL /vsis3/, no Python, no key, no auth"| R
+  HARM --> A
+  DRV --> D
 ```
 
-## Guides
+The Analytics Engine stores its climate data as [Zarr](https://zarr.dev/), a
+cloud native array format. A Zarr store is not one giant file you download
+whole; it is split into many small chunks, and a reader can pull just the chunks
+it needs over the network. caladaptaer reads those chunks through GDAL's
+`/vsis3/` virtual filesystem, the same engine already sitting under `sf`,
+`stars`, and `terra`. That is why there is nothing to install on the Python
+side, no key to manage, and no client session to keep alive. You ask for what
+you want and the bytes come back as an R object.
 
-| Vignette | Description |
-|----------|-------------|
-| [Getting Started](vignettes/getting_started.qmd) | Catalog queries, fetching gridded data, point extraction, visualization |
-| [SIPNET Met Drivers](vignettes/sipnet_met_drivers.qmd) | Build CF-standard NetCDF met drivers for SIPNET from WRF projections |
+## The data you can reach
 
-## Installation
+Two downscaling products live on the Engine, both downscaled from CMIP6 global
+models for California and the western US.
+
+| Dataset | Resolution | Step | GCMs | Scenarios | Period |
+|---|---|---|---|---|---|
+| WRF CMIP6 (WUS-D3) | 45 / 9 / 3 km | Hourly | 8 | SSP3-7.0 (all); SSP2-4.5 and SSP5-8.5 (CESM2) | 1980--2100 |
+| LOCA2-Hybrid | 3 km | Daily | 15 | SSP2-4.5, SSP3-7.0, SSP5-8.5 | 1950--2100 |
+
+They get there two different ways, and which one you want depends on the job.
+WRF is dynamically downscaled by UCLA (Rahimi et al. 2024), a physics based
+weather model run at high resolution, so it carries the full hourly surface
+meteorology and resolves things like mountain rain shadows and the sea breeze.
+Reach for it when you need hourly drivers or process based physics. LOCA2 is
+statistically downscaled by Scripps (Pierce et al.), mapping coarse model output
+onto a fine grid from historical analog patterns, so you get daily data for more
+models and more scenarios at 3 km. Reach for it when you want a wide ensemble or
+daily extremes. caladaptaer reads both, plus the ERA5 reanalysis driven WRF run,
+through the same handful of functions.
+
+## What's in the box
+
+Eleven `cae_*` functions cover the whole path from catalog to model ready files.
+You can search the CADCAT catalog by model, scenario, variable, and resolution,
+and check up front whether a model and scenario even carry the fields you need.
+You can read any Zarr store into a `stars` grid, or pull a time series at one
+point or ten thousand; the multi site read grabs the grid from S3 once and
+extracts every site locally, so it is one read per variable, not one read per
+site. And you can turn WRF output into CF-1.8 NetCDF for ecosystem models, units
+and all, in a single call. Precipitation gets filled in automatically for the
+models that ship it split across `rainc` and `rainnc`.
+
+## Quick start
 
 ```r
 remotes::install_github("lebauerapproach/caladaptaer")
 ```
 
-## License
+```r
+library(caladaptaer)
 
-BSD 3-Clause
+# what is on the engine
+cae_models(activity = "WRF")
+
+# does CESM2 SSP3-7.0 carry the variables I need
+cae_check_variables("CESM2", "ssp370")
+
+# a summer day of hourly temperature at Fresno, 2050
+cae_fetch_point("t2", model = "CESM2", scenario = "ssp370",
+                lon = -119.77, lat = 36.75,
+                start_time = "2050-07-01T00:00:00",
+                end_time   = "2050-07-01T23:00:00")
+```
+
+[Getting Started](vignettes/getting_started.qmd) takes this from install to a
+real time series, [Data Access](vignettes/data_access.qmd) is the full tour of
+every function with live output, and [Showcase](vignettes/showcase.qmd) answers
+"what can I actually do with it" in a few worked analyses against live data.
+
+## Used in production
+
+We run caladaptaer in our MAGiC project to pull climate
+projections for our California design points, where it has already generated
+12,474 site-years of hourly drivers: three GCM and scenario combinations (CESM2
+SSP2-4.5, CESM2 SSP3-7.0, MPI-ESM1-2-HR SSP3-7.0) over 2025 to 2045.
+
+## Where we're headed
+
+Today caladaptaer nails access: find the data, read it, turn it into model ready
+files. Three things come next. First, an analysis ready layer that harmonizes
+WRF and LOCA2 behind one interface and quietly applies Cal-Adapt's known data
+quirks (the renamed humidity and wind variables, the precipitation unit fix), so
+you write code once and run it on both. Second, provenance: every output stamped
+with exactly where it came from, the store, version, slice, model, scenario, and
+transform, plus the Cal-Adapt citation carried through, so you can rerun and
+cite a file straight from itself. Third, the analysis layer that turns raw
+projections into what people actually report on, spatial subsetting to counties
+and watersheds, temporal aggregation, derived variables like growing degree days
+and reference ET, warming levels, extremes, and bias correction. After that,
+rOpenSci review and a CRAN submission.
+
+Why it is worth doing: it is the only real path into the Analytics Engine for R
+users right now, since the old R client stops at the previous CMIP5 generation.
+The provenance piece is something even the Python tooling does not do today. And
+it stays general, so the same gateway serves an ecologist, a hydrologist, or an
+energy modeler. We are building it to sit next to the Python tools in the
+Cal-Adapt ecosystem, not to fork them.
+
+## Guides and reference
+
+| Page | What is on it |
+|---|---|
+| [Getting Started](vignettes/getting_started.qmd) | Install to a real time series in a few calls |
+| [Data Access](vignettes/data_access.qmd) | Every function, with live output |
+| [Showcase](vignettes/showcase.qmd) | Worked analyses that show what the data can do |
+| [SIPNET Met Drivers](vignettes/sipnet_met_drivers.qmd) | WRF to CF NetCDF for ecosystem models |
+| [Bulk Met Drivers](vignettes/bulk_met_drivers.qmd) | The multi site driver path |
+| [Reference](reference/index.html) | Every function, every argument |
+
+## Citing and license
+
+caladaptaer is released under BSD-3-Clause. See `CITATION.cff` in the repo for
+how to cite it.
