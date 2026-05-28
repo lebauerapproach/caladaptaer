@@ -4,7 +4,7 @@
 #' intake-ESM catalog. The catalog indexes all Zarr stores on the
 #' CADCAT S3 bucket with CMIP6-style metadata fields.
 
-# -- catalog URLs (match climakitae core/paths.py) --
+##catalog URLs
 .catalog_csv_url <- "https://cadcat.s3-us-west-2.amazonaws.com/cae-zarr.csv"
 .catalog_json_url <- "https://cadcat.s3.amazonaws.com/cae-collection.json"
 
