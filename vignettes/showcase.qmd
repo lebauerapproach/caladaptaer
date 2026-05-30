@@ -20,7 +20,7 @@ science instead.
 library(caladaptaer)
 ```
 
-## One interface, two very different products
+## Comparing the two products
 
 Analytics Engine ships two downscaled products, and they flat out don't line
 up. WRF is dynamical, hourly, sits on a 45 km Lambert grid, and calls near
@@ -85,11 +85,6 @@ way more varied, ground than that little 3 km LOCA2 cell, and part of it is that
 dynamical and statistical downscaling are just different animals. Bottom line,
 which product you grab changes your number. Pulling both into R side by side is
 how you actually see that for yourself instead of taking somebody's word for it.
-
-This is what we're chasing next: one interface that lines up names, units, and
-time across both products, and quietly handles the known Cal-Adapt gotchas
-(those renamed humidity and wind variables, that precip unit fix) so you never
-trip over them. [Home page](../index.html) has where that fits.
 
 ## How much does the model you pick matter
 
@@ -247,20 +242,8 @@ That's 45 km, so California comes out to about 191 cells, blocky but honest. The
 statewide mean falls out of one `aggregate()` call. Want a county or a watershed
 instead? Swap the polygon, everything else stays the same.
 
-## Where this is going
+## Where to go next
 
-Everything up there uses only what the package does today: read a point or a
-grid, across both products, in a few calls. Here's where it goes from here.
-
-- **Analysis ready across products.** One interface that harmonizes WRF and
-  LOCA2 (names, units, grid, time) and applies the known Cal-Adapt data fixes
-  automatically, so write once and run across both.
-- **Provenance you can reproduce from.** Every output stamped with the exact
-  store, version, slice, model, scenario, and transform that made it, and with
-  the Cal-Adapt citation carried through, so a file can be rerun and cited from
-  itself.
-- **The analysis layer.** Spatial subsetting to counties and watersheds,
-  temporal aggregation, derived variables, warming levels, and carrying the
-  full ensemble through to calibrated uncertainty. [Home page](../index.html)
-  has the full roadmap, and [Data Access](data_access.qmd) walks every function
-  with live output.
+These analyses use only what the package does today. The
+[home page](../index.html) has the roadmap, and
+[Data Access](data_access.qmd) covers every function with live output.
