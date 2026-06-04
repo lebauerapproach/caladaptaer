@@ -1,0 +1,183 @@
+---
+title: "WRF Meteorological Drivers"
+---
+
+```{r}
+#| include: false
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+## Purpose
+
+This guide describes how to convert hourly WRF output from the Cal-Adapt
+Analytics Engine into CF-1.8 NetCDF meteorological driver files. The workflow
+is intended for site-based ecosystem models and other tools that consume
+CF-standard meteorological forcing.
+
+`caladaptaer` provides two driver-generation paths:
+
+- `cae_write_cf_netcdf()` writes a CF NetCDF file from a named list of WRF
+  `stars` grids.
+- `cae_build_met_drivers()` extracts WRF data for multiple sites and writes one
+  NetCDF file per site per year.
+
+## Prerequisites
+
+Install `caladaptaer` and verify that GDAL is available as described in
+[Getting Started](getting_started.qmd). This guide assumes the package is
+already installed.
+
+```{r}
+library(caladaptaer)
+```
+
+The driver workflow requires WRF hourly data. LOCA2-Hybrid daily products do
+not provide the full hourly meteorological variable set required by these
+functions.
+
+## Required Inputs
+
+Multi-site driver generation requires a site table with three columns:
+
+| Column | Description |
+|---|---|
+| `site_id` | Site identifier used in output paths |
+| `lon` | Longitude in WGS84 decimal degrees |
+| `lat` | Latitude in WGS84 decimal degrees |
+
+Additional columns can be present; `cae_build_met_drivers()` uses only
+`site_id`, `lon`, and `lat`.
+
+```{r}
+sites <- data.frame(
+    site_id = c("fresno", "los_angeles", "sacramento"),
+    lon = c(-119.77, -118.24, -121.49),
+    lat = c(36.75, 34.05, 38.58)
+)
+```
+
+Driver generation also requires a WRF model, scenario, year range, spatial
+grid, and output directory. Use `cae_models()`, `cae_scenarios()`, and
+`cae_search()` to confirm availability before starting a large job.
+
+## Required Variables
+
+The CF driver files are built from eight WRF surface meteorology variables.
+`wind_speed` is derived from `u10` and `v10`.
+
+| CF variable | WRF variable | WRF units | CF units | Conversion |
+|---|---|---|---|---|
+| `air_temperature` | `t2` | K | K | none |
+| `air_pressure` | `psfc` | Pa | Pa | none |
+| `precipitation_flux` | `prec` | mm per timestep | kg m-2 s-1 | divide by timestep seconds |
+| `specific_humidity` | `q2` | kg kg-1 mixing ratio | 1 | `q2 / (1 + q2)` |
+| `surface_downwelling_shortwave_flux_in_air` | `swdnb` | W m-2 | W m-2 | none |
+| `surface_downwelling_longwave_flux_in_air` | `lwdnb` | W m-2 | W m-2 | none |
+| `eastward_wind` | `u10` | m s-1 | m s-1 | none |
+| `northward_wind` | `v10` | m s-1 | m s-1 | none |
+| `wind_speed` | `u10`, `v10` | m s-1 | m s-1 | `sqrt(u10^2 + v10^2)` |
+
+Use `cae_check_variables()` to check whether the required variables are present
+or derivable for a model, scenario, timescale, and resolution.
+
+```{r}
+cae_check_variables(
+    model = "CESM2",
+    scenario = "ssp370",
+    timescale = "1hr",
+    resolution = "d01"
+)
+```
+
+Some WRF models store precipitation as accumulated convective and
+non-convective components rather than the precomputed `prec` field.
+`caladaptaer` derives `prec` from those components when possible.
+
+## Single-Grid Workflow
+
+Use `cae_write_cf_netcdf()` when the intended output is a CF NetCDF file for a
+single WRF grid subset. The input is a named list of `stars` objects, one per
+required WRF variable.
+
+```{r}
+wrf_vars <- c("t2", "psfc", "prec", "q2", "swdnb", "lwdnb", "u10", "v10")
+
+var_data <- lapply(wrf_vars, function(variable) {
+    cae_fetch(
+        variable = variable,
+        model = "CESM2",
+        scenario = "ssp370",
+        timescale = "1hr",
+        resolution = "d01",
+        start_time = "2050-07-01T00:00:00",
+        end_time = "2050-07-01T23:00:00"
+    )
+})
+names(var_data) <- wrf_vars
+
+cae_write_cf_netcdf(
+    var_list = var_data,
+    outfile = "CESM2.ssp370.2050-07-01.cf.nc",
+    dt_seconds = 3600,
+    overwrite = TRUE
+)
+```
+
+The output file contains CF-1.8 global metadata, CF variable names, converted
+units, and derived wind speed.
+
+## Multi-Site Workflow
+
+Use `cae_build_met_drivers()` when the intended output is one NetCDF file per
+site per year. The function reads each WRF variable once per year, extracts all
+sites from that grid, and writes site-year files.
+
+```{r}
+result <- cae_build_met_drivers(
+    sites = sites,
+    model = "CESM2",
+    scenario = "ssp370",
+    start_year = 2050,
+    end_year = 2051,
+    outdir = "met_drivers",
+    resolution = "d01"
+)
+
+head(result)
+```
+
+By default, existing files are skipped. Set `overwrite = TRUE` only when files
+should be regenerated.
+
+```{r}
+result <- cae_build_met_drivers(
+    sites = sites,
+    model = "CESM2",
+    scenario = "ssp370",
+    start_year = 2050,
+    end_year = 2051,
+    outdir = "met_drivers",
+    resolution = "d01",
+    overwrite = TRUE
+)
+```
+
+## Output Structure
+
+`cae_build_met_drivers()` writes files using this path pattern:
+
+```text
+{outdir}/{site_id}/{model}.{scenario}.{year}.nc
+```
+
+For example:
+
+```text
+met_drivers/fresno/CESM2.ssp370.2050.nc
+met_drivers/los_angeles/CESM2.ssp370.2050.nc
+met_drivers/sacramento/CESM2.ssp370.2050.nc
+```
+
+Each file contains one site and one year of hourly data. Dimensions are
+`latitude`, `longitude`, and `time`. The time coordinate is stored as seconds
+since the start of the file year.

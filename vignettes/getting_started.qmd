@@ -9,10 +9,9 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 
 `caladaptaer` provides access to downscaled CMIP6 climate projections from the
 [Cal-Adapt Analytics Engine](https://analytics.cal-adapt.org/). This tutorial
-is the shortest path from installation to reading and plotting a time series in
-R.
+covers installation, catalog checks, and the first point time-series read.
 
-For a more comprehensive exposition of the functions, see
+For a broader data-access guide, see
 [Accessing Cal-Adapt Data in R](data_access.qmd).
 
 ## Installation
@@ -31,7 +30,7 @@ Requirements:
 remotes::install_github("lebauerapproach/caladaptaer")
 ```
 
-To confirm that you have a compatible version of GDAL, check the version:
+Check the GDAL version before reading from the cloud-hosted Zarr stores:
 
 ```{r}
 sf::sf_extSoftVersion()["GDAL"]
@@ -41,12 +40,12 @@ sf::sf_extSoftVersion()["GDAL"]
 library(caladaptaer)
 ```
 
-## Pull a time series at a point
+## Fetch a time series at a point
 
 `cae_fetch_point()` reads the grid and extracts data from the grid cell that is
 closest to the provided longitude and latitude.
 
-Here's a summer day in Fresno in 2050 under SSP3-7.0:
+The following example reads one summer day in Fresno in 2050 under SSP3-7.0:
 
 ```{r}
 ts <- cae_fetch_point("t2",
@@ -58,26 +57,32 @@ ts <- cae_fetch_point("t2",
 head(ts)
 ```
 
-The result is a `data.frame` with `time` and `value` in Kelvin, so base R
-plotting just works. Times are UTC, so the midday dip is the local overnight
-low (UTC noon is roughly 5am Pacific).
+The result is a `data.frame` with `time` and `value` columns. Values for `t2`
+are in Kelvin. Times are returned in UTC; the plot below converts the time axis
+to Pacific local time.
 
 ```{r}
 #| fig-width: 8
 #| fig-height: 4.5
 #| fig-alt: "Hourly 2 meter air temperature at Fresno for 1 July 2050 under CESM2 SSP3-7.0, ranging from about 12 to 31 degrees C across the day."
 ts$temp_c <- ts$value - 273.15
-plot(ts$time, ts$temp_c,
-    type = "l", lwd = 2, col = "#D62728",
-    xlab = "time", ylab = "temperature (C)"
+ts$time_local <- as.POSIXct(
+    as.numeric(ts$time),
+    origin = "1970-01-01",
+    tz = "America/Los_Angeles"
 )
+
+ggplot2::ggplot(ts, ggplot2::aes(x = time_local, y = temp_c)) +
+    ggplot2::geom_line(linewidth = 1, color = "#D62728") +
+    ggplot2::labs(x = "time (America/Los_Angeles)", y = "temperature (C)") +
+    ggplot2::theme_minimal()
 ```
 
 ## Extract many locations in one read
 
-It is also possible to extract data from multiple locations in a single read
-using `cae_fetch_points()`. This function reads the grid from S3 once and
-extracts every location locally.
+Use `cae_fetch_points()` to extract data from multiple locations in a single
+read. This function reads the grid from S3 once and extracts every location
+locally.
 
 ```{r}
 #| message: true
@@ -97,9 +102,7 @@ head(mp, 8)
 
 ## Where to go next
 
-- [Accessing Cal-Adapt Data in R](data_access.qmd) -- every function with
-  output: catalog search, gridded fetch, California maps, multi model
-  comparison, and the full surface meteorology
-- [SIPNET Met Drivers](sipnet_met_drivers.qmd) -- raw WRF to CF standard
-  NetCDF for ecosystem models
-- [Bulk Met Drivers](bulk_met_drivers.qmd) -- the multi site extraction path
+- [Accessing Cal-Adapt Data in R](data_access.qmd) -- dataset background,
+  catalog search, gridded fetch, point extraction, and model comparison
+- [WRF Meteorological Drivers](met_drivers.qmd) -- WRF to CF-standard NetCDF
+  meteorological drivers for site-based model workflows

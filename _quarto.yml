@@ -7,8 +7,7 @@ project:
     - index.qmd
     - vignettes/getting_started.qmd
     - vignettes/data_access.qmd
-    - vignettes/sipnet_met_drivers.qmd
-    - vignettes/bulk_met_drivers.qmd
+    - vignettes/met_drivers.qmd
 
 website:
   title: "caladaptaer"
@@ -27,10 +26,8 @@ website:
             text: Data Access
       - section: Advanced
         contents:
-          - href: vignettes/sipnet_met_drivers.qmd
-            text: SIPNET Met Drivers
-          - href: vignettes/bulk_met_drivers.qmd
-            text: Bulk Met Drivers
+          - href: vignettes/met_drivers.qmd
+            text: Met Drivers
       - href: reference/index.html
         text: Reference
     tools:

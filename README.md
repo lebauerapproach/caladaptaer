@@ -1,10 +1,13 @@
 # caladaptaer
 
-Native R access to the [Cal-Adapt Analytics Engine](https://analytics.cal-adapt.org/) -- California's repository of downscaled CMIP6 climate projections.
+Native R access to the [Cal-Adapt Analytics Engine](https://analytics.cal-adapt.org/),
+California's repository of downscaled CMIP6 climate projections.
 
 ## What it does
 
-caladaptaer reads WRF dynamically downscaled (hourly, 3/9/45 km) and LOCA2-Hybrid statistically downscaled (daily, 3 km) climate data directly from AWS S3 Zarr stores. No Python dependency, no API key, no authentication.
+`caladaptaer` reads WRF dynamically downscaled (hourly, 3/9/45 km) and
+LOCA2-Hybrid statistically downscaled (daily, 3 km) climate data directly from
+AWS S3 Zarr stores. It does not require Python, an API key, or authentication.
 
 ## Quick start
 
@@ -20,7 +23,7 @@ remotes::install_github("lebauerapproach/caladaptaer")
 ```r
 library(caladaptaer)
 
-# What WRF-downscaledclimate models are available?
+# What WRF-downscaled climate models are available?
 cae_models(activity = "WRF")
 
 # What variables are available for WRF on a 1hr timescale?
@@ -45,12 +48,14 @@ plot(ts$time, ts$value - 273.15, type = "l",
 | WRF CMIP6    | 45 / 9 / 3 km | Hourly   | 8 models  | SSP3-7.0 (all); SSP2-4.5, SSP5-8.5 (CESM2) | 1980-2100 |
 | LOCA2-Hybrid | 3 km          | Daily    | 15 models | SSP2-4.5, SSP3-7.0, SSP5-8.5               | 1950-2100 |
 
-Data produced by UCLA Center for Climate Science (WRF, Rahimi et al. 2024) and Scripps/UCSD (LOCA2, Pierce et al.). Hosted on AWS S3 by the Cal-Adapt Analytics Engine.
+WRF data are produced by the UCLA Center for Climate Science (Rahimi et al.
+2024). LOCA2-Hybrid data are produced by Scripps/UCSD (Pierce et al.). Both
+products are hosted on AWS S3 by the Cal-Adapt Analytics Engine.
 
 ## Requirements
 
 - R >= 4.1
-- GDAL >= 3.4 (for Zarr driver -- check with `sf::sf_extSoftVersion()`)
+- GDAL >= 3.4 for the Zarr driver; check with `sf::sf_extSoftVersion()`
 - Internet access to AWS S3 (us-west-2 region)
 
 ## How it works

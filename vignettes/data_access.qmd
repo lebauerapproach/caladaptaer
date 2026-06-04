@@ -7,19 +7,22 @@ title: "Accessing Cal-Adapt Data in R"
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
-This tutorial walks through the main data access functions in `caladaptaer`.
-For the shortest path from installation to a time series, start with
+## Purpose
+
+This guide describes the main data access functions in `caladaptaer`.
+For the shortest path from installation to a time series, see
 [Getting Started](getting_started.qmd).
 
 These functions fall into three groups:
 
 - **discovery** (what data are available),
 - **fetching** (reading grids and point time series into R), and
-- **drivers** (turning WRF output into CF-standard NetCDF for ecosystem models).
+- **coverage checks** (confirming variable availability before larger
+  workflows).
 
-All functions are documented, with function signatures, defaults, and return types
-in the [package reference](../reference/index.html) - or by using the `?`
-function in R (e.g. `?cae_catalog`).
+All functions are documented, with signatures, defaults, and return types in
+the [package reference](../reference/index.html) or in R help
+(for example, `?cae_catalog`).
 
 ## What is on the Analytics Engine
 
@@ -66,15 +69,64 @@ The products differ in ways that matter for downstream analysis:
 
 | Product | Time step | Time domain | Ensemble | Use when |
 |---|---|---|---|---|
-| WRF CMIP6 | Hourly | 1980--2014 historical GCM runs; 2015--2100 SSP runs | Smaller GCM ensemble; SSP3-7.0 is broadest, with additional CESM2 scenarios | You need sub-daily meteorology, pressure, radiation, wind, or historical/future simulations from the same downscaling framework. |
-| WRF-ERA5 historical reconstruction | Hourly | 1980--2020 | Single reanalysis-driven run | You need an observation-constrained historical reconstruction rather than a future climate scenario. |
-| LOCA2-Hybrid | Daily | 1950--2014 historical GCM runs; 2015--2100 SSP runs | Broader GCM and SSP coverage | You need a larger daily ensemble or daily temperature and precipitation extremes, and do not need hourly drivers. |
+| WRF CMIP6 | Hourly | 1980--2014 historical GCM runs; 2015--2100 SSP runs | Smaller GCM ensemble; SSP3-7.0 is broadest, with additional CESM2 scenarios | Analyses requiring sub-daily meteorology, pressure, radiation, wind, or historical/future simulations from the same downscaling framework. |
+| WRF-ERA5 historical reconstruction | Hourly | 1980--2020 | Single reanalysis-driven run | Historical analyses requiring an observation-constrained reconstruction rather than a future climate scenario. |
+| LOCA2-Hybrid | Daily | 1950--2014 historical GCM runs; 2015--2100 SSP runs | Broader GCM and SSP coverage | Analyses requiring a larger daily ensemble or daily temperature and precipitation extremes, without hourly driver variables. |
 
 WRF CMIP6 provides historical and future simulations at the same spatial
 resolution and with the same dynamical downscaling method, but the historical
 GCM runs are still climate model simulations, not observations. The ERA5-driven
 WRF reconstruction is historical only and is better suited when a reanalysis
 baseline is needed.
+
+### Product-comparison example
+
+WRF and LOCA2-Hybrid differ by downscaling method, grid, timestep, and variable
+names. The following non-evaluated example shows the package interface for
+comparing hourly WRF `t2` with daily LOCA2-Hybrid `tasmax` and `tasmin` for the
+same model, scenario, location, and week.
+
+```{r}
+#| eval: false
+wrf <- cae_fetch_point(
+    variable = "t2",
+    model = "EC-Earth3",
+    scenario = "ssp370",
+    lon = -119.77,
+    lat = 36.75,
+    start_time = "2050-07-01T00:00:00",
+    end_time = "2050-07-07T23:00:00"
+)
+
+tasmax <- cae_fetch_point(
+    variable = "tasmax",
+    model = "EC-Earth3",
+    scenario = "ssp370",
+    lon = -119.77,
+    lat = 36.75,
+    timescale = "day",
+    resolution = "d03",
+    start_time = "2050-07-01",
+    end_time = "2050-07-07"
+)
+
+tasmin <- cae_fetch_point(
+    variable = "tasmin",
+    model = "EC-Earth3",
+    scenario = "ssp370",
+    lon = -119.77,
+    lat = 36.75,
+    timescale = "day",
+    resolution = "d03",
+    start_time = "2050-07-01",
+    end_time = "2050-07-07"
+)
+```
+
+The returned objects use the same `data.frame` structure, but the values should
+not be treated as interchangeable. WRF `t2` is hourly near-surface air
+temperature from a dynamical simulation; LOCA2-Hybrid `tasmax` and `tasmin` are
+daily maximum and minimum temperatures from a statistical downscaling product.
 
 ## Setup
 
@@ -97,10 +149,10 @@ sf::sf_extSoftVersion()["GDAL"]
 
 ## Discovery
 
-### CAE Catalog Inventory
+### CAE catalog inventory
 
-The `cae_catalog()` lists the CADCAT index, one row per variable per
-model/scenario/resolution combo, and caches it for the session.
+`cae_catalog()` returns the CADCAT index, one row per
+model/scenario/variable/resolution combination, and caches it for the session.
 
 ```{r}
 cat <- cae_catalog()
@@ -124,10 +176,9 @@ The columns of the catalog follow CMIP6 naming. All functions use this vocabular
 
 ### Models, scenarios, variables
 
-Three helper functions make it easy to explore the catalog.
-Each takes an `activity` of `"WRF"` or `"LOCA2"` (`NULL`, the default, returns both)
-and returns a character vector of the unique values in that column for that activity.
-
+Three helper functions summarize common catalog fields. Each takes an
+`activity` of `"WRF"` or `"LOCA2"`; `NULL`, the default, returns both
+activities.
 
 #### Models
 
@@ -151,7 +202,9 @@ List available scenarios for the WRF activity:
 cae_scenarios(activity = "WRF")
 ```
 
-You can also filter scenarios by model. Note that WRF-downscaled CESM2 only provides 'historical' and three SSPs; ERA5 provides only 'historical'; and the other WRF GCMs provide only 'historical and one SSP':
+Scenarios can also be filtered by model. In the current WRF catalog, CESM2
+provides `historical`, `ssp245`, `ssp370`, and `ssp585`; ERA5 provides
+`reanalysis`; most other WRF GCMs provide `historical` and `ssp370`.
 
 ```{r}
 cae_scenarios(activity = "WRF", model = "CESM2")
@@ -162,22 +215,24 @@ cae_scenarios(activity = "WRF", model = "MIROC6")
 
 #### Variables
 
-The `cae_variables()` function returns a character vector of variable names in the catalog that match a specific activity and / or timescale.
+`cae_variables()` returns variable names in the catalog that match a specific
+activity, timescale, or both.
 
 For example, to see what variables are available for WRF on an hourly timescale:
 
 ```{r}
-cae_variables(activity = "WRF", timescale = "day")
+cae_variables(activity = "WRF", timescale = "1hr")
 ```
 
-Available time scales include hourly, daily, and monthly (`"1hr"`, `"day"`, `"mon"`).
+Available time scales include hourly, daily, and monthly (`"1hr"`, `"day"`,
+`"mon"`).
 
-#### Global Search
+#### Global search
 
-The `cae_search()` function filters the catalog on any combination of `activity`, `model`,
-`scenario`, `variable`, `timescale`, and `resolution`.
+The `cae_search()` function filters the catalog on any combination of
+`activity`, `model`, `scenario`, `variable`, `timescale`, and `resolution`.
 
-The filter uses AND to combine the arguments and filter the catalog.
+`cae_search()` combines filters with AND logic.
 
 ```{r}
 cae_search(
@@ -186,41 +241,32 @@ cae_search(
 )
 ```
 
-### Checking a model driver set before you fetch
+### WRF driver-variable coverage
 
-We have provided a helper function to confirm the
-availability of a core set of variables that are commonly used as drivers for ecosystem models.
-
-| WRF name | Field | Units |
-|----------|-------|-------|
-| `t2` | 2 meter air temperature | K |
-| `psfc` | Surface pressure | Pa |
-| `prec` | Precipitation | mm/timestep |
-| `q2` | Water vapor mixing ratio | kg/kg |
-| `swdnb` | Downward shortwave radiation | W/m2 |
-| `u10` | 10 meter eastward wind | m/s |
-| `v10` | 10 meter northward wind | m/s |
-
-Before you commit to building met drivers `cae_check_variables()`
-will report whether each of the eight fields wants is directly available or can be derived from other variables.
+For WRF-to-NetCDF driver workflows, `cae_check_variables()` reports whether the
+required surface meteorology variables are available or derivable for a model,
+scenario, timescale, and resolution. See
+[WRF Meteorological Drivers](met_drivers.qmd) for the full variable mapping and
+driver-generation workflow.
 
 ```{r}
 cae_check_variables("CESM2", "ssp370")
 ```
 
-## Data Access
+## Fetching
 
-Given a combination of `activity`, `model`, `scenario`, `variable`, and time window,
-`caladaptaer` reads the requested subset and returns either a `stars` grid or a
-`data.frame`. The next sections show how to fetch both grids and point time series.
+Given a combination of `activity`, `model`, `scenario`, `variable`, and time
+window, `caladaptaer` reads the requested subset and returns either a `stars`
+grid or a `data.frame`.
 
-### Fetching a Raster Grid
+### Fetching a raster grid
 
 The `cae_fetch()` function reads a Zarr store from S3 and returns a `stars` object.
-Before reading in a large dataset, test a short time window by setting the `start_time` and `end_time` either in the ISO 8601
-time format (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)
-or POSIXct format.
-The  `resolution` picks the grid and `timescale` picks `1hr` (WRF) or `day` (LOCA2).
+Before reading a large dataset, test a short time window by setting
+`start_time` and `end_time` in ISO 8601 format (`YYYY-MM-DD` or
+`YYYY-MM-DDTHH:MM:SS`) or as `POSIXct` values. `resolution` selects the grid,
+and `timescale` selects the temporal resolution, such as `"1hr"` for WRF or
+`"day"` for LOCA2-Hybrid.
 
 ```{r}
 t2 <- cae_fetch("t2",
@@ -233,10 +279,10 @@ t2
 The result has three dimensions: x and y in the WRF Lambert Conformal grid and
 time in UTC. Values are 2 meter air temperature in Kelvin.
 
-#### Mapping a Grid
+#### Mapping a grid
 
-The 45 km domain covers most of western North America. Next, we will
-demonstrate how to plot the map of 2m air temperature on July 1, 2050 with state boundaries.
+The 45 km domain covers most of western North America. The following example
+plots 2 meter air temperature on July 1, 2050 with state boundaries.
 
 ```{r}
 #| fig-width: 7
@@ -265,14 +311,16 @@ plot(st_geometry(western_wrf), add = TRUE, border = "grey30", lwd = 0.6)
 plot(st_geometry(ca_wrf), add = TRUE, border = "black", lwd = 1.5)
 ```
 
-To fetch data with 9 or 3 km resolution, use `resolution = "d02"` or `"d03"`, respectively.
-But be aware that the finer grids are much larger, so they will take longer to read and use more memory - a timestep at 45km is approximately 0.3MB while and is 150 MB at 3 km.
+To fetch data at 9 or 3 km resolution, use `resolution = "d02"` or
+`resolution = "d03"`, respectively. Finer grids require more memory and longer
+read times. A single 45 km timestep is approximately 0.3 MB; a single 3 km
+timestep is approximately 150 MB.
 
-### Fetching a Time Series from a Point
+### Fetching a time series from a point
 
 `cae_fetch_point()` reads the grid and pulls the time series at the nearest
 cell to a `lon`/`lat`. The transform from WGS84 to the WRF Lambert grid is
-handled for you. Here is a summer day at Fresno:
+handled internally. The following example reads a summer day at Fresno:
 
 ```{r}
 ts <- cae_fetch_point("t2",
@@ -285,25 +333,33 @@ head(ts)
 ```
 
 This returns a `data.frame` with `time` and `value` columns that can be
-plotted or analyzed directly. Recall that the `value` column for `t2` is in Kelvin, and time is in UTC; we will convert these before plotting.
+plotted or analyzed directly. The `value` column for `t2` is in Kelvin. Times
+are returned in UTC; the plot below converts the time axis to Pacific local
+time.
 
 ```{r}
 #| fig-width: 8
 #| fig-height: 4.5
 #| fig-alt: "Hourly 2 meter air temperature at Fresno for 1 July 2050 under CESM2 SSP3-7.0, swinging from roughly 12 to 31 degrees C across the day."
 ts$temp_c <- ts$value - 273.15
-ts$time <- lubridate::with_tz(ts$time, tz = "PST")
-plot(ts$time, ts$temp_c,
-    type = "l", lwd = 2, col = "#D62728",
-    xlab = "time", ylab = "temperature (C)"
+ts$time_local <- as.POSIXct(
+    as.numeric(ts$time),
+    origin = "1970-01-01",
+    tz = "America/Los_Angeles"
 )
+
+ggplot2::ggplot(ts, ggplot2::aes(x = time_local, y = temp_c)) +
+    ggplot2::geom_line(linewidth = 1, color = "#D62728") +
+    ggplot2::labs(x = "time (America/Los_Angeles)", y = "temperature (C)") +
+    ggplot2::theme_minimal()
 ```
 
-### Fetching Many points at Once
+### Fetching many points at once
 
-The `cae_fetch_points()` function reads the grid from S3 once, and then extracts
-every site locally in a single pass. It takes a `data.frame` with `lon` and `lat`
-columns (and an optional `site_id`) and returns a `data.frame` with `site_id`, `lon`, `lat`, `time`, and `value` columns.
+The `cae_fetch_points()` function reads the grid from S3 once and extracts
+every site locally in a single pass. It takes a `data.frame` with `lon` and
+`lat` columns and an optional `site_id`, and returns a `data.frame` with
+`site_id`, `lon`, `lat`, `time`, and `value` columns.
 
 ```{r}
 #| message: true
@@ -321,11 +377,13 @@ mp <- cae_fetch_points("t2",
 head(mp, 8)
 ```
 
-### Comparing Models and Scenarios
+### Comparing models and scenarios
 
-Because every GCM is downscaled to a common spatial and temporal resolution,  it is straightforward to evaluate differences across models and scenarios.
+Because WRF GCMs are downscaled to a common spatial and temporal resolution,
+the same point-extraction workflow can be applied across models and scenarios.
 
-Here we fetch the same day at Fresno from every WRF GCM under SSP3-7.0, and plot them together. The curves share the cool night, warm afternoon shape but separate by a few degrees C in absolute level.
+The following example fetches the same day at Fresno from every WRF GCM under
+SSP3-7.0 and plots the resulting time series together.
 
 ```{r}
 #| fig-width: 8
@@ -360,8 +418,8 @@ legend("topright", legend = wrf_370, col = cols, lwd = 2, cex = 0.7, bty = "n")
 
 ## Where to go next
 
-- [SIPNET Met Drivers](sipnet_met_drivers.qmd) -- raw WRF to CF standard NetCDF
-- [Bulk Met Drivers](bulk_met_drivers.qmd) -- the multi site driver path
+- [WRF Meteorological Drivers](met_drivers.qmd) -- WRF to CF-standard NetCDF
+  meteorological drivers
 - [Package reference](../reference/index.html) -- every function, every
   argument, every default
 

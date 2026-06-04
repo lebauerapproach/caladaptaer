@@ -37,8 +37,8 @@ domains, and citations.
 
 | Tool | Use Case | How it differs from `caladaptaer` |
 |---|---|---|
-| [climakitae](https://climakitae.readthedocs.io/) | Python access and analysis workflows for CAE data | Official Python toolkit for the Fifth Assessment data; use `caladaptaer` when you want native R access. |
-| [climakitaegui](https://climakitaegui.readthedocs.io/) | Interactive Python menus for retrieving CAE data | Adds a GUI-style layer on top of `climakitae`; use `caladaptaer` for scriptable R workflows. |
+| [climakitae](https://climakitae.readthedocs.io/) | Python access and analysis workflows for CAE data | Official Python toolkit for the Fifth Assessment data; `caladaptaer` supports native R access. |
+| [climakitaegui](https://climakitaegui.readthedocs.io/) | Interactive Python menus for retrieving CAE data | Adds a GUI-style layer on top of `climakitae`; `caladaptaer` supports scriptable R workflows. |
 | [CAE intake catalog](https://analytics.cal-adapt.org/data/access/) | Direct Python/xarray/dask access to the CAE Zarr catalog | Lower-level Python access to the same cloud-hosted data; `caladaptaer` wraps discovery and fetch operations for R users. |
 | [Cal-Adapt web tools](https://cal-adapt.org/) | Browser-based exploration, maps, charts, and downloads | Useful for visual exploration; `caladaptaer` is for reproducible R scripts and model workflows. |
 | [caladaptR](https://ucanr-igis.github.io/caladaptr/) | R access to the legacy Cal-Adapt.org API | Targets the older Cal-Adapt API and Fourth Assessment-era datasets rather than the CAE cloud Zarr stores. |
@@ -47,11 +47,10 @@ domains, and citations.
 
 | Page | What is on it |
 |---|---|
-| [Getting Started](vignettes/getting_started.qmd) | Install to a real time series in a few calls |
-| [Data Access](vignettes/data_access.qmd) | Every function, with live output |
-| [SIPNET Met Drivers](vignettes/sipnet_met_drivers.qmd) | WRF to CF NetCDF for ecosystem models |
-| [Bulk Met Drivers](vignettes/bulk_met_drivers.qmd) | The multi site driver path |
-| [Reference](reference/index.html) | Every function, every argument |
+| [Getting Started](vignettes/getting_started.qmd) | Minimal installation and point time-series workflow |
+| [Data Access](vignettes/data_access.qmd) | Dataset background, product comparison, discovery, and fetch functions |
+| [Met Drivers](vignettes/met_drivers.qmd) | WRF to CF NetCDF meteorological drivers |
+| [Reference](reference/index.html) | Function documentation |
 
 ## Citing and license
 
