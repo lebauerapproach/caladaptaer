@@ -7,27 +7,31 @@ title: "Getting Started"
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
-caladaptaer reads downscaled CMIP6 climate projections off the
-[Cal-Adapt Analytics Engine](https://analytics.cal-adapt.org/) directly into
-R. Data lives as cloud optimized Zarr on AWS S3, and the package reads it
-through GDAL: no Python, no API key, no authentication. Every call hands back
-a native R object, a `stars` grid or a tidy `data.frame`, so results drop
-right into the R geospatial and modeling stack.
+`caladaptaer` provides access to downscaled CMIP6 climate projections from the
+[Cal-Adapt Analytics Engine](https://analytics.cal-adapt.org/). This tutorial
+is the shortest path from installation to reading and plotting a time series in
+R.
 
-This page goes from install to a real time series in a few calls, then shows
-the design choice that lets the same code scale to thousands of sites. Every
-output below comes from actually running the code on this page. For the full
-function tour see [Accessing Cal-Adapt Data in R](data_access.qmd).
+For a more comprehensive exposition of the functions, see
+[Accessing Cal-Adapt Data in R](data_access.qmd).
 
-## Install
+## Installation
+
+Requirements:
+
+- R >= 4.1
+- GDAL >= 3.4
+- internet connection
+- R packages:
+  - `sf`, `stars`, `dplyr`, `ggplot2` (and their dependencies)
+  - `remotes` (for installation from GitHub)
 
 ```{r}
 #| eval: false
 remotes::install_github("lebauerapproach/caladaptaer")
 ```
 
-You need R >= 4.1 and GDAL >= 3.4 for the Zarr driver. Confirm your GDAL is
-recent enough:
+To confirm that you have a compatible version of GDAL, check the version:
 
 ```{r}
 sf::sf_extSoftVersion()["GDAL"]
@@ -37,36 +41,24 @@ sf::sf_extSoftVersion()["GDAL"]
 library(caladaptaer)
 ```
 
-## Discover what's available
-
-Ask what the WRF dynamical downscaling covers:
-
-```{r}
-cae_models(activity = "WRF")
-```
-
-Eight GCMs plus the ERA5 reanalysis driven run. CESM2 carries the widest set
-of scenarios:
-
-```{r}
-cae_scenarios(activity = "WRF", model = "CESM2")
-```
-
 ## Pull a time series at a point
 
-`cae_fetch_point()` reads the grid and extracts the nearest cell to a
-lon/lat. Transform from WGS84 to the WRF Lambert Conformal grid happens for
-you. Here's a summer day in 2050 at Fresno under SSP3-7.0:
+`cae_fetch_point()` reads the grid and extracts data from the grid cell that is
+closest to the provided longitude and latitude.
+
+Here's a summer day in Fresno in 2050 under SSP3-7.0:
 
 ```{r}
-ts <- cae_fetch_point("t2", model = "CESM2", scenario = "ssp370",
-                      lon = -119.77, lat = 36.75,
-                      start_time = "2050-07-01T00:00:00",
-                      end_time   = "2050-07-01T23:00:00")
+ts <- cae_fetch_point("t2",
+    model = "CESM2", scenario = "ssp370",
+    lon = -119.77, lat = 36.75,
+    start_time = "2050-07-01T00:00:00",
+    end_time = "2050-07-01T23:00:00"
+)
 head(ts)
 ```
 
-Result is a plain `data.frame` with `time` and `value` in Kelvin, so base R
+The result is a `data.frame` with `time` and `value` in Kelvin, so base R
 plotting just works. Times are UTC, so the midday dip is the local overnight
 low (UTC noon is roughly 5am Pacific).
 
@@ -75,28 +67,31 @@ low (UTC noon is roughly 5am Pacific).
 #| fig-height: 4.5
 #| fig-alt: "Hourly 2 meter air temperature at Fresno for 1 July 2050 under CESM2 SSP3-7.0, ranging from about 12 to 31 degrees C across the day."
 ts$temp_c <- ts$value - 273.15
-plot(ts$time, ts$temp_c, type = "l", lwd = 2, col = "#D62728",
-     xlab = "time", ylab = "temperature (C)")
+plot(ts$time, ts$temp_c,
+    type = "l", lwd = 2, col = "#D62728",
+    xlab = "time", ylab = "temperature (C)"
+)
 ```
 
 ## Extract many locations in one read
 
-This is the design choice worth knowing up front. `cae_fetch_points()` reads
-the grid from S3 once and extracts every location locally in a single
-vectorized pass. Three sites or ten thousand, it's one S3 read per variable,
-not one per site.
+It is also possible to extract data from multiple locations in a single read
+using `cae_fetch_points()`. This function reads the grid from S3 once and
+extracts every location locally.
 
 ```{r}
 #| message: true
 sites <- data.frame(
-  site_id = c("davis", "fresno", "sacramento"),
-  lon = c(-121.74, -119.77, -121.49),
-  lat = c(38.54, 36.75, 38.58)
+    site_id = c("davis", "fresno", "sacramento"),
+    lon = c(-121.74, -119.77, -121.49),
+    lat = c(38.54, 36.75, 38.58)
 )
-mp <- cae_fetch_points("t2", model = "CESM2", scenario = "ssp370",
-                       points = sites,
-                       start_time = "2050-07-01T00:00:00",
-                       end_time   = "2050-07-01T05:00:00")
+mp <- cae_fetch_points("t2",
+    model = "CESM2", scenario = "ssp370",
+    points = sites,
+    start_time = "2050-07-01T00:00:00",
+    end_time = "2050-07-01T05:00:00"
+)
 head(mp, 8)
 ```
 

@@ -20,8 +20,10 @@ remotes::install_github("lebauerapproach/caladaptaer")
 ```r
 library(caladaptaer)
 
-# What's available?
+# What WRF-downscaledclimate models are available?
 cae_models(activity = "WRF")
+
+# What variables are available for WRF on a 1hr timescale?
 cae_variables(activity = "WRF", timescale = "1hr")
 
 # Read hourly temperature, 45km grid, one day
@@ -38,10 +40,10 @@ plot(ts$time, ts$value - 273.15, type = "l",
 
 ## Available data
 
-| Dataset | Resolution | Temporal | GCMs | SSPs | Period |
-|---------|-----------|----------|------|------|--------|
-| WRF CMIP6 | 45 / 9 / 3 km | Hourly | 8 models | SSP3-7.0 (all); SSP2-4.5, SSP5-8.5 (CESM2) | 1980-2100 |
-| LOCA2-Hybrid | 3 km | Daily | 15 models | SSP2-4.5, SSP3-7.0, SSP5-8.5 | 1950-2100 |
+| Dataset      | Resolution    | Temporal | GCMs      | SSPs                                       | Period    |
+| ------------ | ------------- | -------- | --------- | ------------------------------------------ | --------- |
+| WRF CMIP6    | 45 / 9 / 3 km | Hourly   | 8 models  | SSP3-7.0 (all); SSP2-4.5, SSP5-8.5 (CESM2) | 1980-2100 |
+| LOCA2-Hybrid | 3 km          | Daily    | 15 models | SSP2-4.5, SSP3-7.0, SSP5-8.5               | 1950-2100 |
 
 Data produced by UCLA Center for Climate Science (WRF, Rahimi et al. 2024) and Scripps/UCSD (LOCA2, Pierce et al.). Hosted on AWS S3 by the Cal-Adapt Analytics Engine.
 

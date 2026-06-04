@@ -5,7 +5,10 @@ project:
     watch-inputs: true
   render:
     - index.qmd
-    - vignettes/*.qmd
+    - vignettes/getting_started.qmd
+    - vignettes/data_access.qmd
+    - vignettes/sipnet_met_drivers.qmd
+    - vignettes/bulk_met_drivers.qmd
 
 website:
   title: "caladaptaer"
@@ -22,8 +25,6 @@ website:
             text: Getting Started
           - href: vignettes/data_access.qmd
             text: Data Access
-          - href: vignettes/showcase.qmd
-            text: Showcase
       - section: Advanced
         contents:
           - href: vignettes/sipnet_met_drivers.qmd
