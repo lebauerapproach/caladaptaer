@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Akash B V and David LeBauer">
-<meta name="dcterms.date" content="2026-05-28">
+<meta name="dcterms.date" content="2026-06-05">
 
 <title>caladaptaer</title>
 <style>
@@ -22,69 +22,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1.6em;
   vertical-align: middle;
 }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -123,9 +60,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     "search-submit-button-title": "Submit"
   }
 }</script>
-<script src="site_libs/quarto-diagram/mermaid.min.js"></script>
-<script src="site_libs/quarto-diagram/mermaid-init.js"></script>
-<link href="site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
 
 </head>
@@ -185,11 +119,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <a href="./vignettes/data_access.html" class="sidebar-item-text sidebar-link">Data Access</a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./vignettes/showcase.html" class="sidebar-item-text sidebar-link">Showcase</a>
-  </div>
-</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -202,12 +131,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./vignettes/sipnet_met_drivers.html" class="sidebar-item-text sidebar-link">SIPNET Met Drivers</a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./vignettes/bulk_met_drivers.html" class="sidebar-item-text sidebar-link">Bulk Met Drivers</a>
+  <a href="./vignettes/met_drivers.html" class="sidebar-item-text sidebar-link">Met Drivers</a>
   </div>
 </li>
       </ul>
@@ -226,12 +150,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#how-it-works" id="toc-how-it-works" class="nav-link active" data-scroll-target="#how-it-works">How it works</a></li>
-  <li><a href="#the-data-you-can-reach" id="toc-the-data-you-can-reach" class="nav-link" data-scroll-target="#the-data-you-can-reach">The data you can reach</a></li>
-  <li><a href="#whats-in-the-box" id="toc-whats-in-the-box" class="nav-link" data-scroll-target="#whats-in-the-box">What’s in the box</a></li>
-  <li><a href="#quick-start" id="toc-quick-start" class="nav-link" data-scroll-target="#quick-start">Quick start</a></li>
-  <li><a href="#used-in-production" id="toc-used-in-production" class="nav-link" data-scroll-target="#used-in-production">Used in production</a></li>
-  <li><a href="#where-were-headed" id="toc-where-were-headed" class="nav-link" data-scroll-target="#where-were-headed">Where we’re headed</a></li>
+  <li><a href="#what-it-does" id="toc-what-it-does" class="nav-link active" data-scroll-target="#what-it-does">What it does</a></li>
+  <li><a href="#available-data" id="toc-available-data" class="nav-link" data-scroll-target="#available-data">Available data</a></li>
+  <li><a href="#related-tools" id="toc-related-tools" class="nav-link" data-scroll-target="#related-tools">Related Tools</a></li>
   <li><a href="#guides-and-reference" id="toc-guides-and-reference" class="nav-link" data-scroll-target="#guides-and-reference">Guides and reference</a></li>
   <li><a href="#citing-and-license" id="toc-citing-and-license" class="nav-link" data-scroll-target="#citing-and-license">Citing and license</a></li>
   </ul>
@@ -243,7 +164,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title d-none d-lg-block">caladaptaer</h1>
-<p class="subtitle lead">Cal-Adapt climate projections, straight into R</p>
+<p class="subtitle lead">R access to Cal-Adapt climate projections</p>
 </div>
 
 
@@ -260,7 +181,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 28, 2026</p>
+      <p class="date">June 5, 2026</p>
     </div>
   </div>
   
@@ -270,56 +191,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 </header>
 
-<p>If you work in R and you have tried to pull California’s downscaled climate projections off the <a href="https://analytics.cal-adapt.org/">Cal-Adapt Analytics Engine</a>, you have probably hit a wall. The data sits as cloud optimized Zarr on AWS S3, and until now the R side of that story basically did not exist. caladaptaer is the piece that was missing. You ask for a variable, a model, a scenario, and a time window, and it hands back a native R object, a <code>stars</code> grid or a tidy <code>data.frame</code>, ready to drop into the rest of your work. No Python, no API key, nothing to authenticate.</p>
-<p>And it stays general on purpose. caladaptaer is a data gateway, not a model. Whatever you do in R, ecology, hydrology, ag, energy, water resources, carbon, you point it at the projection you need and keep working in your own tools.</p>
-<section id="how-it-works" class="level2">
-<h2 class="anchored" data-anchor-id="how-it-works">How it works</h2>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<p>
-</p><pre class="mermaid mermaid-js" data-tooltip-selector="#mermaid-tooltip-1">flowchart LR
-  classDef data fill:#F6A23C,stroke:#C77B1E,color:#1f1300,stroke-width:1px;
-  classDef fn fill:#BBD8EC,stroke:#3B7DB5,color:#0f3350,stroke-width:1px;
-  classDef next fill:#EAF3FB,stroke:#3B7DB5,color:#0f3350,stroke-width:1px,stroke-dasharray:5 3;
-  classDef goal fill:#ffffff,stroke:#555555,color:#111111,stroke-width:1px;
-
-  subgraph DATA["Data, level by level"]
-    direction TB
-    S["Cal-Adapt on AWS S3&lt;br/&gt;WRF and LOCA2 Zarr stores"]:::data
-    R["native R object&lt;br/&gt;stars grid or data.frame,&lt;br/&gt;one variable"]:::data
-    A["analysis ready&lt;br/&gt;harmonized across&lt;br/&gt;WRF and LOCA2"]:::data
-    D["model drivers&lt;br/&gt;CF NetCDF"]:::data
-    G(["your science&lt;br/&gt;any domain"]):::goal
-    S --&gt; R --&gt; A --&gt; D --&gt; G
-    A --&gt; G
-  end
-
-  subgraph CODE["caladaptaer"]
-    direction TB
-    DISC["Discover&lt;br/&gt;cae_catalog, cae_models, cae_scenarios,&lt;br/&gt;cae_variables, cae_search, cae_check_variables"]:::fn
-    FETCH["Fetch, the engine&lt;br/&gt;cae_fetch, cae_fetch_point, cae_fetch_points"]:::fn
-    HARM["Harmonize and stamp provenance&lt;br/&gt;next up"]:::next
-    DRV["Drivers&lt;br/&gt;cae_write_cf_netcdf, cae_build_met_drivers"]:::fn
-  end
-
-  DISC -.-&gt;|"what is on S3"| S
-  FETCH --&gt;|"GDAL /vsis3/, no Python, no key, no auth"| R
-  HARM --&gt; A
-  DRV --&gt; D
-</pre>
-<div id="mermaid-tooltip-1" class="mermaidTooltip">
-
-</div>
-<p></p>
-</div>
-</div>
-</div>
-<p>The Analytics Engine stores its climate data as <a href="https://zarr.dev/">Zarr</a>, a cloud native array format. A Zarr store is not one giant file you download whole; it is split into many small chunks, and a reader can pull just the chunks it needs over the network. caladaptaer reads those chunks through GDAL’s <code>/vsis3/</code> virtual filesystem, the same engine already sitting under <code>sf</code>, <code>stars</code>, and <code>terra</code>. That is why there is nothing to install on the Python side, no key to manage, and no client session to keep alive. You ask for what you want and the bytes come back as an R object.</p>
+<p>The <code>caladaptaer</code> package provides native R access to Cal-Adapt climate data from California’s Fifth Climate Change Assessment. The data are downscaled CMIP6 climate projections hosted on the <a href="https://analytics.cal-adapt.org/">Cal-Adapt Analytics Engine (CAE)</a>. Given a variable, model, scenario, and time window, <code>caladaptaer</code> reads the requested subset and returns either a <code>stars</code> grid or a <code>data.frame</code>.</p>
+<section id="what-it-does" class="level2">
+<h2 class="anchored" data-anchor-id="what-it-does">What it does</h2>
+<ul>
+<li>Discovers available models, scenarios, variables, and resolutions from the CAE catalog.</li>
+<li>Reads WRF and LOCA2 climate projections into R.</li>
+<li>Extracts time series for one or many locations.</li>
+<li>Builds CF-1.8 NetCDF meteorological driver files from hourly WRF data.</li>
+</ul>
+<p><code>caladaptaer</code> is a data access package. It does not model, bias-correct, or analyze climate data. The objects it returns work directly with the standard R geospatial and modeling stack.</p>
 </section>
-<section id="the-data-you-can-reach" class="level2">
-<h2 class="anchored" data-anchor-id="the-data-you-can-reach">The data you can reach</h2>
-<p>Two downscaling products live on the Engine, both downscaled from CMIP6 global models for California and the western US.</p>
+<section id="available-data" class="level2">
+<h2 class="anchored" data-anchor-id="available-data">Available data</h2>
+<p>The package reads the two main downscaling products hosted by CAE. See <a href="./vignettes/data_access.html">Data Access</a> for product-selection guidance, time domains, and citations.</p>
 <table class="table">
 <colgroup>
 <col style="width: 16%">
@@ -358,38 +243,45 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tr>
 </tbody>
 </table>
-<p>They get there two different ways, and which one you want depends on the job. WRF is dynamically downscaled by UCLA (Rahimi et al.&nbsp;2024), a physics based weather model run at high resolution, so it carries the full hourly surface meteorology and resolves things like mountain rain shadows and the sea breeze. Reach for it when you need hourly drivers or process based physics. LOCA2 is statistically downscaled by Scripps (Pierce et al.), mapping coarse model output onto a fine grid from historical analog patterns, so you get daily data for more models and more scenarios at 3 km. Reach for it when you want a wide ensemble or daily extremes. caladaptaer reads both, plus the ERA5 reanalysis driven WRF run, through the same handful of functions.</p>
 </section>
-<section id="whats-in-the-box" class="level2">
-<h2 class="anchored" data-anchor-id="whats-in-the-box">What’s in the box</h2>
-<p>Eleven <code>cae_*</code> functions cover the whole path from catalog to model ready files. You can search the CADCAT catalog by model, scenario, variable, and resolution, and check up front whether a model and scenario even carry the fields you need. You can read any Zarr store into a <code>stars</code> grid, or pull a time series at one point or ten thousand; the multi site read grabs the grid from S3 once and extracts every site locally, so it is one read per variable, not one read per site. And you can turn WRF output into CF-1.8 NetCDF for ecosystem models, units and all, in a single call. Precipitation gets filled in automatically for the models that ship it split across <code>rainc</code> and <code>rainnc</code>.</p>
-</section>
-<section id="quick-start" class="level2">
-<h2 class="anchored" data-anchor-id="quick-start">Quick start</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"lebauerapproach/caladaptaer"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caladaptaer)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># what is on the engine</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cae_models</span>(<span class="at">activity =</span> <span class="st">"WRF"</span>)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># does CESM2 SSP3-7.0 carry the variables I need</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cae_check_variables</span>(<span class="st">"CESM2"</span>, <span class="st">"ssp370"</span>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># a summer day of hourly temperature at Fresno, 2050</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">cae_fetch_point</span>(<span class="st">"t2"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>                <span class="at">lon =</span> <span class="sc">-</span><span class="fl">119.77</span>, <span class="at">lat =</span> <span class="fl">36.75</span>,</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>                <span class="at">start_time =</span> <span class="st">"2050-07-01T00:00:00"</span>,</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>                <span class="at">end_time   =</span> <span class="st">"2050-07-01T23:00:00"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><a href="./vignettes/getting_started.html">Getting Started</a> takes this from install to a real time series, <a href="./vignettes/data_access.html">Data Access</a> is the full tour of every function with live output, and <a href="./vignettes/showcase.html">Showcase</a> answers “what can I actually do with it” in a few worked analyses against live data.</p>
-</section>
-<section id="used-in-production" class="level2">
-<h2 class="anchored" data-anchor-id="used-in-production">Used in production</h2>
-<p>We run caladaptaer in our MAGiC project to pull climate projections for our California design points, where it has already generated 12,474 site-years of hourly drivers: three GCM and scenario combinations (CESM2 SSP2-4.5, CESM2 SSP3-7.0, MPI-ESM1-2-HR SSP3-7.0) over 2025 to 2045.</p>
-</section>
-<section id="where-were-headed" class="level2">
-<h2 class="anchored" data-anchor-id="where-were-headed">Where we’re headed</h2>
-<p>Today caladaptaer nails access: find the data, read it, turn it into model ready files. Three things come next. First, an analysis ready layer that harmonizes WRF and LOCA2 behind one interface and quietly applies Cal-Adapt’s known data quirks (the renamed humidity and wind variables, the precipitation unit fix), so you write code once and run it on both. Second, provenance: every output stamped with exactly where it came from, the store, version, slice, model, scenario, and transform, plus the Cal-Adapt citation carried through, so you can rerun and cite a file straight from itself. Third, the analysis layer that turns raw projections into what people actually report on, spatial subsetting to counties and watersheds, temporal aggregation, derived variables like growing degree days and reference ET, warming levels, extremes, and bias correction. After that, rOpenSci review and a CRAN submission.</p>
-<p>Why it is worth doing: it is the only real path into the Analytics Engine for R users right now, since the old R client stops at the previous CMIP5 generation. The provenance piece is something even the Python tooling does not do today. And it stays general, so the same gateway serves an ecologist, a hydrologist, or an energy modeler. We are building it to sit next to the Python tools in the Cal-Adapt ecosystem, not to fork them.</p>
+<section id="related-tools" class="level2">
+<h2 class="anchored" data-anchor-id="related-tools">Related Tools</h2>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Tool</th>
+<th>Use Case</th>
+<th>How it differs from <code>caladaptaer</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="https://climakitae.readthedocs.io/">climakitae</a></td>
+<td>Python access and analysis workflows for CAE data</td>
+<td>Official Python toolkit for the Fifth Assessment data; <code>caladaptaer</code> supports native R access.</td>
+</tr>
+<tr class="even">
+<td><a href="https://climakitaegui.readthedocs.io/">climakitaegui</a></td>
+<td>Interactive Python menus for retrieving CAE data</td>
+<td>Adds a GUI-style layer on top of <code>climakitae</code>; <code>caladaptaer</code> supports scriptable R workflows.</td>
+</tr>
+<tr class="odd">
+<td><a href="https://analytics.cal-adapt.org/data/access/">CAE intake catalog</a></td>
+<td>Direct Python/xarray/dask access to the CAE Zarr catalog</td>
+<td>Lower-level Python access to the same cloud-hosted data; <code>caladaptaer</code> wraps discovery and fetch operations for R users.</td>
+</tr>
+<tr class="even">
+<td><a href="https://cal-adapt.org/">Cal-Adapt web tools</a></td>
+<td>Browser-based exploration, maps, charts, and downloads</td>
+<td>Useful for visual exploration; <code>caladaptaer</code> is for reproducible R scripts and model workflows.</td>
+</tr>
+<tr class="odd">
+<td><a href="https://ucanr-igis.github.io/caladaptr/">caladaptR</a></td>
+<td>R access to the legacy Cal-Adapt.org API</td>
+<td>Targets the older Cal-Adapt API and Fourth Assessment-era datasets rather than the CAE cloud Zarr stores.</td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="guides-and-reference" class="level2">
 <h2 class="anchored" data-anchor-id="guides-and-reference">Guides and reference</h2>
@@ -403,34 +295,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <tbody>
 <tr class="odd">
 <td><a href="./vignettes/getting_started.html">Getting Started</a></td>
-<td>Install to a real time series in a few calls</td>
+<td>Minimal installation and point time-series workflow</td>
 </tr>
 <tr class="even">
 <td><a href="./vignettes/data_access.html">Data Access</a></td>
-<td>Every function, with live output</td>
+<td>Dataset background, product comparison, discovery, and fetch functions</td>
 </tr>
 <tr class="odd">
-<td><a href="./vignettes/showcase.html">Showcase</a></td>
-<td>Worked analyses that show what the data can do</td>
-</tr>
-<tr class="even">
-<td><a href="./vignettes/sipnet_met_drivers.html">SIPNET Met Drivers</a></td>
-<td>WRF to CF NetCDF for ecosystem models</td>
-</tr>
-<tr class="odd">
-<td><a href="./vignettes/bulk_met_drivers.html">Bulk Met Drivers</a></td>
-<td>The multi site driver path</td>
+<td><a href="./vignettes/met_drivers.html">Met Drivers</a></td>
+<td>WRF to CF NetCDF meteorological drivers</td>
 </tr>
 <tr class="even">
 <td><a href="reference/index.html">Reference</a></td>
-<td>Every function, every argument</td>
+<td>Function documentation</td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="citing-and-license" class="level2">
 <h2 class="anchored" data-anchor-id="citing-and-license">Citing and license</h2>
-<p>caladaptaer is released under BSD-3-Clause. See <code>CITATION.cff</code> in the repo for how to cite it.</p>
+<p><code>caladaptaer</code> is released under BSD-3-Clause. Please cite as</p>
+<blockquote class="blockquote">
+<p>B V, A., &amp; LeBauer, D. (2026). caladaptaer: Access Cal-Adapt Climate Data from R (Version 0.2.0) [Computer software]. https://github.com/lebauerapproach/caladaptaer</p>
+</blockquote>
 
 
 </section>

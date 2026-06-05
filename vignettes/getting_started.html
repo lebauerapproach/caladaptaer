@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Akash B V and David LeBauer">
-<meta name="dcterms.date" content="2026-05-28">
+<meta name="dcterms.date" content="2026-06-05">
 
 <title>caladaptaer - Getting Started</title>
 <style>
@@ -182,11 +182,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <a href="../vignettes/data_access.html" class="sidebar-item-text sidebar-link">Data Access</a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../vignettes/showcase.html" class="sidebar-item-text sidebar-link">Showcase</a>
-  </div>
-</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -199,12 +194,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../vignettes/sipnet_met_drivers.html" class="sidebar-item-text sidebar-link">SIPNET Met Drivers</a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../vignettes/bulk_met_drivers.html" class="sidebar-item-text sidebar-link">Bulk Met Drivers</a>
+  <a href="../vignettes/met_drivers.html" class="sidebar-item-text sidebar-link">Met Drivers</a>
   </div>
 </li>
       </ul>
@@ -223,9 +213,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#install" id="toc-install" class="nav-link active" data-scroll-target="#install">Install</a></li>
-  <li><a href="#discover-whats-available" id="toc-discover-whats-available" class="nav-link" data-scroll-target="#discover-whats-available">Discover what’s available</a></li>
-  <li><a href="#pull-a-time-series-at-a-point" id="toc-pull-a-time-series-at-a-point" class="nav-link" data-scroll-target="#pull-a-time-series-at-a-point">Pull a time series at a point</a></li>
+  <li><a href="#installation" id="toc-installation" class="nav-link active" data-scroll-target="#installation">Installation</a></li>
+  <li><a href="#fetch-a-time-series-at-a-point" id="toc-fetch-a-time-series-at-a-point" class="nav-link" data-scroll-target="#fetch-a-time-series-at-a-point">Fetch a time series at a point</a></li>
   <li><a href="#extract-many-locations-in-one-read" id="toc-extract-many-locations-in-one-read" class="nav-link" data-scroll-target="#extract-many-locations-in-one-read">Extract many locations in one read</a></li>
   <li><a href="#where-to-go-next" id="toc-where-to-go-next" class="nav-link" data-scroll-target="#where-to-go-next">Where to go next</a></li>
   </ul>
@@ -253,7 +242,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 28, 2026</p>
+      <p class="date">June 5, 2026</p>
     </div>
   </div>
   
@@ -263,14 +252,25 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 </header>
 
-<p>caladaptaer reads downscaled CMIP6 climate projections off the <a href="https://analytics.cal-adapt.org/">Cal-Adapt Analytics Engine</a> directly into R. Data lives as cloud optimized Zarr on AWS S3, and the package reads it through GDAL: no Python, no API key, no authentication. Every call hands back a native R object, a <code>stars</code> grid or a tidy <code>data.frame</code>, so results drop right into the R geospatial and modeling stack.</p>
-<p>This page goes from install to a real time series in a few calls, then shows the design choice that lets the same code scale to thousands of sites. Every output below comes from actually running the code on this page. For the full function tour see <a href="../vignettes/data_access.html">Accessing Cal-Adapt Data in R</a>.</p>
-<section id="install" class="level2">
-<h2 class="anchored" data-anchor-id="install">Install</h2>
+<p><code>caladaptaer</code> provides access to downscaled CMIP6 climate projections from the <a href="https://analytics.cal-adapt.org/">Cal-Adapt Analytics Engine</a>. This tutorial covers installation, catalog checks, and the first point time-series read.</p>
+<p>For a broader data-access guide, see <a href="../vignettes/data_access.html">Accessing Cal-Adapt Data in R</a>.</p>
+<section id="installation" class="level2">
+<h2 class="anchored" data-anchor-id="installation">Installation</h2>
+<p>Requirements:</p>
+<ul>
+<li>R &gt;= 4.1</li>
+<li>GDAL &gt;= 3.4</li>
+<li>internet connection</li>
+<li>R packages:
+<ul>
+<li><code>sf</code>, <code>stars</code>, <code>dplyr</code>, <code>ggplot2</code> (and their dependencies)</li>
+<li><code>remotes</code> (for installation from GitHub)</li>
+</ul></li>
+</ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"lebauerapproach/caladaptaer"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>You need R &gt;= 4.1 and GDAL &gt;= 3.4 for the Zarr driver. Confirm your GDAL is recent enough:</p>
+<p>Check the GDAL version before reading from the cloud-hosted Zarr stores:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sf<span class="sc">::</span><span class="fu">sf_extSoftVersion</span>()[<span class="st">"GDAL"</span>]</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     GDAL </span></span>
@@ -280,81 +280,78 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caladaptaer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="discover-whats-available" class="level2">
-<h2 class="anchored" data-anchor-id="discover-whats-available">Discover what’s available</h2>
-<p>Ask what the WRF dynamical downscaling covers:</p>
+<section id="fetch-a-time-series-at-a-point" class="level2">
+<h2 class="anchored" data-anchor-id="fetch-a-time-series-at-a-point">Fetch a time series at a point</h2>
+<p><code>cae_fetch_point()</code> reads the grid and extracts data from the grid cell that is closest to the provided longitude and latitude.</p>
+<p>The following example reads one summer day in Fresno in 2050 under SSP3-7.0:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cae_models</span>(<span class="at">activity =</span> <span class="st">"WRF"</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "CESM2"         "CNRM-ESM2-1"   "EC-Earth3"     "EC-Earth3-Veg"</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [5] "ERA5"          "FGOALS-g3"     "MIROC6"        "MPI-ESM1-2-HR"</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [9] "TaiESM1"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>ts <span class="ot">&lt;-</span> <span class="fu">cae_fetch_point</span>(<span class="st">"t2"</span>,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">lon =</span> <span class="sc">-</span><span class="fl">119.77</span>, <span class="at">lat =</span> <span class="fl">36.75</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_time =</span> <span class="st">"2050-07-01T00:00:00"</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_time =</span> <span class="st">"2050-07-01T23:00:00"</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(ts)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                  time    value</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 2050-07-01 00:00:00 304.5662</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 2050-07-01 01:00:00 302.7805</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 2050-07-01 02:00:00 301.1025</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 2050-07-01 03:00:00 298.4392</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 2050-07-01 04:00:00 295.5602</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 2050-07-01 05:00:00 293.1013</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Eight GCMs plus the ERA5 reanalysis driven run. CESM2 carries the widest set of scenarios:</p>
+<p>The result is a <code>data.frame</code> with <code>time</code> and <code>value</code> columns. Values for <code>t2</code> are in Kelvin. Times are returned in UTC; the plot below converts the time axis to Pacific local time.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cae_scenarios</span>(<span class="at">activity =</span> <span class="st">"WRF"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "historical" "ssp245"     "ssp370"     "ssp585"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="pull-a-time-series-at-a-point" class="level2">
-<h2 class="anchored" data-anchor-id="pull-a-time-series-at-a-point">Pull a time series at a point</h2>
-<p><code>cae_fetch_point()</code> reads the grid and extracts the nearest cell to a lon/lat. Transform from WGS84 to the WRF Lambert Conformal grid happens for you. Here’s a summer day in 2050 at Fresno under SSP3-7.0:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ts <span class="ot">&lt;-</span> <span class="fu">cae_fetch_point</span>(<span class="st">"t2"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">lon =</span> <span class="sc">-</span><span class="fl">119.77</span>, <span class="at">lat =</span> <span class="fl">36.75</span>,</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">start_time =</span> <span class="st">"2050-07-01T00:00:00"</span>,</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">end_time   =</span> <span class="st">"2050-07-01T23:00:00"</span>)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(ts)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                  time    value</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 2050-07-01 00:00:00 304.5662</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 2050-07-01 01:00:00 302.7805</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 2050-07-01 02:00:00 301.1025</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 2050-07-01 03:00:00 298.4392</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 2050-07-01 04:00:00 295.5602</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 2050-07-01 05:00:00 293.1013</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Result is a plain <code>data.frame</code> with <code>time</code> and <code>value</code> in Kelvin, so base R plotting just works. Times are UTC, so the midday dip is the local overnight low (UTC noon is roughly 5am Pacific).</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>ts<span class="sc">$</span>temp_c <span class="ot">&lt;-</span> ts<span class="sc">$</span>value <span class="sc">-</span> <span class="fl">273.15</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ts<span class="sc">$</span>time, ts<span class="sc">$</span>temp_c, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#D62728"</span>,</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"time"</span>, <span class="at">ylab =</span> <span class="st">"temperature (C)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ts<span class="sc">$</span>temp_c <span class="ot">&lt;-</span> ts<span class="sc">$</span>value <span class="sc">-</span> <span class="fl">273.15</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>ts<span class="sc">$</span>time_local <span class="ot">&lt;-</span> <span class="fu">as.POSIXct</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.numeric</span>(ts<span class="sc">$</span>time),</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">origin =</span> <span class="st">"1970-01-01"</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">tz =</span> <span class="st">"America/Los_Angeles"</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>ggplot2<span class="sc">::</span><span class="fu">ggplot</span>(ts, ggplot2<span class="sc">::</span><span class="fu">aes</span>(<span class="at">x =</span> time_local, <span class="at">y =</span> temp_c)) <span class="sc">+</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"#D62728"</span>) <span class="sc">+</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"time (America/Los_Angeles)"</span>, <span class="at">y =</span> <span class="st">"temperature (C)"</span>) <span class="sc">+</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="getting_started_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" alt="Hourly 2 meter air temperature at Fresno for 1 July 2050 under CESM2 SSP3-7.0, ranging from about 12 to 31 degrees C across the day." width="768"></p>
+<p><img src="getting_started_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" alt="Hourly 2 meter air temperature at Fresno for 1 July 2050 under CESM2 SSP3-7.0, ranging from about 12 to 31 degrees C across the day." width="768"></p>
 </div>
 </div>
 </section>
 <section id="extract-many-locations-in-one-read" class="level2">
 <h2 class="anchored" data-anchor-id="extract-many-locations-in-one-read">Extract many locations in one read</h2>
-<p>This is the design choice worth knowing up front. <code>cae_fetch_points()</code> reads the grid from S3 once and extracts every location locally in a single vectorized pass. Three sites or ten thousand, it’s one S3 read per variable, not one per site.</p>
+<p>Use <code>cae_fetch_points()</code> to extract data from multiple locations in a single read. This function reads the grid from S3 once and extracts every location locally.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sites <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">site_id =</span> <span class="fu">c</span>(<span class="st">"davis"</span>, <span class="st">"fresno"</span>, <span class="st">"sacramento"</span>),</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">lon =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">121.74</span>, <span class="sc">-</span><span class="fl">119.77</span>, <span class="sc">-</span><span class="fl">121.49</span>),</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">lat =</span> <span class="fu">c</span>(<span class="fl">38.54</span>, <span class="fl">36.75</span>, <span class="fl">38.58</span>)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>mp <span class="ot">&lt;-</span> <span class="fu">cae_fetch_points</span>(<span class="st">"t2"</span>, <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">points =</span> sites,</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">start_time =</span> <span class="st">"2050-07-01T00:00:00"</span>,</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>                       <span class="at">end_time   =</span> <span class="st">"2050-07-01T05:00:00"</span>)</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Reading grid (1 S3 fetch for all 3 sites)</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Extracting 3 sites</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mp, <span class="dv">8</span>)</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   site_id                time    value</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1   davis 2050-07-01 00:00:00 304.7827</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2   davis 2050-07-01 01:00:00 303.4674</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3   davis 2050-07-01 02:00:00 301.8932</span></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4   davis 2050-07-01 03:00:00 299.8713</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5   davis 2050-07-01 04:00:00 297.6558</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6   davis 2050-07-01 05:00:00 295.5995</span></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7  fresno 2050-07-01 00:00:00 304.5662</span></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8  fresno 2050-07-01 01:00:00 302.7805</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>sites <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">site_id =</span> <span class="fu">c</span>(<span class="st">"davis"</span>, <span class="st">"fresno"</span>, <span class="st">"sacramento"</span>),</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">lon =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">121.74</span>, <span class="sc">-</span><span class="fl">119.77</span>, <span class="sc">-</span><span class="fl">121.49</span>),</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">lat =</span> <span class="fu">c</span>(<span class="fl">38.54</span>, <span class="fl">36.75</span>, <span class="fl">38.58</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>mp <span class="ot">&lt;-</span> <span class="fu">cae_fetch_points</span>(<span class="st">"t2"</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">model =</span> <span class="st">"CESM2"</span>, <span class="at">scenario =</span> <span class="st">"ssp370"</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">points =</span> sites,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_time =</span> <span class="st">"2050-07-01T00:00:00"</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_time =</span> <span class="st">"2050-07-01T05:00:00"</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Reading grid (1 S3 fetch for all 3 sites)</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Extracting 3 sites</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mp, <span class="dv">8</span>)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   site_id                time    value</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1   davis 2050-07-01 00:00:00 304.7827</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2   davis 2050-07-01 01:00:00 303.4674</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3   davis 2050-07-01 02:00:00 301.8932</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4   davis 2050-07-01 03:00:00 299.8713</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5   davis 2050-07-01 04:00:00 297.6558</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6   davis 2050-07-01 05:00:00 295.5995</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7  fresno 2050-07-01 00:00:00 304.5662</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8  fresno 2050-07-01 01:00:00 302.7805</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="where-to-go-next" class="level2">
 <h2 class="anchored" data-anchor-id="where-to-go-next">Where to go next</h2>
 <ul>
-<li><a href="../vignettes/data_access.html">Accessing Cal-Adapt Data in R</a> – every function with output: catalog search, gridded fetch, California maps, multi model comparison, and the full surface meteorology</li>
-<li><a href="../vignettes/sipnet_met_drivers.html">SIPNET Met Drivers</a> – raw WRF to CF standard NetCDF for ecosystem models</li>
-<li><a href="../vignettes/bulk_met_drivers.html">Bulk Met Drivers</a> – the multi site extraction path</li>
+<li><a href="../vignettes/data_access.html">Accessing Cal-Adapt Data in R</a> – dataset background, catalog search, gridded fetch, point extraction, and model comparison</li>
+<li><a href="../vignettes/met_drivers.html">WRF Meteorological Drivers</a> – WRF to CF-standard NetCDF meteorological drivers for site-based model workflows</li>
 </ul>
 
 
