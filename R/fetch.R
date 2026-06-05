@@ -361,6 +361,80 @@ cae_fetch_points <- function(variable, model, scenario,
 }
 
 
+#' Map points to their grid cells
+#'
+#' Snaps each lon/lat to the nearest cell of a fetched grid, so sites that
+#' fall in the same cell collapse onto one identifier. Useful for
+#' deduplicating downstream output: build one driver file per cell and point
+#' every site in that cell at it. At 45 km (`d01`) a few thousand California
+#' sites ride on at most a couple hundred cells.
+#'
+#' Designed for the WRF (WUS-D3) grid, which uses projected `x`/`y`
+#' coordinates. Snapping picks the same cell that [cae_fetch_point()] would
+#' extract.
+#'
+#' @param points data.frame with columns `lon` and `lat` in WGS84 decimal
+#'   degrees. Any other columns (such as `site_id`) are carried through.
+#' @param grid a `stars` object from [cae_fetch()] (any single variable, any
+#'   timestep). Only its grid geometry and CRS are used.
+#' @return `points` with added columns: `cell_i`, `cell_j` (1-based grid
+#'   indices), `cell_id` (a label like `"x50_y58"`), and `cell_lon`,
+#'   `cell_lat` (the cell center in WGS84).
+#' @export
+#' @examples
+#' \dontrun{
+#' grid <- cae_fetch("t2", model = "CESM2", scenario = "ssp370",
+#'                   start_time = "2050-07-01T00:00:00",
+#'                   end_time   = "2050-07-01T00:00:00")
+#' sites <- data.frame(site_id = c("davis", "west_sac", "fresno"),
+#'                     lon = c(-121.74, -121.53, -119.77),
+#'                     lat = c(38.54, 38.58, 36.75))
+#' cells <- cae_grid_cells(sites, grid)
+#' length(unique(cells$cell_id))   # davis and west_sac share a 45 km cell
+#' }
+cae_grid_cells <- function(points, grid) {
+  if (!is.data.frame(points) || !all(c("lon", "lat") %in% names(points))) {
+    stop("'points' must be a data.frame with 'lon' and 'lat' columns",
+         call. = FALSE)
+  }
+  if (!inherits(grid, "stars")) {
+    stop("'grid' must be a stars object from cae_fetch()", call. = FALSE)
+  }
+  if (!all(c("x", "y") %in% names(stars::st_dimensions(grid)))) {
+    stop("grid has no 'x'/'y' dimensions; cae_grid_cells expects the WRF grid",
+         call. = FALSE)
+  }
+
+  xs <- stars::st_get_dimension_values(grid, "x")
+  ys <- stars::st_get_dimension_values(grid, "y")
+
+  pts_native <- sf::st_transform(
+    sf::st_as_sf(points, coords = c("lon", "lat"), crs = 4326),
+    sf::st_crs(grid)
+  )
+  xy <- sf::st_coordinates(pts_native)
+
+  i <- vapply(xy[, 1], function(px) which.min(abs(xs - px)), integer(1))
+  j <- vapply(xy[, 2], function(py) which.min(abs(ys - py)), integer(1))
+
+  # cell centers back in WGS84
+  centers <- sf::st_transform(
+    sf::st_sfc(Map(function(a, b) sf::st_point(c(a, b)), xs[i], ys[j]),
+               crs = sf::st_crs(grid)),
+    4326
+  )
+  cc <- sf::st_coordinates(centers)
+
+  out <- points
+  out$cell_i  <- i
+  out$cell_j  <- j
+  out$cell_id <- paste0("x", i, "_y", j)
+  out$cell_lon <- cc[, 1]
+  out$cell_lat <- cc[, 2]
+  out
+}
+
+
 # -- internal helpers --
 
 #' Detect activity_id from model name and params

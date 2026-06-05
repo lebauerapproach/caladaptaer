@@ -101,3 +101,29 @@ test_that("all 8 CF-standard met variables are readable", {
     expect_s3_class(x, "stars")
   }
 })
+
+
+test_that("cae_grid_cells snaps points to cells and dedups", {
+  # synthetic projected grid, no S3 needed. 100 km cells in a Lambert CRS.
+  crs <- paste("+proj=lcc +lat_0=38 +lon_0=-70 +lat_1=30 +lat_2=60",
+               "+R=6370000 +units=m +no_defs")
+  xs <- seq(-4.5e6, -3.6e6, by = 1e5)
+  ys <- seq(0.6e6, 1.8e6, by = 1e5)
+  g <- stars::st_as_stars(array(1, dim = c(length(xs), length(ys))))
+  g <- stars::st_set_dimensions(g, 1, names = "x", values = xs)
+  g <- stars::st_set_dimensions(g, 2, names = "y", values = ys)
+  sf::st_crs(g) <- crs
+
+  pts <- data.frame(site_id = c("a", "b", "c"),
+                    lon = c(-121.0, -121.05, -118.0),
+                    lat = c(38.0, 38.0, 34.0))
+  out <- cae_grid_cells(pts, g)
+
+  expect_true(all(c("cell_i", "cell_j", "cell_id", "cell_lon", "cell_lat")
+                  %in% names(out)))
+  expect_equal(nrow(out), 3L)
+  # a and b are ~4 km apart, far inside one 100 km cell -> same cell
+  expect_equal(out$cell_id[1], out$cell_id[2])
+  # c is hundreds of km away -> a different cell
+  expect_false(out$cell_id[1] == out$cell_id[3])
+})
