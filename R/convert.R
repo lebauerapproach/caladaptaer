@@ -3,6 +3,8 @@
 #' Functions to convert Cal-Adapt WRF variables to CF-standard
 #' NetCDF format. Handles variable renaming, unit conversions, and
 #' metadata stamping.
+#'
+#' @keywords internal
 
 # WRF-to-CF variable mapping
 # source: WRF output conventions + CF met standard

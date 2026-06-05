@@ -29,6 +29,10 @@ _site/
 _freeze/
 .quarto/
 vignettes/*_files/
+vignettes/*.rmarkdown
 # keep vignettes/figures/ tracked -- they're pre-rendered from S3
+
+# pkgdown reference build (intermediate; merged into _site/reference by build_site.sh)
+docs/
 
 /.quarto/

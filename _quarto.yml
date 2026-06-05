@@ -5,7 +5,9 @@ project:
     watch-inputs: true
   render:
     - index.qmd
-    - vignettes/*.qmd
+    - vignettes/getting_started.qmd
+    - vignettes/data_access.qmd
+    - vignettes/met_drivers.qmd
 
 website:
   title: "caladaptaer"
@@ -20,12 +22,14 @@ website:
         contents:
           - href: vignettes/getting_started.qmd
             text: Getting Started
+          - href: vignettes/data_access.qmd
+            text: Data Access
       - section: Advanced
         contents:
-          - href: vignettes/sipnet_met_drivers.qmd
-            text: SIPNET Met Drivers
-          - href: vignettes/bulk_met_drivers.qmd
-            text: Bulk Met Drivers
+          - href: vignettes/met_drivers.qmd
+            text: Met Drivers
+      - href: reference/index.html
+        text: Reference
     tools:
       - icon: github
         href: https://github.com/lebauerapproach/caladaptaer
@@ -35,13 +39,18 @@ format:
     theme: cosmo
     toc: true
     self-contained: false
-    df-print: paged
+    df-print: default
 
 execute:
   echo: true
   warning: false
   message: false
   freeze: auto
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
 
 author: "Akash B V and David LeBauer"
 date: today

@@ -1,0 +1,49 @@
+url: https://lebauerapproach.github.io/caladaptaer
+
+destination: docs
+
+template:
+  bootstrap: 5
+  bootswatch: cosmo
+
+navbar:
+  structure:
+    left: [reference]
+    right: [search, site, github]
+  components:
+    site:
+      text: Guides and home
+      href: index.html
+    github:
+      icon: fab fa-github
+      href: https://github.com/lebauerapproach/caladaptaer
+      aria-label: GitHub
+
+reference:
+  - title: Discovery
+    desc: >
+      Find out what is on the Cal-Adapt Analytics Engine and where it lives in
+      the CADCAT catalog.
+    contents:
+      - cae_catalog
+      - cae_models
+      - cae_scenarios
+      - cae_variables
+      - cae_search
+      - cae_check_variables
+  - title: Fetching
+    desc: >
+      Read gridded Zarr stores from S3 into R, and pull time series at one or
+      many points.
+    contents:
+      - cae_fetch
+      - cae_fetch_point
+      - cae_fetch_points
+      - cae_grid_cells
+  - title: Drivers
+    desc: >
+      Turn fetched WRF output into CF standard NetCDF that ecosystem models
+      read directly.
+    contents:
+      - cae_write_cf_netcdf
+      - cae_build_met_drivers
