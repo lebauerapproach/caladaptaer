@@ -39,7 +39,7 @@
     )
   }
   if (!inherits(times, "POSIXct")) {
-    labels <- times
+    labels <- sub("T", " ", times, fixed = TRUE)
     times <- .parse_time(labels)
     if (anyNA(times) || any(format(times, "%Y-%m-%d %H:%M:%S", tz = "UTC") != labels)) {
       stop("Source calendar contains dates not representable by POSIXct; no calendar conversion is performed")
