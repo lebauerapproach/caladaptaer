@@ -3,7 +3,7 @@
 \docType{data}
 \name{.ucla_wrf_bucket}
 \alias{.ucla_wrf_bucket}
-\title{UCLA WRF source-bucket inventory helpers}
+\title{UCLA WRF source-bucket listing helpers}
 \format{
 An object of class \code{character} of length 1.
 }

@@ -1,4 +1,4 @@
-#' UCLA WRF source-bucket inventory helpers
+#' UCLA WRF source-bucket listing helpers
 #'
 #' Source listings are independent of the CADCAT Zarr catalog.
 #'

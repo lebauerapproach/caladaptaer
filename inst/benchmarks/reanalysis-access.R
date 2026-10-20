@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 # Run each mode in a fresh process; capture CPL_CURL_VERBOSE stderr for bytes.
-# Rscript inventory-access.R MODE SITE_CSV OUTPUT_DIR SOURCE_KEY
+# Rscript reanalysis-access.R MODE SITE_CSV OUTPUT_DIR SOURCE_KEY
 args <- commandArgs(trailingOnly = TRUE)
 mode <- match.arg(args[1], c("remote", "staged"))
 sites <- utils::read.csv(args[2])

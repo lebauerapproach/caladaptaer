@@ -5,7 +5,7 @@ test_that("UCLA file listings parse timestamps and September source folders", {
     list(contents=data.frame(key=paste0(prefix,"auxhist_d01_2023-09-01_00:00:00"),
                               last_modified="2025-09-01",size=123))
   })
-  x <- cae_inventory_files("2023-09-01","2023-09-01","d03")
+  x <- cae_reanalysis_files("2023-09-01","2023-09-01","d03")
   expect_equal(nrow(x),1L)
   expect_equal(x$time,as.POSIXct("2023-09-01",tz="UTC"))
   expect_equal(queried,"downscaled_products/reanalysis/era5/hourly/2023/d03/")
@@ -16,7 +16,7 @@ test_that("overlapping September boundary selects the new source folder", {
     list(contents = data.frame(key = paste0(prefix, "auxhist_d01_2023-09-01_00:00:00"),
                                last_modified = "2025-09-01", size = 123))
   })
-  x <- cae_inventory_files("2023-08-31 23:00:00", "2023-09-01 00:00:00")
+  x <- cae_reanalysis_files("2023-08-31 23:00:00", "2023-09-01 00:00:00")
   expect_equal(nrow(x), 1L)
   expect_match(x$key, "/2023/d03/")
   expect_match(x$precipitation_key, "/2022/d03/")
@@ -28,16 +28,16 @@ test_that("warm-start accumulation at a source boundary is not counted as rain",
   old_final <- 701.59058
   new_initial <- 17.75461
   new_next <- 17.75461
-  expect_equal(.inventory_precip_increment(new_initial, old_previous, old_final), 0)
-  expect_equal(.inventory_precip_increment(new_next, new_initial), 0)
-  expect_equal(.inventory_precip_increment(1, 100), 1)
+  expect_equal(.reanalysis_precip_increment(new_initial, old_previous, old_final), 0)
+  expect_equal(.reanalysis_precip_increment(new_next, new_initial), 0)
+  expect_equal(.reanalysis_precip_increment(1, 100), 1)
 })
 
 test_that("discard mode cleans owned downloads and preserves existing sources", {
   cache <- tempfile()
   dir.create(cache)
   on.exit(unlink(cache, recursive = TRUE))
-  local_mocked_bindings(.download_inventory_file = function(key, cache_dir) {
+  local_mocked_bindings(.download_reanalysis_file = function(key, cache_dir) {
     path <- file.path(cache_dir, key)
     dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
     if (!file.exists(path)) writeLines("source", path)
@@ -47,14 +47,14 @@ test_that("discard mode cleans owned downloads and preserves existing sources", 
     expect_true(file.exists(path))
     readLines(path)
   }
-  expect_equal(.with_inventory_file("new.nc", cache, FALSE, read), "source")
+  expect_equal(.with_reanalysis_file("new.nc", cache, FALSE, read), "source")
   expect_length(list.files(cache, all.files = TRUE, no.. = TRUE), 0L)
-  expect_error(.with_inventory_file("failed.nc", cache, FALSE, function(path) stop("read failed")), "read failed")
+  expect_error(.with_reanalysis_file("failed.nc", cache, FALSE, function(path) stop("read failed")), "read failed")
   expect_length(list.files(cache, all.files = TRUE, no.. = TRUE), 0L)
-  cached <- .download_inventory_file("existing.nc", cache)
-  expect_equal(.with_inventory_file("existing.nc", cache, FALSE, read), "source")
+  cached <- .download_reanalysis_file("existing.nc", cache)
+  expect_equal(.with_reanalysis_file("existing.nc", cache, FALSE, read), "source")
   expect_true(file.exists(cached))
-  .with_inventory_file("retained.nc", cache, TRUE, read)
+  .with_reanalysis_file("retained.nc", cache, TRUE, read)
   expect_true(file.exists(file.path(cache, "retained.nc")))
 })
 
@@ -87,11 +87,11 @@ test_that("streaming preserves actual times and interval precipitation", {
   }
   sites <- data.frame(site_id = c("a", "b"), lon = -121, lat = 38)
   paths <- file.path(out, paste0(sites$site_id, ".nc"))
-  manifest <- .inventory_manifest(files, out, "d03", 2024)
+  manifest <- .reanalysis_manifest(files, out, "d03", 2024)
   identity <- .driver_identity("ERA5", "reanalysis", "d03", list(manifest = manifest$checksum))
-  .stream_inventory_year(sites, files, paths, cache, "d03", 2024, 1L, FALSE, manifest, identity, FALSE)
+  .stream_reanalysis_year(sites, files, paths, cache, "d03", 2024, 1L, FALSE, manifest, identity, FALSE)
   for (path in paths) {
-    expect_true(.valid_inventory_file(path, nominal[-1], 38, -121, identity))
+    expect_true(.valid_reanalysis_file(path, nominal[-1], 38, -121, identity))
     nc <- ncdf4::nc_open(path)
     expect_equal(as.numeric(ncdf4::ncvar_get(nc, "time")), as.numeric(actual[-1]))
     expect_equal(as.numeric(ncdf4::ncvar_get(nc, "source_nominal_time")), as.numeric(nominal[-1]))
@@ -108,8 +108,8 @@ test_that("streaming preserves actual times and interval precipitation", {
   ncdf4::ncvar_put(nc, "RAINC", array(1.5, c(3, 3)))
   ncdf4::nc_close(nc)
   files$precipitation_key[2] <- "old.nc"
-  manifest <- .inventory_manifest(files, out, "d03", 2024)
-  .stream_inventory_year(sites, files, paths, cache, "d03", 2024, 1L, FALSE, manifest, identity, FALSE)
+  manifest <- .reanalysis_manifest(files, out, "d03", 2024)
+  .stream_reanalysis_year(sites, files, paths, cache, "d03", 2024, 1L, FALSE, manifest, identity, FALSE)
   nc <- ncdf4::nc_open(paths[1])
   bounds <- ncdf4::ncvar_get(nc, "time_bounds")
   expect_equal(bounds[2, 1], as.numeric(nominal[2] + 5))
@@ -117,7 +117,7 @@ test_that("streaming preserves actual times and interval precipitation", {
   expect_equal(sum(ncdf4::ncvar_get(nc, "precipitation_flux") * (bounds[2, ] - bounds[1, ])), 1.5, tolerance = 1e-6)
   ncdf4::nc_close(nc)
   expect_true(all(file.exists(file.path(cache, files$key))))
-  expect_error(cae_build_inventory_drivers(sites, files, 2024, 2024, out, cache), "coverage incomplete")
+  expect_error(cae_build_reanalysis_drivers(sites, files, 2024, 2024, out, cache), "coverage incomplete")
 })
 
 
@@ -129,6 +129,6 @@ test_that("failed source downloads cannot become cached sources", {
     writeLines("partial", destfile)
     1L
   }, .package = "utils")
-  expect_error(.download_inventory_file("hour.nc", cache), "download incomplete")
+  expect_error(.download_reanalysis_file("hour.nc", cache), "download incomplete")
   expect_length(list.files(cache, all.files = TRUE, no.. = TRUE), 0L)
 })

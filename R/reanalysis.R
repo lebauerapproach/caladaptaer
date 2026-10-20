@@ -1,4 +1,7 @@
-#' List UCLA hourly WRF-ERA5 source files for an inventory period
+#' List hourly files from UCLA's ERA5-driven WRF reanalysis
+#'
+#' Currently supports UCLA's ERA5-driven WRF reanalysis only. GCM historical
+#' simulations and other reanalysis products are not supported by this function.
 #' @param start_time,end_time Inclusive UTC timestamps; include one preceding
 #'   hour when precipitation must be differenced.
 #' @param resolution WRF domain, default `d03` (3 km).
@@ -6,11 +9,11 @@
 #'   `last_modified`. At overlapping September boundaries, precipitation_key
 #'   identifies the previous run's final record for counter differencing.
 #' @export
-cae_inventory_files <- function(start_time, end_time, resolution = "d03") {
+cae_reanalysis_files <- function(start_time, end_time, resolution = "d03") {
   resolution <- match.arg(resolution, .ucla_wrf_domains)
   start <- .parse_time(start_time)
   end <- .parse_time(end_time)
-  if (is.na(start) || is.na(end) || start > end) stop("Invalid inventory period")
+  if (is.na(start) || is.na(end) || start > end) stop("Invalid reanalysis period")
   source_year <- function(time) as.integer(format(time, "%Y")) - as.integer(format(time, "%m") < "09")
   years <- seq.int(source_year(start), source_year(end))
   files <- lapply(years, function(year) {
@@ -60,7 +63,7 @@ cae_inventory_files <- function(start_time, end_time, resolution = "d03") {
   sf::st_set_crs(grid, crs)
 }
 
-.download_inventory_file <- function(key, cache_dir) {
+.download_reanalysis_file <- function(key, cache_dir) {
   .check_cache_keys(key)
   path <- file.path(cache_dir, key)
   if (!file.exists(path)) {
@@ -69,39 +72,43 @@ cae_inventory_files <- function(start_time, end_time, resolution = "d03") {
     on.exit(unlink(tmp), add = TRUE)
     url <- paste0("https://", .ucla_wrf_bucket, ".s3.us-west-2.amazonaws.com/", key)
     status <- utils::download.file(url, tmp, mode = "wb", quiet = TRUE)
-    if (status != 0 || !file.exists(tmp) || file.info(tmp)$size == 0) stop("Inventory source download incomplete")
-    if (!file.rename(tmp, path)) stop("Failed to stage inventory source")
+    if (status != 0 || !file.exists(tmp) || file.info(tmp)$size == 0) stop("Reanalysis source download incomplete")
+    if (!file.rename(tmp, path)) stop("Failed to stage reanalysis source")
   }
   path
 }
 
 # A private scratch directory owns disposable downloads. The reusable cache is
 # read-only in this mode, so cleanup cannot remove a caller's pre-existing file.
-.with_inventory_file <- function(key, cache_dir, retain_source, read) {
+.with_reanalysis_file <- function(key, cache_dir, retain_source, read) {
   existing <- file.path(cache_dir, key)
   if (retain_source || file.exists(existing)) {
-    return(read(.download_inventory_file(key, cache_dir)))
+    return(read(.download_reanalysis_file(key, cache_dir)))
   }
   dir.create(cache_dir, recursive = TRUE, showWarnings = FALSE)
-  scratch <- tempfile("inventory-hour-", tmpdir = cache_dir)
+  scratch <- tempfile("reanalysis-hour-", tmpdir = cache_dir)
   dir.create(scratch)
   on.exit(unlink(scratch, recursive = TRUE), add = TRUE)
-  read(.download_inventory_file(key, scratch))
+  read(.download_reanalysis_file(key, scratch))
 }
 
-#' Build source-preserving CF files from UCLA hourly historical WRF files
+#' Build CF drivers from UCLA's ERA5-driven WRF reanalysis
+#'
+#' Currently supports UCLA's ERA5-driven WRF reanalysis only. GCM historical
+#' simulations and other reanalysis products are not supported by this function.
 #'
 #' Streams each source file across bounded cell batches before discarding it.
 #' Source internal timestamps are preserved; nominal filename times are recorded
 #' separately. No gaps are filled and no calendar conversion is performed.
 #' @inheritParams cae_build_met_drivers
-#' @param files Data frame from [cae_inventory_files()], with one preceding hour.
+#' @param files Data frame from [cae_reanalysis_files()], with one preceding hour.
 #' @param cache_dir Source-file cache directory.
+#' @param resolution WRF domain, default `d03` (3 km).
 #' @param retain_source Keep newly downloaded files (default TRUE). FALSE deletes
 #'   only owned temporary downloads after all requested cells have been read.
 #' @return Invisibly, a data frame of `site_id`, `year`, and output `file`.
 #' @export
-cae_build_inventory_drivers <- function(sites, files, start_year, end_year,
+cae_build_reanalysis_drivers <- function(sites, files, start_year, end_year,
                                         outdir, cache_dir, resolution = "d03",
                                         overwrite = FALSE, verbose = TRUE,
                                         batch_size = 64L, retain_source = TRUE) {
@@ -123,13 +130,13 @@ cae_build_inventory_drivers <- function(sites, files, start_year, end_year,
     rows <- match(nominal, files$time)
     if (anyNA(rows)) stop("Source coverage incomplete for ", year, " including preceding hour")
     selected <- files[rows, , drop = FALSE]
-    manifest <- .inventory_manifest(selected, outdir, resolution, year)
+    manifest <- .reanalysis_manifest(selected, outdir, resolution, year)
     identity <- .driver_identity("ERA5", "reanalysis", resolution, list(manifest = manifest$checksum))
     paths <- file.path(outdir, sites$site_id, paste0("ERA5.reanalysis.", year, ".nc"))
-    valid <- vapply(seq_len(nrow(sites)), function(i) .valid_inventory_file(paths[i], nominal[-1], sites$lat[i], sites$lon[i], identity), logical(1))
+    valid <- vapply(seq_len(nrow(sites)), function(i) .valid_reanalysis_file(paths[i], nominal[-1], sites$lat[i], sites$lon[i], identity), logical(1))
     wanted <- which(overwrite | !valid)
     if (length(wanted)) {
-      .stream_inventory_year(sites[wanted, , drop = FALSE], selected, paths[wanted],
+      .stream_reanalysis_year(sites[wanted, , drop = FALSE], selected, paths[wanted],
         cache_dir, resolution, year, batch_size, retain_source, manifest, identity, verbose)
     }
     results[[length(results) + 1L]] <- data.frame(site_id = sites$site_id, year = year, file = paths)
@@ -137,7 +144,7 @@ cae_build_inventory_drivers <- function(sites, files, start_year, end_year,
   invisible(do.call(rbind, results))
 }
 
-.inventory_manifest <- function(files, outdir, resolution, year) {
+.reanalysis_manifest <- function(files, outdir, resolution, year) {
   directory <- file.path(outdir, "source-manifests")
   dir.create(directory, recursive = TRUE, showWarnings = FALSE)
   tmp <- tempfile(tmpdir = directory)
@@ -151,9 +158,9 @@ cae_build_inventory_drivers <- function(sites, files, start_year, end_year,
   list(path = path, checksum = checksum)
 }
 
-.inventory_provenance <- function(files, times, resolution, manifest) {
+.reanalysis_provenance <- function(files, times, resolution, manifest) {
   list(source = paste0("s3://", .ucla_wrf_bucket, "/", unique(dirname(files$key))),
-    catalog = "not applicable: direct UCLA historical files", model = "ERA5", scenario = "reanalysis",
+    catalog = "not applicable: direct UCLA reanalysis files", model = "ERA5", scenario = "reanalysis",
     member = "one source realization", variable = .wrf_cf_map$wrf_name, resolution = resolution,
     calendar = "standard", time_units = "seconds since 1970-01-01 00:00:00",
     times = times, time_values = as.numeric(times),
@@ -163,7 +170,7 @@ cae_build_inventory_drivers <- function(sites, files, start_year, end_year,
       "Converted precipitation increments using actual source interval seconds; mixing ratio to specific humidity; wind speed from u10/v10"))
 }
 
-.stream_inventory_year <- function(sites, files, paths, cache_dir, resolution, year,
+.stream_reanalysis_year <- function(sites, files, paths, cache_dir, resolution, year,
                                    batch_size, retain_source, manifest, identity, verbose) {
   temporary <- vapply(paths, function(path) {
     dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
@@ -171,7 +178,7 @@ cae_build_inventory_drivers <- function(sites, files, start_year, end_year,
   }, character(1))
   on.exit(unlink(temporary), add = TRUE)
   nominal <- files$time[-1]
-  p <- .inventory_provenance(files, nominal, resolution, manifest)
+  p <- .reanalysis_provenance(files, nominal, resolution, manifest)
   empty <- stats::setNames(rep(list(rep(NA_real_, length(nominal))), 9L), c(.wrf_cf_map$cf_name, "wind_speed"))
   for (i in seq_along(temporary)) {
     .write_site_cf_nc(empty, nominal, sites$lat[i], sites$lon[i], temporary[i], year, p)
@@ -188,17 +195,17 @@ cae_build_inventory_drivers <- function(sites, files, start_year, end_year,
   for (j in seq_len(nrow(files))) {
     process <- function(path, boundary_path = NULL) {
       if (is.null(cells)) {
-        reference <- .read_inventory_hour(path, sites[1, , drop = FALSE], NULL, resolution, files$time[j], TRUE)
+        reference <- .read_reanalysis_hour(path, sites[1, , drop = FALSE], NULL, resolution, files$time[j], TRUE)
         cells <<- cae_grid_cells(sites, reference$grid)
       }
       ids <- unique(cells$cell_id)
       batches <- split(ids, ceiling(seq_along(ids) / batch_size))
       for (batch in batches) {
         k <- match(batch, cells$cell_id)
-        hour <- .read_inventory_hour(path, sites[k, , drop = FALSE], if (is.null(cells)) NULL else cells[k, , drop = FALSE], resolution, files$time[j])
+        hour <- .read_reanalysis_hour(path, sites[k, , drop = FALSE], if (is.null(cells)) NULL else cells[k, , drop = FALSE], resolution, files$time[j])
         if (is.na(actual[j])) actual[j] <<- hour$time
         if (!identical(as.numeric(actual[j]), as.numeric(hour$time))) stop("Source timestamps differ between cell batches")
-        boundary_hour <- if (is.null(boundary_path)) hour else .read_inventory_hour(boundary_path,
+        boundary_hour <- if (is.null(boundary_path)) hour else .read_reanalysis_hour(boundary_path,
           sites[k, , drop = FALSE], cells[k, , drop = FALSE], resolution, files$time[j], TRUE)
         boundary <- boundary_hour$total
         precipitation_end[j] <<- boundary_hour$time
@@ -206,7 +213,7 @@ cae_build_inventory_drivers <- function(sites, files, start_year, end_year,
           dt <- as.numeric(difftime(precipitation_end[j], actual[j - 1L], units = "secs"))
           if (!is.finite(dt) || dt <= 0) stop("Source internal timestamps are not strictly increasing")
           raw <- hour$values
-          raw$prec <- .inventory_precip_increment(hour$total, previous[k], boundary)
+          raw$prec <- .reanalysis_precip_increment(hour$total, previous[k], boundary)
           converted <- .convert_driver_values(raw, dt)
           owners <- which(cells$cell_id %in% batch)
           for (owner in owners) {
@@ -221,14 +228,14 @@ cae_build_inventory_drivers <- function(sites, files, start_year, end_year,
         previous[k] <<- hour$total
       }
     }
-    .with_inventory_file(files$key[j], cache_dir, retain_source, function(path) {
+    .with_reanalysis_file(files$key[j], cache_dir, retain_source, function(path) {
       if (files$precipitation_key[j] == files$key[j]) process(path) else {
-        .with_inventory_file(files$precipitation_key[j], cache_dir, retain_source, function(old) process(path, old))
+        .with_reanalysis_file(files$precipitation_key[j], cache_dir, retain_source, function(old) process(path, old))
       }
     })
     if (verbose && j %% 168L == 0L) message(year, ": ", j, " / ", nrow(files), " source hours")
   }
-  p <- .inventory_provenance(files, actual[-1], resolution, manifest)
+  p <- .reanalysis_provenance(files, actual[-1], resolution, manifest)
   for (i in seq_along(temporary)) {
     nc <- ncdf4::nc_open(temporary[i], write = TRUE)
     tryCatch({
@@ -245,13 +252,13 @@ cae_build_inventory_drivers <- function(sites, files, start_year, end_year,
       ncdf4::ncatt_put(nc, 0, "source_manifest_md5", manifest$checksum)
       ncdf4::ncatt_put(nc, 0, "cae_request", identity)
     }, finally = ncdf4::nc_close(nc))
-    if (!.valid_inventory_file(temporary[i], nominal, sites$lat[i], sites$lon[i], identity)) stop("Inventory export validation failed")
-    if (!file.rename(temporary[i], paths[i])) stop("Could not publish inventory file")
+    if (!.valid_reanalysis_file(temporary[i], nominal, sites$lat[i], sites$lon[i], identity)) stop("Reanalysis export validation failed")
+    if (!file.rename(temporary[i], paths[i])) stop("Could not publish reanalysis file")
   }
   invisible(paths)
 }
 
-.valid_inventory_file <- function(path, nominal, lat, lon, identity) {
+.valid_reanalysis_file <- function(path, nominal, lat, lon, identity) {
   if (!file.exists(path)) return(FALSE)
   tryCatch({
     nc <- ncdf4::nc_open(path)
@@ -263,12 +270,12 @@ cae_build_inventory_drivers <- function(sites, files, start_year, end_year,
 }
 
 # A boundary's previous-run final total and new-run baseline are distinct.
-.inventory_precip_increment <- function(current, previous, boundary_total = current) {
+.reanalysis_precip_increment <- function(current, previous, boundary_total = current) {
   delta <- boundary_total - previous
   ifelse(delta < -0.01, boundary_total, pmax(delta, 0))
 }
 
-.read_inventory_hour <- function(path, sites, cells, resolution, expected, precipitation_only = FALSE) {
+.read_reanalysis_hour <- function(path, sites, cells, resolution, expected, precipitation_only = FALSE) {
   nc <- ncdf4::nc_open(path)
   on.exit(ncdf4::nc_close(nc))
   grid <- .raw_wrf_grid(nc)
