@@ -104,3 +104,20 @@ test_that("reference geometry and geographic-grid local fetch preserve data", {
   expect_true(all(is.na(grid[[1]])))
   expect_equal(cae_fetch("t2", "CESM2", "ssp370", source = f$path), .read_store_window(f$path, "t2"))
 })
+
+
+test_that("CF geographic axes without a grid mapping support point extraction", {
+  path <- tempfile(fileext = ".nc")
+  on.exit(unlink(path))
+  dims <- list(ncdf4::ncdim_def("lon", "degrees_east", c(-122, -121)),
+               ncdf4::ncdim_def("lat", "degrees_north", c(38, 39)),
+               ncdf4::ncdim_def("time", "days since 2024-02-28", 0:2))
+  nc <- ncdf4::nc_create(path, ncdf4::ncvar_def("tasmax", "K", dims, -9999))
+  values <- array(1:12, c(2, 2, 3))
+  ncdf4::ncvar_put(nc, "tasmax", values)
+  ncdf4::nc_close(nc)
+  out <- cae_fetch_point("tasmax", "EC-Earth3", "ssp370", -121, 38,
+    timescale = "day", resolution = "d03", source = path)
+  expect_equal(out$value, as.numeric(values[2, 1, ]))
+  expect_equal(out$time, as.POSIXct("2024-02-28", tz = "UTC") + 0:2 * 86400)
+})

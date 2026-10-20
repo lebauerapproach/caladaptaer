@@ -17,6 +17,11 @@
   }
   meta <- sf::gdal_read_mdim(.store_path(path), variable, proxy = TRUE)
   if (!"time" %in% names(meta$dimensions)) stop("Store has no time axis")
+  if (is.na(meta$srs) && all(c("lon", "lat") %in% names(meta$dimensions)) &&
+      identical(attr(meta$dimensions$lon$values[[1]], "units"), "degrees_east") &&
+      identical(attr(meta$dimensions$lat$values[[1]], "units"), "degrees_north")) {
+    meta$srs <- sf::st_crs(4326)$wkt
+  }
   axis <- meta$dimensions$time$values[[1]]
   encoding <- attr(axis, "units")
   attrs <- attr(axis, "attributes")
