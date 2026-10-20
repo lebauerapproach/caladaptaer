@@ -81,7 +81,7 @@ cae_stage_zarr <- function(variable, model, scenario, points, cache_dir,
   on.exit(unlink(tmp), add = TRUE)
   status <- utils::download.file(paste0(base, "/", keys), tmp,
                                  method = "libcurl", mode = "wb", quiet = TRUE)
-  if (status != 0 || any(!file.exists(tmp)) || any(file.info(tmp)$size == 0)) stop("Could not download staged chunks")
+  if (status != 0 || any(attr(status, "retvals") != 0) || any(!file.exists(tmp)) || any(file.info(tmp)$size == 0)) stop("Could not download staged chunks")
   if (!all(file.rename(tmp, output))) stop("Could not publish staged chunks")
   invisible(output)
 }

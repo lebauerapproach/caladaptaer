@@ -37,3 +37,16 @@ test_that("source chunk paths cannot escape the cache", {
   expect_error(.check_cache_keys("/absolute"), "Unsafe")
   expect_silent(.check_cache_keys(c("v/0.1.2", ".zmetadata")))
 })
+
+
+test_that("mixed libcurl results never publish partial chunks", {
+  target <- tempfile()
+  dir.create(target)
+  on.exit(unlink(target, recursive = TRUE))
+  local_mocked_bindings(download.file = function(url, destfile, ...) {
+    for (path in destfile) writeLines("partial", path)
+    structure(0L, retvals = c(0L, 1L))
+  }, .package = "utils")
+  expect_error(.stage_zarr_download_batch("https://example.test", c("v/0", "v/1"), target), "Could not download")
+  expect_length(list.files(file.path(target, "v")), 0L)
+})
