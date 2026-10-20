@@ -41,8 +41,8 @@ cae_fetch <- function(variable, model, scenario,
                      n_timesteps = NULL, source = NULL) {
 
   if (!is.null(source)) {
-    return(.fetch_points_grid(variable, model, scenario, NULL, timescale, resolution,
-                               start_time, end_time, n_timesteps, source))
+    return(.request_provenance(.fetch_points_grid(variable, model, scenario, NULL, timescale, resolution,
+                               start_time, end_time, n_timesteps, source), model, scenario, resolution, start_time, end_time))
   }
 
   # figure out activity from catalog -- WRF or LOCA2
@@ -86,7 +86,8 @@ cae_fetch <- function(variable, model, scenario,
                           scenario = scenario, variable = variable,
                           timescale = timescale, resolution = resolution)
 
-  .read_store_window(s3_path, variable, start_time, end_time, n_timesteps)
+  .request_provenance(.read_store_window(s3_path, variable, start_time, end_time, n_timesteps),
+                      model, scenario, resolution, start_time, end_time)
 
 }
 
@@ -206,7 +207,9 @@ cae_fetch_point <- function(variable, model, scenario,
                              data.frame(lon = lon, lat = lat),
                              timescale, resolution, start_time, end_time,
                              n_timesteps, source = source)
-  result[, c("time", "value")]
+  out <- result[, c("time", "value")]
+  attr(out, "cae_provenance") <- attr(result, "cae_provenance")
+  out
 
 }
 
@@ -273,9 +276,11 @@ cae_fetch_points <- function(variable, model, scenario,
     coords <- sf::st_transform(sf::st_as_sf(points, coords = c("lon", "lat"), crs = 4326), sf::st_crs(grid))
     values <- as.numeric(stars::st_extract(grid, coords)[[1]])
     times <- .get_time_values(grid)
-    return(data.frame(site_id = rep(site_ids, each = length(times)),
+    out <- data.frame(site_id = rep(site_ids, each = length(times)),
                       time = rep(times, times = n_sites),
-                      value = as.vector(t(matrix(values, nrow = n_sites)))))
+                      value = as.vector(t(matrix(values, nrow = n_sites))))
+    attr(out, "cae_provenance") <- attr(grid, "cae_provenance")
+    return(.request_provenance(out, model, scenario, resolution, start_time, end_time))
   }
   cells <- cae_grid_cells(points, .store_grid(meta))
   groups <- split(seq_len(n_sites), paste((cells$cell_i - 1L) %/% 32L,
@@ -292,15 +297,19 @@ cae_fetch_points <- function(variable, model, scenario,
     }), use.names = FALSE)
     if (length(values) != length(k) * length(times)) stop("Unexpected extraction dimensions")
 
-    data.frame(.point_order = rep(k, each = length(times)),
+    out <- data.frame(.point_order = rep(k, each = length(times)),
                site_id = rep(site_ids[k], each = length(times)),
                time = rep(times, times = length(k)),
                value = values)
+    attr(out, "cae_provenance") <- attr(grid, "cae_provenance")
+    out
   })
+  provenance <- .combine_provenance(result)
   result <- do.call(rbind, result)
   result <- result[order(result$.point_order, result$time), c("site_id", "time", "value")]
   rownames(result) <- NULL
-  result
+  attr(result, "cae_provenance") <- provenance
+  .request_provenance(result, model, scenario, resolution, start_time, end_time)
 
 }
 

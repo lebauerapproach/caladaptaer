@@ -94,6 +94,9 @@ cae_write_cf_netcdf <- function(var_list, outfile, dt_seconds = 3600,
   # get time info from the first variable
   time_vals <- .get_time_values(var_list[[1]])
   n_time <- length(time_vals)
+  if (!all(vapply(var_list, function(x) identical(.get_time_values(x), time_vals), logical(1)))) {
+    stop("Variable timestamps differ")
+  }
 
   # get spatial info -- extract point values if single-point
   # (for gridded output this writes the full grid)
@@ -133,7 +136,7 @@ cae_write_cf_netcdf <- function(var_list, outfile, dt_seconds = 3600,
   converted$wind_speed <- .compute_wind_speed(raw_u10, raw_v10)
 
   # write NetCDF
-  .write_cf_nc(converted, time_vals, dims, outfile)
+  .write_cf_nc(converted, time_vals, dims, outfile, .combine_provenance(var_list))
 
   invisible(outfile)
 }
@@ -141,13 +144,11 @@ cae_write_cf_netcdf <- function(var_list, outfile, dt_seconds = 3600,
 
 #' Write CF-compliant NetCDF from converted data
 #' @keywords internal
-.write_cf_nc <- function(converted, time_vals, dims, outfile) {
+.write_cf_nc <- function(converted, time_vals, dims, outfile, provenance = NULL) {
 
   # define time dimension
-  time_origin <- as.POSIXct("1970-01-01", tz = "UTC")
-  time_secs <- as.numeric(difftime(time_vals, time_origin, units = "secs"))
-  time_dim <- ncdf4::ncdim_def("time", "seconds since 1970-01-01 00:00:00",
-                                time_secs, unlim = TRUE)
+  encoding <- .export_time(time_vals, provenance)
+  time_dim <- ncdf4::ncdim_def("time", encoding$units, encoding$values, unlim = TRUE)
 
   # figure out spatial dims from the first variable
   arr <- converted[[1]]
@@ -197,10 +198,6 @@ cae_write_cf_netcdf <- function(var_list, outfile, dt_seconds = 3600,
     }
   }
 
-  # global attributes
-  ncdf4::ncatt_put(nc, 0, "Conventions", "CF-1.8")
-  ncdf4::ncatt_put(nc, 0, "source", "Cal-Adapt Analytics Engine (CADCAT)")
-  ncdf4::ncatt_put(nc, 0, "created_by", "caladaptaer")
-  ncdf4::ncatt_put(nc, 0, "history",
-                    paste("Created", Sys.time(), "by caladaptaer"))
+  .write_provenance(nc, provenance, time_vals,
+    "CF export: precipitation mm per timestep to kg m-2 s-1; mixing ratio to specific humidity; wind speed from u10/v10")
 }

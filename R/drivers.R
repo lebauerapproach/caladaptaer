@@ -150,7 +150,7 @@ cae_build_met_drivers <- function(sites, model = "CESM2", scenario = "ssp370",
       .write_site_cf_nc(
         converted, time_vals,
         lat = sites$lat[k], lon = sites$lon[k],
-        outfile = nc_file, year = year
+        outfile = nc_file, year = year, provenance = .combine_provenance(var_data)
       )
 
       if (verbose) message("  wrote ", nc_file)
@@ -179,23 +179,19 @@ cae_build_met_drivers <- function(sites, model = "CESM2", scenario = "ssp370",
 #' @param lon numeric; site longitude (WGS84)
 #' @param outfile character; output file path
 #' @param year integer; reference year for time origin
+#' @param provenance Optional source metadata carried by retrieved objects.
 #' @keywords internal
-.write_site_cf_nc <- function(converted, time_vals, lat, lon, outfile, year) {
+.write_site_cf_nc <- function(converted, time_vals, lat, lon, outfile, year, provenance = NULL) {
 
-  time_origin <- paste0(year, "-01-01 00:00:00")
-  time_secs <- as.numeric(difftime(
-    time_vals,
-    as.POSIXct(time_origin, tz = "UTC"),
-    units = "secs"
-  ))
+  encoding <- .export_time(time_vals, provenance)
 
   lat_dim  <- ncdf4::ncdim_def("latitude", "degree_north",
                                 lat, create_dimvar = TRUE)
   lon_dim  <- ncdf4::ncdim_def("longitude", "degree_east",
                                 lon, create_dimvar = TRUE)
   time_dim <- ncdf4::ncdim_def("time",
-                                paste("seconds since", time_origin),
-                                time_secs,
+                                encoding$units,
+                                encoding$values,
                                 create_dimvar = TRUE, unlim = TRUE)
   dims <- list(lat_dim, lon_dim, time_dim)
 
@@ -214,9 +210,6 @@ cae_build_met_drivers <- function(sites, model = "CESM2", scenario = "ssp370",
     ncdf4::ncvar_put(nc, nc_vars[[j]], converted[[j]])
   }
 
-  ncdf4::ncatt_put(nc, 0, "Conventions", "CF-1.8")
-  ncdf4::ncatt_put(nc, 0, "source", "Cal-Adapt Analytics Engine (CADCAT)")
-  ncdf4::ncatt_put(nc, 0, "created_by", "caladaptaer::cae_build_met_drivers")
-  ncdf4::ncatt_put(nc, 0, "history",
-                    paste("Created", Sys.time(), "by caladaptaer"))
+  .write_provenance(nc, provenance, time_vals,
+    "CF export: precipitation mm per timestep to kg m-2 s-1; mixing ratio to specific humidity; wind speed from u10/v10")
 }

@@ -28,7 +28,10 @@ test_that("seconds and hours encodings select equivalent values", {
   ncdf4::ncatt_put(nc, "time", "units", "seconds since 2024-01-01")
   ncdf4::ncvar_put(nc, "time", as.numeric(difftime(times, as.POSIXct("2024-01-01", tz = "UTC"), units = "secs")))
   ncdf4::nc_close(nc)
-  expect_equal(.read_store_window(f$path, "t2"), .read_store_window(g$path, "t2"))
+  a <- .read_store_window(f$path, "t2")
+  b <- .read_store_window(g$path, "t2")
+  expect_equal(a[[1]], b[[1]])
+  expect_equal(.get_time_values(a), .get_time_values(b))
 })
 
 
@@ -102,7 +105,7 @@ test_that("reference geometry and geographic-grid local fetch preserve data", {
   grid <- cae_reference_grid(source = f$path)
   expect_equal(stars::st_get_dimension_values(grid, "x"), f$x)
   expect_true(all(is.na(grid[[1]])))
-  expect_equal(cae_fetch("t2", "CESM2", "ssp370", source = f$path), .read_store_window(f$path, "t2"))
+  expect_equal(cae_fetch("t2", "CESM2", "ssp370", source = f$path)[[1]], .read_store_window(f$path, "t2")[[1]])
 })
 
 

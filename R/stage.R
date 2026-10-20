@@ -59,6 +59,7 @@ cae_stage_zarr <- function(variable, model, scenario, points, cache_dir,
     }
     download(paste0(name, "/", keys))
   }
+  jsonlite::write_json(list(source = path), file.path(target, ".caladaptaer-source.json"), auto_unbox = TRUE)
   normalizePath(target)
 }
 
