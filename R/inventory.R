@@ -68,7 +68,8 @@ cae_inventory_files <- function(start_time, end_time, resolution = "d03") {
     tmp <- tempfile(tmpdir = dirname(path))
     on.exit(unlink(tmp), add = TRUE)
     url <- paste0("https://", .ucla_wrf_bucket, ".s3.us-west-2.amazonaws.com/", key)
-    utils::download.file(url, tmp, mode = "wb", quiet = TRUE)
+    status <- utils::download.file(url, tmp, mode = "wb", quiet = TRUE)
+    if (status != 0 || !file.exists(tmp) || file.info(tmp)$size == 0) stop("Inventory source download incomplete")
     if (!file.rename(tmp, path)) stop("Failed to stage inventory source")
   }
   path

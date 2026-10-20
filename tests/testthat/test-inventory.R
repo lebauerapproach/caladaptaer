@@ -119,3 +119,16 @@ test_that("streaming preserves actual times and interval precipitation", {
   expect_true(all(file.exists(file.path(cache, files$key))))
   expect_error(cae_build_inventory_drivers(sites, files, 2024, 2024, out, cache), "coverage incomplete")
 })
+
+
+test_that("failed source downloads cannot become cached sources", {
+  cache <- tempfile()
+  dir.create(cache)
+  on.exit(unlink(cache, recursive = TRUE))
+  local_mocked_bindings(download.file = function(url, destfile, ...) {
+    writeLines("partial", destfile)
+    1L
+  }, .package = "utils")
+  expect_error(.download_inventory_file("hour.nc", cache), "download incomplete")
+  expect_length(list.files(cache, all.files = TRUE, no.. = TRUE), 0L)
+})
