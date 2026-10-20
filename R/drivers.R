@@ -97,8 +97,8 @@ cae_build_met_drivers <- function(sites, model = "CESM2", scenario = "ssp370",
   invisible(do.call(rbind, results))
 }
 
-.convert_driver_values <- function(values) {
-  values$prec <- .precip_to_flux(values$prec, 3600)
+.convert_driver_values <- function(values, dt_seconds = 3600) {
+  values$prec <- .precip_to_flux(values$prec, dt_seconds)
   values$q2 <- .mixing_ratio_to_specific_humidity(values$q2)
   wind <- .compute_wind_speed(values$u10, values$v10)
   names(values) <- .wrf_cf_map$cf_name[match(names(values), .wrf_cf_map$wrf_name)]
