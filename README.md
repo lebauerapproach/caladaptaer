@@ -74,3 +74,10 @@ BSD 3-Clause
 - Rahimi, S. et al. (2024). An overview of the Western United States Dynamically Downscaled Dataset (WUS-D3). *Geoscientific Model Development*, 17, 2265-2286. https://doi.org/10.5194/gmd-17-2265-2024
 - Cal-Adapt Analytics Engine: https://analytics.cal-adapt.org/
 - CADCAT on AWS: https://registry.opendata.aws/caladapt-coproduced-climate-data/
+
+## Source timestamps
+
+Date selections follow stored time coordinates, including omitted leap days.
+No missing hours or leap days are inserted. Outputs produced with arithmetic
+time indexing for no-leap WRF sources must be regenerated: their values may
+have been shifted relative to their date labels (see issue #22).

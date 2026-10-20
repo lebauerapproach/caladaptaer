@@ -17,11 +17,7 @@
 )
 }
 \description{
-Computes array offset/count for the requested time window, reads via
-GDAL's multidimensional API, then decodes the time dimension to
-POSIXct. Time decoding is done by reading the Zarr time/.zattrs
-encoding directly because stars + CFtime has a subsetting bug where
-CFtime's [ operator returns integer indices instead of timestamps
-(stars 0.7.x, CFtime 1.7.x).
+Locates the requested window in stored time coordinates and reads its values.
+Source timestamps are retained, including omitted leap days.
 }
 \keyword{internal}
