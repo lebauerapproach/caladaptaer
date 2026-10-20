@@ -174,10 +174,8 @@ cae_write_cf_netcdf <- function(var_list, outfile, dt_seconds = 3600,
 
   } else {
     # gridded output -- 3D (x, y, time)
-    x_vals <- seq(dims$x$offset, by = dims$x$delta,
-                  length.out = dims$x$to)
-    y_vals <- seq(dims$y$offset, by = dims$y$delta,
-                  length.out = dims$y$to)
+    x_vals <- stars::st_get_dimension_values(dims, "x")
+    y_vals <- stars::st_get_dimension_values(dims, "y")
     x_dim <- ncdf4::ncdim_def("x", "m", x_vals)
     y_dim <- ncdf4::ncdim_def("y", "m", y_vals)
 
@@ -190,8 +188,15 @@ cae_write_cf_netcdf <- function(var_list, outfile, dt_seconds = 3600,
     })
     names(nc_vars) <- names(converted)
 
+    crs <- sf::st_crs(dims$x$refsys)
+    if (is.na(crs)) stop("Source grid CRS is missing")
+    nc_vars <- c(nc_vars, list(ncdf4::ncvar_def("crs", "", list(), prec = "integer")))
     nc <- ncdf4::nc_create(outfile, nc_vars)
     on.exit(ncdf4::nc_close(nc), add = TRUE)
+
+    ncdf4::ncatt_put(nc, "crs", "crs_wkt", crs$wkt)
+    ncdf4::ncatt_put(nc, "crs", "spatial_ref", crs$wkt)
+    for (vname in names(converted)) ncdf4::ncatt_put(nc, vname, "grid_mapping", "crs")
 
     for (vname in names(converted)) {
       ncdf4::ncvar_put(nc, vname, converted[[vname]])

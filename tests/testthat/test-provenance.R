@@ -41,3 +41,20 @@ test_that("staged source identity and caller metadata are explicit", {
   expect_equal(ncdf4::ncatt_get(nc, 0, "source")$value, "unknown")
   expect_equal(as.numeric(ncdf4::ncvar_get(nc, "time")), as.numeric(times))
 })
+
+
+test_that("grid exports preserve subset coordinates and CRS", {
+  times <- as.POSIXct("2024-01-01", tz = "UTC") + 0:1 * 3600
+  f <- make_weather_store(times)
+  x <- cae_fetch("t2", "CESM2", "ssp370", source = f$path)
+  variables <- stats::setNames(rep(list(x), nrow(.wrf_cf_map)), .wrf_cf_map$wrf_name)
+  path <- tempfile(fileext = ".nc")
+  on.exit(unlink(path))
+  cae_write_cf_netcdf(variables, path)
+  nc <- ncdf4::nc_open(path)
+  expect_equal(as.numeric(nc$dim$x$vals), f$x)
+  expect_equal(as.numeric(nc$dim$y$vals), f$y)
+  expect_equal(ncdf4::ncatt_get(nc, "air_temperature", "grid_mapping")$value, "crs")
+  expect_equal(sf::st_crs(ncdf4::ncatt_get(nc, "crs", "crs_wkt")$value), sf::st_crs(x))
+  ncdf4::nc_close(nc)
+})
