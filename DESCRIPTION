@@ -25,6 +25,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Depends:
     R (>= 4.1.0)
+SystemRequirements: GDAL (>= 3.9.0) for remote Zarr reads
 Imports:
     CFtime,
     stars,

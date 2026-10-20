@@ -14,7 +14,8 @@ cae_fetch_point(
   resolution = "d01",
   start_time = NULL,
   end_time = NULL,
-  n_timesteps = NULL
+  n_timesteps = NULL,
+  source = NULL
 )
 }
 \arguments{
@@ -45,6 +46,9 @@ Default NULL reads to the end.}
 
 \item{n_timesteps}{integer; number of timesteps to read.
 Alternative to end_time for quick reads. Default NULL.}
+
+\item{source}{Optional local Zarr store, CF NetCDF file, or named list of
+variable-to-store paths. NULL reads S3.}
 }
 \value{
 A data.frame with columns: time, value (in native units)
