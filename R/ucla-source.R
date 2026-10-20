@@ -139,5 +139,3 @@
     next_continuation_token = NA_character_
   )
 }
-
-
