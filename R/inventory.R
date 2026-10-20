@@ -183,6 +183,7 @@ cae_build_inventory_drivers <- function(sites, files, start_year, end_year,
   previous <- rep(NA_real_, nrow(sites))
   cells <- NULL
   actual <- as.POSIXct(rep(NA_real_, nrow(files)), origin = "1970-01-01", tz = "UTC")
+  precipitation_end <- actual
   for (j in seq_len(nrow(files))) {
     process <- function(path, boundary_path = NULL) {
       if (is.null(cells)) {
@@ -196,9 +197,12 @@ cae_build_inventory_drivers <- function(sites, files, start_year, end_year,
         hour <- .read_inventory_hour(path, sites[k, , drop = FALSE], if (is.null(cells)) NULL else cells[k, , drop = FALSE], resolution, files$time[j])
         if (is.na(actual[j])) actual[j] <<- hour$time
         if (!identical(as.numeric(actual[j]), as.numeric(hour$time))) stop("Source timestamps differ between cell batches")
-        boundary <- if (is.null(boundary_path)) hour$total else .read_inventory_hour(boundary_path, sites[k, , drop = FALSE], cells[k, , drop = FALSE], resolution, files$time[j], TRUE)$total
+        boundary_hour <- if (is.null(boundary_path)) hour else .read_inventory_hour(boundary_path,
+          sites[k, , drop = FALSE], cells[k, , drop = FALSE], resolution, files$time[j], TRUE)
+        boundary <- boundary_hour$total
+        precipitation_end[j] <<- boundary_hour$time
         if (j > 1L) {
-          dt <- as.numeric(difftime(actual[j], actual[j - 1L], units = "secs"))
+          dt <- as.numeric(difftime(precipitation_end[j], actual[j - 1L], units = "secs"))
           if (!is.finite(dt) || dt <= 0) stop("Source internal timestamps are not strictly increasing")
           raw <- hour$values
           raw$prec <- .inventory_precip_increment(hour$total, previous[k], boundary)
@@ -229,8 +233,12 @@ cae_build_inventory_drivers <- function(sites, files, start_year, end_year,
     tryCatch({
       nv <- ncdf4::ncdim_def("bounds", "", 1:2, create_dimvar = FALSE)
       nc <- ncdf4::ncvar_add(nc, ncdf4::ncvar_def("time_bounds", p$time_units, list(nv, nc$dim$time), prec = "double"))
-      ncdf4::ncvar_put(nc, "time_bounds", rbind(as.numeric(utils::head(actual, -1)), as.numeric(actual[-1])))
-      ncdf4::ncatt_put(nc, "time", "bounds", "time_bounds")
+      ncdf4::ncvar_put(nc, "time_bounds", rbind(as.numeric(utils::head(actual, -1)), as.numeric(precipitation_end[-1])))
+      nc <- ncdf4::ncvar_add(nc, ncdf4::ncvar_def("precipitation_time", p$time_units, list(nc$dim$time), prec = "double"))
+      ncdf4::ncvar_put(nc, "precipitation_time", as.numeric(precipitation_end[-1]))
+      ncdf4::ncatt_put(nc, "precipitation_time", "standard_name", "time")
+      ncdf4::ncatt_put(nc, "precipitation_time", "bounds", "time_bounds")
+      ncdf4::ncatt_put(nc, "precipitation_flux", "coordinates", "precipitation_time")
       .write_provenance(nc, p, actual[-1], "Streamed CF export without calendar modification")
       ncdf4::ncatt_put(nc, 0, "source_manifest", file.path("source-manifests", basename(manifest$path)))
       ncdf4::ncatt_put(nc, 0, "source_manifest_md5", manifest$checksum)

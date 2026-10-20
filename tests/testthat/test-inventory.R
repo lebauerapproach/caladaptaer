@@ -100,6 +100,22 @@ test_that("streaming preserves actual times and interval precipitation", {
     expect_true(is.na(ncdf4::ncvar_get(nc, "air_temperature")[2]))
     ncdf4::nc_close(nc)
   }
+  # The old run's precipitation endpoint can differ from the new weather snapshot.
+  old <- file.path(cache, "old.nc")
+  file.copy(file.path(cache, files$key[2]), old)
+  nc <- ncdf4::nc_open(old, write = TRUE)
+  ncdf4::ncvar_put(nc, "Times", format(nominal[2] + 5, "%Y-%m-%d_%H:%M:%S", tz = "UTC"))
+  ncdf4::ncvar_put(nc, "RAINC", array(1.5, c(3, 3)))
+  ncdf4::nc_close(nc)
+  files$precipitation_key[2] <- "old.nc"
+  manifest <- .inventory_manifest(files, out, "d03", 2024)
+  .stream_inventory_year(sites, files, paths, cache, "d03", 2024, 1L, FALSE, manifest, identity, FALSE)
+  nc <- ncdf4::nc_open(paths[1])
+  bounds <- ncdf4::ncvar_get(nc, "time_bounds")
+  expect_equal(bounds[2, 1], as.numeric(nominal[2] + 5))
+  expect_equal(as.numeric(ncdf4::ncvar_get(nc, "time")), as.numeric(actual[-1]))
+  expect_equal(sum(ncdf4::ncvar_get(nc, "precipitation_flux") * (bounds[2, ] - bounds[1, ])), 1.5, tolerance = 1e-6)
+  ncdf4::nc_close(nc)
   expect_true(all(file.exists(file.path(cache, files$key))))
   expect_error(cae_build_inventory_drivers(sites, files, 2024, 2024, out, cache), "coverage incomplete")
 })
