@@ -1,17 +1,17 @@
 # Bounded access benchmarks
 
-Run `inventory-access.R` in separate R processes for `staged` and `remote` modes:
+Run `reanalysis-access.R` in separate R processes for `staged` and `remote` modes:
 
 ```sh
-Rscript inventory-access.R staged points.csv output SOURCE_KEY
-CPL_CURL_VERBOSE=YES Rscript inventory-access.R remote points.csv output SOURCE_KEY 2>remote-curl.log
+Rscript reanalysis-access.R staged points.csv output SOURCE_KEY
+CPL_CURL_VERBOSE=YES Rscript reanalysis-access.R remote points.csv output SOURCE_KEY 2>remote-curl.log
 ```
 
 First place a representative source file at `output/grid-source.nc`; it supplies
 geometry and file size. The staged comparison still makes a fresh full download.
 Compare the saved `*-values.rds` objects exactly. JSON results contain elapsed
 time, site/cell counts, source size, variables, and peak process memory on Linux.
-The benchmark's remote method uses GDAL/HDF5; package historical retrieval uses
+The benchmark's remote method uses GDAL/HDF5; package reanalysis retrieval uses
 download-and-extract. No special remote NetCDF build is required by the package.
 
 On 2026-10-20, Geo's existing GDAL 3.12.3 environment produced these results for

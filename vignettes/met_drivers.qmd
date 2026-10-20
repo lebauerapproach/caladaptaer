@@ -18,7 +18,7 @@ CF-standard meteorological forcing.
 
 - `cae_write_cf_netcdf()` writes a CF NetCDF file from a named list of WRF
   `stars` grids.
-- `cae_build_inventory_drivers()` streams direct UCLA historical WRF files.
+- `cae_build_reanalysis_drivers()` streams UCLA's ERA5-driven WRF reanalysis files.
 - `cae_build_met_drivers()` extracts WRF data for multiple sites and writes one
   NetCDF file per site per year.
 
@@ -202,15 +202,17 @@ result <- cae_build_met_drivers(sites, "CESM2", "ssp370", 2024, 2024,
     batch_size = 16L)
 ```
 
-## Direct UCLA historical files
+## UCLA ERA5-driven WRF reanalysis files
 
-Cataloged WRF-ERA5 Zarr coverage may end before the direct historical files.
+These APIs currently support UCLA's ERA5-driven WRF reanalysis only. They do not
+retrieve GCM historical simulations or other reanalysis products.
+Cataloged WRF-ERA5 Zarr coverage may end before the direct reanalysis files.
 List the requested period and one preceding hour before exporting a full year:
 
 ```{r}
-files <- cae_inventory_files("2022-12-31 23:00:00", "2023-12-31 23:00:00", "d03")
-result <- cae_build_inventory_drivers(sites, files, 2023, 2023,
-    outdir = "historical_drivers", cache_dir = "historical_sources",
+files <- cae_reanalysis_files("2022-12-31 23:00:00", "2023-12-31 23:00:00", "d03")
+result <- cae_build_reanalysis_drivers(sites, files, 2023, 2023,
+    outdir = "reanalysis_drivers", cache_dir = "reanalysis_sources",
     resolution = "d03", retain_source = FALSE, batch_size = 16L)
 ```
 
@@ -218,7 +220,7 @@ This is a full-year download, not a small tutorial fetch. Inspect file sizes and
 coverage first. `retain_source = TRUE` (default) keeps newly downloaded sources.
 FALSE downloads into owned temporary directories and discards each file only
 after all requested cells have been read. Pre-existing cache files are always
-preserved. The historical reader streams into temporary output files rather
+preserved. The reanalysis reader streams into temporary output files rather
 than holding an annual array for every site. It trades additional output I/O
 for bounded memory and source storage.
 

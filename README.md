@@ -7,8 +7,8 @@ California's repository of downscaled CMIP6 climate projections.
 
 `caladaptaer` reads WRF dynamically downscaled (hourly, 3/9/45 km) and
 LOCA2-Hybrid statistically downscaled (daily, 3 km) climate data directly from
-AWS S3 Zarr stores and public UCLA historical WRF files. It does not require
-Python, an API key, or authentication.
+AWS S3 Zarr stores and public UCLA ERA5-driven WRF reanalysis files.
+It does not require Python, an API key, or authentication.
 
 ## Quick start
 
@@ -85,12 +85,12 @@ time indexing for no-leap WRF sources must be regenerated: their values may
 have been shifted relative to their date labels (see [issue #22](https://github.com/lebauerapproach/caladaptaer/issues/22)).
 
 
-## Historical data, mapping, and local reuse
+## Reanalysis data, mapping, and local reuse
 
 ERA5-driven WRF uses `model = "ERA5"`, `scenario = "reanalysis"`:
 
 ```r
-historical <- cae_fetch_point("t2", "ERA5", "reanalysis",
+reanalysis <- cae_fetch_point("t2", "ERA5", "reanalysis",
                               lon = -121.5, lat = 38.5,
                               resolution = "d03", start_time = "2016-06-01",
                               n_timesteps = 3)
@@ -119,9 +119,11 @@ identified source grid; verify geometry before sharing mappings across products.
 Staging preserves source chunks and metadata, reuses existing chunks, and makes
 new files available only after their downloads finish.
 
-For historical periods beyond cataloged Zarr coverage, `cae_inventory_files()`
-lists the separate UCLA hourly files. `cae_build_inventory_drivers()` downloads
-and exports those files, retaining sources by default. `retain_source = FALSE`
+For reanalysis periods beyond cataloged Zarr coverage, `cae_reanalysis_files()`
+lists UCLA's ERA5-driven WRF reanalysis files.
+`cae_build_reanalysis_drivers()` downloads and exports those files, retaining
+sources by default. Both APIs currently support this product only, rather than
+GCM historical simulations or other reanalyses. `retain_source = FALSE`
 discards only its own temporary downloads after all requested cells are read;
 it never removes pre-existing cached sources. A full-year listing must include
 the preceding hour for precipitation. Missing coverage stops the affected year.

@@ -70,7 +70,7 @@ The products differ in ways that matter for downstream analysis:
 | Product | Time step | Time domain | Ensemble | Use when |
 |---|---|---|---|---|
 | WRF CMIP6 | Hourly | 1980--2014 historical GCM runs; 2015--2100 SSP runs | Smaller GCM ensemble; SSP3-7.0 is broadest, with additional CESM2 scenarios | Analyses requiring sub-daily meteorology, pressure, radiation, wind, or historical/future simulations from the same downscaling framework. |
-| WRF-ERA5 historical reconstruction | Hourly | Query the selected Zarr store and direct-file listings separately | Single reanalysis-driven run | Historical analyses requiring an observation-constrained reconstruction rather than a future climate scenario. |
+| WRF-ERA5 reanalysis | Hourly | Query the selected Zarr store and reanalysis-file listings separately | Single reanalysis-driven run | Historical analyses requiring an observation-constrained reconstruction rather than a future climate scenario. |
 | LOCA2-Hybrid | Daily | 1950--2014 historical GCM runs; 2015--2100 SSP runs | Broader GCM and SSP coverage | Analyses requiring a larger daily ensemble or daily temperature and precipitation extremes, without hourly driver variables. |
 
 WRF CMIP6 provides historical and future simulations at the same spatial
@@ -421,8 +421,8 @@ legend("topright", legend = wrf_370, col = cols, lwd = 2, cex = 0.7, bty = "n")
 The availability table above summarizes products rather than guaranteeing every
 model/scenario/grid combination. Query `cae_search()` for cataloged products;
 use `cae_reference_grid()` and its `source_time_start` / `source_time_end`
-attributes to inspect the selected WRF store. Direct UCLA historical files
-use `cae_inventory_files()` and are not indexed by the CADCAT Zarr catalog.
+attributes to inspect the selected WRF store. UCLA ERA5-driven WRF reanalysis files
+use `cae_reanalysis_files()` and are not indexed by the CADCAT Zarr catalog.
 Directory year labels are not guarantees of calendar-year coverage.
 
 ```{r}
@@ -431,7 +431,7 @@ grid <- cae_reference_grid(model = "ERA5", scenario = "reanalysis", resolution =
 attr(grid, "source_time_start")
 attr(grid, "source_time_end")
 mapping <- cae_grid_cells(sites, grid)
-files <- cae_inventory_files("2022-12-31 23:00:00", "2023-01-01 01:00:00", "d03")
+files <- cae_reanalysis_files("2022-12-31 23:00:00", "2023-01-01 01:00:00", "d03")
 ```
 
 `cae_reference_grid()` reads geometry and coordinate metadata, without climate

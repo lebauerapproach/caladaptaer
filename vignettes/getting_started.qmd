@@ -99,18 +99,19 @@ mp <- cae_fetch_points("t2",
 head(mp, 8)
 ```
 
-## ERA5 historical reconstruction
+## ERA5-driven WRF reanalysis
 
-Use `ERA5` / `reanalysis` for the cataloged WRF historical reconstruction:
+Use `ERA5` / `reanalysis` for the cataloged ERA5-driven WRF reanalysis:
 
 ```{r}
 #| eval: false
-historical <- cae_fetch_point("t2", "ERA5", "reanalysis",
+reanalysis <- cae_fetch_point("t2", "ERA5", "reanalysis",
     lon = -121.5, lat = 38.5, resolution = "d03",
     start_time = "2016-06-01", n_timesteps = 3)
 ```
 
-Catalog coverage and direct UCLA historical-file coverage differ. Use the
+Catalog coverage and direct UCLA ERA5-driven WRF reanalysis-file coverage
+differ. Use the
 [Data Access guide](data_access.qmd) to inspect them before requesting a period.
 Source leap days are retained where present and left absent where missing;
 caladaptaer does not interpolate or fill gaps.
