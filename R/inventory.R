@@ -180,15 +180,20 @@ cae_build_inventory_drivers <- function(sites, files, start_year, end_year,
       ncdf4::ncvar_put(nc, "source_nominal_time", as.numeric(nominal))
     }, finally = ncdf4::nc_close(nc))
   }
-  batches <- split(seq_len(nrow(sites)), ceiling(seq_len(nrow(sites)) / batch_size))
   previous <- rep(NA_real_, nrow(sites))
   cells <- NULL
   actual <- as.POSIXct(rep(NA_real_, nrow(files)), origin = "1970-01-01", tz = "UTC")
   for (j in seq_len(nrow(files))) {
     process <- function(path, boundary_path = NULL) {
-      for (k in batches) {
+      if (is.null(cells)) {
+        reference <- .read_inventory_hour(path, sites[1, , drop = FALSE], NULL, resolution, files$time[j], TRUE)
+        cells <<- cae_grid_cells(sites, reference$grid)
+      }
+      ids <- unique(cells$cell_id)
+      batches <- split(ids, ceiling(seq_along(ids) / batch_size))
+      for (batch in batches) {
+        k <- match(batch, cells$cell_id)
         hour <- .read_inventory_hour(path, sites[k, , drop = FALSE], if (is.null(cells)) NULL else cells[k, , drop = FALSE], resolution, files$time[j])
-        if (is.null(cells)) cells <<- cae_grid_cells(sites, hour$grid)
         if (is.na(actual[j])) actual[j] <<- hour$time
         if (!identical(as.numeric(actual[j]), as.numeric(hour$time))) stop("Source timestamps differ between cell batches")
         boundary <- if (is.null(boundary_path)) hour$total else .read_inventory_hour(boundary_path, sites[k, , drop = FALSE], cells[k, , drop = FALSE], resolution, files$time[j], TRUE)$total
@@ -198,8 +203,10 @@ cae_build_inventory_drivers <- function(sites, files, start_year, end_year,
           raw <- hour$values
           raw$prec <- .inventory_precip_increment(hour$total, previous[k], boundary)
           converted <- .convert_driver_values(raw, dt)
-          for (q in seq_along(k)) {
-            nc <- ncdf4::nc_open(temporary[k[q]], write = TRUE)
+          owners <- which(cells$cell_id %in% batch)
+          for (owner in owners) {
+            q <- match(cells$cell_id[owner], cells$cell_id[k])
+            nc <- ncdf4::nc_open(temporary[owner], write = TRUE)
             tryCatch({
               for (v in names(converted)) ncdf4::ncvar_put(nc, v, converted[[v]][q], start = c(1, 1, j - 1L), count = c(1, 1, 1))
               ncdf4::ncvar_put(nc, "time", as.numeric(actual[j]), start = j - 1L, count = 1L)
