@@ -14,7 +14,7 @@
 ^vignettes/figures$
 ^vignettes/.*\.qmd$
 ^vignettes/_quarto\.yml$
-^\.quarto$
+(^|/)\.quarto$
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$

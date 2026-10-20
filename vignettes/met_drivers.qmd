@@ -14,10 +14,11 @@ Analytics Engine into CF-1.8 NetCDF meteorological driver files. The workflow
 is intended for site-based ecosystem models and other tools that consume
 CF-standard meteorological forcing.
 
-`caladaptaer` provides two driver-generation paths:
+`caladaptaer` provides three export paths:
 
 - `cae_write_cf_netcdf()` writes a CF NetCDF file from a named list of WRF
   `stars` grids.
+- `cae_build_inventory_drivers()` streams direct UCLA historical WRF files.
 - `cae_build_met_drivers()` extracts WRF data for multiple sites and writes one
   NetCDF file per site per year.
 
@@ -123,14 +124,14 @@ cae_write_cf_netcdf(
 )
 ```
 
-The output file contains CF-1.8 global metadata, CF variable names, converted
+The output file contains CF-1.8 / ACDD-1.3 metadata, CF variable names, converted
 units, and derived wind speed.
 
 ## Multi-Site Workflow
 
 Use `cae_build_met_drivers()` when the intended output is one NetCDF file per
-site per year. The function reads each WRF variable once per year, extracts all
-sites from that grid, and writes site-year files.
+site per year. The function retrieves unique native cells in bounded batches,
+shares weather among sites in the same cell, and writes site-year files.
 
 ```{r}
 result <- cae_build_met_drivers(
@@ -146,8 +147,9 @@ result <- cae_build_met_drivers(
 head(result)
 ```
 
-By default, existing files are skipped. Set `overwrite = TRUE` only when files
-should be regenerated.
+By default, completed files are validated before reuse. Files with incompatible
+requests, coordinates, variables, or time axes are regenerated. Set
+`overwrite = TRUE` to regenerate matching files as well.
 
 ```{r}
 result <- cae_build_met_drivers(
@@ -179,5 +181,72 @@ met_drivers/sacramento/CESM2.ssp370.2050.nc
 ```
 
 Each file contains one site and one year of hourly data. Dimensions are
-`latitude`, `longitude`, and `time`. The time coordinate is stored as seconds
-since the start of the file year.
+`latitude`, `longitude`, and `time`. The time coordinate retains the source encoding and calendar. Missing source
+values remain missing; absent leap days remain absent.
+
+
+## Bulk access and local caching
+
+Add `cache_dir = "source-cache"` to stage only the requested Zarr chunks and
+reuse them across batches and runs; omit it for direct remote reads. Set
+`batch_size` to bound the number of unique cells held together in memory
+(default 64). A local store or named list of variable-to-store paths can be
+passed through `source`. Full annual coverage is checked against native source
+timestamps, allowing an entirely absent February 29 but no other missing hours.
+Mismatched variable time axes fail rather than being aligned silently.
+
+```{r}
+# A full-year export; start with a small site set.
+result <- cae_build_met_drivers(sites, "CESM2", "ssp370", 2024, 2024,
+    "met_drivers", resolution = "d03", cache_dir = "source-cache",
+    batch_size = 16L)
+```
+
+## Direct UCLA historical files
+
+Cataloged WRF-ERA5 Zarr coverage may end before the direct historical files.
+List the requested period and one preceding hour before exporting a full year:
+
+```{r}
+files <- cae_inventory_files("2022-12-31 23:00:00", "2023-12-31 23:00:00", "d03")
+result <- cae_build_inventory_drivers(sites, files, 2023, 2023,
+    outdir = "historical_drivers", cache_dir = "historical_sources",
+    resolution = "d03", retain_source = FALSE, batch_size = 16L)
+```
+
+This is a full-year download, not a small tutorial fetch. Inspect file sizes and
+coverage first. `retain_source = TRUE` (default) keeps newly downloaded sources.
+FALSE downloads into owned temporary directories and discards each file only
+after all requested cells have been read. Pre-existing cache files are always
+preserved. The historical reader streams into temporary output files rather
+than holding an annual array for every site. It trades additional output I/O
+for bounded memory and source storage.
+
+Internal WRF `Times` values are the exported timestamps. Filenames may identify
+a nominal hour a few seconds earlier; `source_nominal_time` retains those nominal
+times separately. `precipitation_time` retains the precipitation source endpoint
+when it differs at a run boundary; `time_bounds` records its intervals, including
+the preceding source timestamp. Integrate `precipitation_flux` against those
+interval lengths, rather than assuming every interval is exactly 3,600 seconds.
+Accumulation handling uses the preceding record and, at overlapping September
+run boundaries, the previous run's final counter before adopting the new baseline.
+
+Outputs reference an immutable JSON source manifest under `source-manifests/`.
+Keep that directory with the exported dataset. A checksum connects each file to
+its source listing. Restarting validates existing outputs before reuse; a failed
+write leaves no new final output file, while previously completed files remain.
+
+## Calendars, provenance, and downstream models
+
+CF exports preserve native calendar coordinates and source missingness. They do
+not interpolate leap days, create synthetic precipitation, or fill missing data.
+A downstream model may require different calendars or formats; those decisions
+are outside caladaptaer. For no-leap sources affected by the former arithmetic
+time-indexing bug, regenerate the exports.
+
+Both grid and site files record `CF-1.8, ACDD-1.3`, source identifiers, catalog
+applicability, model/scenario/member, variables, resolution, requested period,
+actual coverage, source calendar/time units, and conversion history. Unknown
+caller metadata is labeled explicitly. Local staging preserves original remote
+source identity. See `inst/benchmarks/` in the source package for bounded access
+comparisons; their timings are not full-year production estimates.
