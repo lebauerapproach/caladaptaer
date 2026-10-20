@@ -24,7 +24,7 @@ remotes::install_github("lebauerapproach/caladaptaer")
 ```r
 library(caladaptaer)
 
-# What WRF-downscaled climate models are available?
+# Which WRF model and reanalysis sources are available?
 cae_models(activity = "WRF")
 
 # What variables are available for WRF on a 1hr timescale?
@@ -44,7 +44,7 @@ plot(ts$time, ts$value - 273.15, type = "l",
 
 ## Available data
 
-| Dataset      | Resolution    | Temporal | GCMs      | SSPs                                       | Period    |
+| Dataset      | Resolution    | Temporal | Models / sources | Experiments | Period    |
 | ------------ | ------------- | -------- | --------- | ------------------------------------------ | --------- |
 | WRF CMIP6    | 45 / 9 / 3 km | Hourly   | 8 models  | SSP3-7.0 (all); SSP2-4.5, SSP5-8.5 (CESM2) | 1980-2100 |
 | WRF-ERA5 | 45 / 9 / 3 km | Hourly | One reanalysis-driven realization | `reanalysis` | Query source coverage |

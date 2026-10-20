@@ -23,10 +23,12 @@ cae_build_met_drivers(
 \item{sites}{data.frame with columns \code{site_id}, \code{lon}, \code{lat} (WGS84
 decimal degrees). See Examples.}
 
-\item{model}{character; WRF GCM name. Default \code{"CESM2"}.
+\item{model}{character; WRF model or reanalysis source identifier
+(e.g. \code{"CESM2"} or \code{"ERA5"}). Default \code{"CESM2"}.
 See \code{cae_models(activity = "WRF")} for options.}
 
-\item{scenario}{character; SSP experiment. Default \code{"ssp370"}.
+\item{scenario}{character; experiment identifier (e.g. \code{"ssp370"},
+\code{"historical"}, or \code{"reanalysis"}). Default \code{"ssp370"}.
 See \code{cae_scenarios()} for options.}
 
 \item{start_year}{integer; first year to process}

@@ -7,9 +7,11 @@
 cae_check_variables(model, scenario, timescale = "1hr", resolution = "d01")
 }
 \arguments{
-\item{model}{character; GCM name}
+\item{model}{character; model or reanalysis source identifier,
+e.g. \code{"CESM2"} or \code{"ERA5"}.}
 
-\item{scenario}{character; SSP experiment}
+\item{scenario}{character; experiment identifier,
+e.g. \code{"ssp370"}, \code{"historical"}, or \code{"reanalysis"}.}
 
 \item{timescale}{character; temporal resolution. Default "1hr".}
 

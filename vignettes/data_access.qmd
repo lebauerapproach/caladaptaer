@@ -161,13 +161,17 @@ names(cat)
 head(cat)
 ```
 
-The columns of the catalog follow CMIP6 naming. All functions use this vocabulary:
+The columns of the catalog follow CMIP6 naming. The `model` argument filters
+`source_id`, including reanalysis sources such as `"ERA5"`; `scenario` filters
+`experiment_id`, including `"historical"` and `"reanalysis"` as well as SSPs.
+Availability depends on the selected product and source. All functions use
+this vocabulary:
 
 | Column | Meaning | Examples |
 |--------|---------|----------|
-| `activity_id` | Downscaling method | WRF, LOCA2 |
-| `source_id` | Parent GCM | CESM2, MIROC6, EC-Earth3 |
-| `experiment_id` | Scenario | ssp370, ssp245, historical |
+| `activity_id` | Catalog downscaling identifier | `WRF`, `LOCA2` (LOCA2-Hybrid) |
+| `source_id` | Model or reanalysis source | `CESM2`, `MIROC6`, `ERA5` |
+| `experiment_id` | Experiment identifier | `ssp370`, `historical`, `reanalysis` |
 | `table_id` | Temporal resolution | 1hr, day, mon |
 | `variable_id` | Variable short name | t2, prec, pr, tasmax |
 | `grid_label` | Spatial grid | d01 (45 km), d02 (9 km), d03 (3 km) |
@@ -177,8 +181,8 @@ The columns of the catalog follow CMIP6 naming. All functions use this vocabular
 ### Models, scenarios, variables
 
 Three helper functions summarize common catalog fields. Each takes an
-`activity` of `"WRF"` or `"LOCA2"`; `NULL`, the default, returns both
-activities.
+`activity` of `"WRF"` or `"LOCA2"` (LOCA2-Hybrid); `NULL`, the default,
+returns both activities.
 
 #### Models
 
@@ -188,7 +192,7 @@ For example, list the models available for WRF:
 cae_models(activity = "WRF")
 ```
 
-Or LOCA2:
+Or LOCA2-Hybrid (catalog identifier `"LOCA2"`):
 
 ```{r}
 cae_models(activity = "LOCA2")

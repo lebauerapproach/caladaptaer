@@ -17,8 +17,8 @@ data directly from AWS S3 Zarr stores via GDAL.
 
 \itemize{
 \item \code{\link{cae_catalog}} -- load the data catalog
-\item \code{\link{cae_models}} -- list available GCMs
-\item \code{\link{cae_scenarios}} -- list available SSPs
+\item \code{\link{cae_models}} -- list model and reanalysis source identifiers
+\item \code{\link{cae_scenarios}} -- list experiment identifiers
 \item \code{\link{cae_variables}} -- list available variables
 \item \code{\link{cae_search}} -- search the catalog
 }

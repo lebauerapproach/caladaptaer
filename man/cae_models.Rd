@@ -2,16 +2,18 @@
 % Please edit documentation in R/catalog.R
 \name{cae_models}
 \alias{cae_models}
-\title{List available climate models}
+\title{List available model and reanalysis source identifiers}
 \usage{
 cae_models(activity = NULL)
 }
 \arguments{
-\item{activity}{character; "WRF" or "LOCA2" or NULL for both.}
+\item{activity}{character; catalog identifier \code{"WRF"} or \code{"LOCA2"}
+(LOCA2-Hybrid), or \code{NULL} for both.}
 }
 \value{
-character vector of model names (source_id values)
+character vector of model and reanalysis source identifiers
+(\code{source_id} values).
 }
 \description{
-List available climate models
+List available model and reanalysis source identifiers
 }

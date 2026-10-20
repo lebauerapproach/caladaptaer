@@ -9,9 +9,11 @@
 #'
 #' @param sites data.frame with columns `site_id`, `lon`, `lat` (WGS84
 #'   decimal degrees). See Examples.
-#' @param model character; WRF GCM name. Default `"CESM2"`.
+#' @param model character; WRF model or reanalysis source identifier
+#'   (e.g. `"CESM2"` or `"ERA5"`). Default `"CESM2"`.
 #'   See `cae_models(activity = "WRF")` for options.
-#' @param scenario character; SSP experiment. Default `"ssp370"`.
+#' @param scenario character; experiment identifier (e.g. `"ssp370"`,
+#'   `"historical"`, or `"reanalysis"`). Default `"ssp370"`.
 #'   See `cae_scenarios()` for options.
 #' @param start_year integer; first year to process
 #' @param end_year integer; last year to process

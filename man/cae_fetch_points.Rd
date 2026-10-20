@@ -21,11 +21,13 @@ cae_fetch_points(
 \item{variable}{character; variable name (e.g. "t2", "prec", "psfc").
 Use cae_variables() to see what's available.}
 
-\item{model}{character; GCM name (e.g. "CESM2", "MPI-ESM1-2-HR").
+\item{model}{character; model or reanalysis source identifier
+(e.g. \code{"CESM2"}, \code{"MPI-ESM1-2-HR"}, or \code{"ERA5"}).
 Use cae_models() to see options.}
 
-\item{scenario}{character; SSP experiment (e.g. "ssp370", "ssp245",
-"historical"). Use cae_scenarios() to see options.}
+\item{scenario}{character; experiment identifier (e.g. \code{"ssp370"},
+\code{"ssp245"}, \code{"historical"}, or \code{"reanalysis"}).
+Use cae_scenarios() to see options.}
 
 \item{points}{data.frame with columns \code{lon} and \code{lat} in
 WGS84 decimal degrees. An optional \code{site_id} column provides

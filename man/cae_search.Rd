@@ -14,11 +14,14 @@ cae_search(
 )
 }
 \arguments{
-\item{activity}{character; "WRF" or "LOCA2"}
+\item{activity}{character; catalog identifier \code{"WRF"} or \code{"LOCA2"}
+(LOCA2-Hybrid).}
 
-\item{model}{character; GCM source_id (e.g. "CESM2", "MIROC6")}
+\item{model}{character; model or reanalysis source identifier (\code{source_id}),
+e.g. \code{"CESM2"}, \code{"MIROC6"}, or \code{"ERA5"}.}
 
-\item{scenario}{character; experiment_id (e.g. "ssp370", "historical")}
+\item{scenario}{character; experiment identifier (\code{experiment_id}),
+e.g. \code{"ssp370"}, \code{"historical"}, or \code{"reanalysis"}.}
 
 \item{variable}{character; variable_id (e.g. "t2", "prec")}
 
