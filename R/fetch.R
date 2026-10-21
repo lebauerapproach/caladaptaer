@@ -20,6 +20,8 @@
 #'   Default NULL reads to the end.
 #' @param n_timesteps integer; number of timesteps to read.
 #'   Alternative to end_time for quick reads. Default NULL.
+#' @param source Optional local Zarr store, CF NetCDF file, or named list of
+#'   variable-to-store paths. NULL reads S3.
 #' @return A stars object with the requested data.
 #' @export
 #' @examples
@@ -36,7 +38,12 @@
 cae_fetch <- function(variable, model, scenario,
                      timescale = "1hr", resolution = "d01",
                      start_time = NULL, end_time = NULL,
-                     n_timesteps = NULL) {
+                     n_timesteps = NULL, source = NULL) {
+
+  if (!is.null(source)) {
+    return(.fetch_points_grid(variable, model, scenario, NULL, timescale, resolution,
+                               start_time, end_time, n_timesteps, source))
+  }
 
   # figure out activity from catalog -- WRF or LOCA2
   activity <- .detect_activity(model, timescale, resolution, variable)
@@ -63,8 +70,12 @@ cae_fetch <- function(variable, model, scenario,
 
 #' Read a single variable from S3
 #'
-#' Locates the requested window in stored time coordinates and reads its values.
-#' Source timestamps are retained, including omitted leap days.
+#' Computes array offset/count for the requested time window, reads via
+#' GDAL's multidimensional API, then decodes the time dimension to
+#' POSIXct. Time decoding is done by reading the Zarr time/.zattrs
+#' encoding directly because stars + CFtime has a subsetting bug where
+#' CFtime's [ operator returns integer indices instead of timestamps
+#' (stars 0.7.x, CFtime 1.7.x).
 #'
 #' @keywords internal
 .fetch_single <- function(variable, activity, model, scenario,
@@ -76,6 +87,7 @@ cae_fetch <- function(variable, model, scenario,
                           timescale = timescale, resolution = resolution)
 
   .read_store_window(s3_path, variable, start_time, end_time, n_timesteps)
+
 }
 
 
@@ -94,24 +106,9 @@ cae_fetch <- function(variable, model, scenario,
 .fetch_derived_precip <- function(model, scenario, timescale,
                                   resolution, start_time, end_time,
                                   n_timesteps) {
-  message("Model ", model, " does not have 'prec'; ",
-          "deriving from rainc + rainnc (deaccumulating)")
+  .fetch_points_grid("prec", model, scenario, NULL, timescale, resolution,
+                       start_time, end_time, n_timesteps)
 
-  rainc <- .fetch_single("rainc", "WRF", model, scenario,
-                         timescale, resolution, start_time,
-                         end_time, n_timesteps)
-  rainnc <- .fetch_single("rainnc", "WRF", model, scenario,
-                          timescale, resolution, start_time,
-                          end_time, n_timesteps)
-
-  # sum the accumulated components
-  result <- rainc
-  result[[1]] <- rainc[[1]] + rainnc[[1]]
-
-  # deaccumulate: convert running total to per-timestep mm
-  result <- .deaccumulate_precip(result)
-
-  result
 }
 
 
@@ -203,29 +200,14 @@ cae_fetch_point <- function(variable, model, scenario,
                            lon, lat,
                            timescale = "1hr", resolution = "d01",
                            start_time = NULL, end_time = NULL,
-                           n_timesteps = NULL) {
+                           n_timesteps = NULL, source = NULL) {
 
-  data <- cae_fetch(variable = variable, model = model,
-                   scenario = scenario, timescale = timescale,
-                   resolution = resolution, start_time = start_time,
-                   end_time = end_time, n_timesteps = n_timesteps)
+  result <- cae_fetch_points(variable, model, scenario,
+                             data.frame(lon = lon, lat = lat),
+                             timescale, resolution, start_time, end_time,
+                             n_timesteps, source = source)
+  result[, c("time", "value")]
 
-  # build point in WGS84 and transform to data CRS
-  pt_wgs84 <- sf::st_sfc(sf::st_point(c(lon, lat)), crs = 4326)
-  pt_native <- sf::st_transform(pt_wgs84, sf::st_crs(data))
-
-  # extract
-  extracted <- stars::st_extract(data, pt_native)
-
-  # reshape to data.frame
-  time_vals <- .get_time_values(data)
-  values <- as.numeric(extracted[[1]])
-
-  data.frame(
-    time = time_vals,
-    value = values,
-    stringsAsFactors = FALSE
-  )
 }
 
 
@@ -265,7 +247,7 @@ cae_fetch_points <- function(variable, model, scenario,
                             points,
                             timescale = "1hr", resolution = "d01",
                             start_time = NULL, end_time = NULL,
-                            n_timesteps = NULL) {
+                            n_timesteps = NULL, source = NULL) {
 
   if (!is.data.frame(points) || !all(c("lon", "lat") %in% names(points))) {
     stop("'points' must be a data.frame with 'lon' and 'lat' columns",
@@ -281,44 +263,45 @@ cae_fetch_points <- function(variable, model, scenario,
     seq_len(n_sites)
   }
 
-  # read the grid ONCE from S3
-  message("Reading grid (1 S3 fetch for all ", n_sites, " sites)")
-  grid <- cae_fetch(variable = variable, model = model,
-                   scenario = scenario, timescale = timescale,
-                   resolution = resolution, start_time = start_time,
-                   end_time = end_time, n_timesteps = n_timesteps)
-
-  # build sf points in WGS84, transform to grid CRS
-  pts_sf <- sf::st_as_sf(points, coords = c("lon", "lat"), crs = 4326)
-  pts_native <- sf::st_transform(pts_sf, sf::st_crs(grid))
-
-  # extract ALL sites in one vectorized call
-  message("Extracting ", n_sites, " sites")
-  extracted <- stars::st_extract(grid, pts_native)
-
-  # reshape to tidy data.frame
-  time_vals <- .get_time_values(grid)
-  n_times <- length(time_vals)
-
-  vals <- extracted[[1]]
-  if (inherits(vals, "units")) vals <- units::drop_units(vals)
-  vals <- as.numeric(vals)
-
-  if (length(vals) != n_sites * n_times) {
-    stop("Unexpected extraction result: expected ", n_sites * n_times,
-         " values but got ", length(vals), call. = FALSE)
+  path <- tryCatch(.resolve_store(variable, model, scenario, timescale, resolution, source),
+                   error = function(e) if (variable == "prec") NULL else stop(e))
+  reference <- if (is.null(path)) .resolve_store("rainc", model, scenario, timescale, resolution, source) else path
+  meta <- .store_metadata(reference, if (is.null(path)) "rainc" else variable)
+  if (!all(c("x", "y") %in% names(meta$dimensions))) {
+    # Preserve geographic-grid products; bounded WRF reads use the path below.
+    grid <- .read_store_window(reference, variable, start_time, end_time, n_timesteps)
+    coords <- sf::st_transform(sf::st_as_sf(points, coords = c("lon", "lat"), crs = 4326), sf::st_crs(grid))
+    values <- as.numeric(stars::st_extract(grid, coords)[[1]])
+    times <- .get_time_values(grid)
+    return(data.frame(site_id = rep(site_ids, each = length(times)),
+                      time = rep(times, times = n_sites),
+                      value = as.vector(t(matrix(values, nrow = n_sites)))))
   }
+  cells <- cae_grid_cells(points, .store_grid(meta))
+  groups <- split(seq_len(n_sites), paste((cells$cell_i - 1L) %/% 32L,
+                                          (cells$cell_j - 1L) %/% 32L))
+  result <- lapply(groups, function(k) {
+    grid <- .fetch_points_grid(variable, model, scenario, points[k, , drop = FALSE],
+                               timescale, resolution, start_time, end_time,
+                               n_timesteps, source = source)
+    times <- .get_time_values(grid)
+    i <- cells$cell_i[k] - min(cells$cell_i[k]) + 1L
+    j <- cells$cell_j[k] - min(cells$cell_j[k]) + 1L
+    values <- unlist(lapply(seq_along(k), function(p) {
+      as.numeric(grid[[1]][i[p], j[p], ])
+    }), use.names = FALSE)
+    if (length(values) != length(k) * length(times)) stop("Unexpected extraction dimensions")
 
-  # st_extract returns [n_sites x n_times] matrix
-  # as.vector goes column-major; we want site-major output
-  mat <- matrix(vals, nrow = n_sites, ncol = n_times)
+    data.frame(.point_order = rep(k, each = length(times)),
+               site_id = rep(site_ids[k], each = length(times)),
+               time = rep(times, times = length(k)),
+               value = values)
+  })
+  result <- do.call(rbind, result)
+  result <- result[order(result$.point_order, result$time), c("site_id", "time", "value")]
+  rownames(result) <- NULL
+  result
 
-  data.frame(
-    site_id = rep(site_ids, each = n_times),
-    time = rep(time_vals, times = n_sites),
-    value = as.vector(t(mat)),
-    stringsAsFactors = FALSE
-  )
 }
 
 
@@ -374,6 +357,8 @@ cae_grid_cells <- function(points, grid) {
     sf::st_crs(grid)
   )
   xy <- sf::st_coordinates(pts_native)
+
+  .check_grid_bounds(xy, xs, ys)
 
   i <- vapply(xy[, 1], function(px) which.min(abs(xs - px)), integer(1))
   j <- vapply(xy[, 2], function(py) which.min(abs(ys - py)), integer(1))
@@ -445,7 +430,7 @@ cae_grid_cells <- function(points, grid) {
 #' Get time values from a stars object
 #'
 #' Extracts POSIXct time values from the time dimension. Uses the
-#' explicit stored time coordinates when available,
+#' explicit coordinate values when available,
 #' otherwise falls back to reconstructing from offset + delta.
 #'
 #' @param data stars object with time dimension
