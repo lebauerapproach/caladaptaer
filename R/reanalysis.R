@@ -263,9 +263,30 @@ cae_build_reanalysis_drivers <- function(sites, files, start_year, end_year,
   tryCatch({
     nc <- ncdf4::nc_open(path)
     on.exit(ncdf4::nc_close(nc))
-    actual <- .store_metadata(path, "air_temperature")$times
-    identical(as.numeric(ncdf4::ncvar_get(nc, "source_nominal_time")), as.numeric(nominal)) &&
-      .valid_driver_file(path, actual, lat, lon, identity) && "time_bounds" %in% names(nc$var)
+    meta <- .store_metadata(path, "air_temperature")
+    actual <- as.numeric(meta$times)
+    nominal <- as.numeric(nominal)
+    n <- length(nominal)
+    if (!n || length(actual) != n ||
+        !all(c("source_nominal_time", "precipitation_time", "time_bounds") %in% names(nc$var))) return(FALSE)
+    # Auxiliary coordinates use the same epoch seconds as the primary time axis.
+    units <- "seconds since 1970-01-01 00:00:00"
+    if (meta$time_units != units || meta$calendar != "standard" ||
+        !all(vapply(c("source_nominal_time", "precipitation_time", "time_bounds"),
+          function(v) identical(ncdf4::ncatt_get(nc, v, "units")$value, units), logical(1)))) return(FALSE)
+    bounds <- ncdf4::ncvar_get(nc, "time_bounds", collapse_degen = FALSE)
+    endpoint <- as.numeric(ncdf4::ncvar_get(nc, "precipitation_time"))
+    if (!identical(dim(bounds), c(2L, as.integer(n))) ||
+        length(endpoint) != n || any(!is.finite(c(actual, bounds, endpoint)))) return(FALSE)
+    # Keep source seconds offsets, but require each timestamp to belong to its file hour.
+    identical(as.numeric(ncdf4::ncvar_get(nc, "source_nominal_time")), nominal) &&
+      all(floor(actual / 3600) == floor(nominal / 3600)) &&
+      all(floor(endpoint / 3600) == floor(nominal / 3600)) &&
+      floor(bounds[1, 1] / 3600) == floor(nominal[1] / 3600) - 1 &&
+      identical(as.numeric(bounds[1, -1]), actual[-n]) &&
+      identical(as.numeric(bounds[2, ]), endpoint) &&
+      all(bounds[2, ] > bounds[1, ]) &&
+      .valid_driver_file(path, meta$times, lat, lon, identity)
   }, error = function(e) FALSE)
 }
 

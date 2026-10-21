@@ -116,6 +116,31 @@ test_that("streaming preserves actual times and interval precipitation", {
   expect_equal(as.numeric(ncdf4::ncvar_get(nc, "time")), as.numeric(actual[-1]))
   expect_equal(sum(ncdf4::ncvar_get(nc, "precipitation_flux") * (bounds[2, ] - bounds[1, ])), 1.5, tolerance = 1e-6)
   ncdf4::nc_close(nc)
+  expect_true(.valid_reanalysis_file(paths[1], nominal[-1], 38, -121, identity))
+  # Resume must reject stale or damaged coordinates without rounding source seconds.
+  for (damage in c("shifted time", "reversed bounds", "wrong endpoint", "wrong start", "missing bounds", "wrong units")) {
+    damaged <- file.path(out, "damaged.nc")
+    file.copy(paths[1], damaged, overwrite = TRUE)
+    nc <- ncdf4::nc_open(damaged, write = TRUE)
+    bad_bounds <- bounds
+    if (damage == "shifted time") ncdf4::ncvar_put(nc, "time", as.numeric(actual[-1]) + 86400)
+    if (damage == "reversed bounds") {
+      bad_bounds[, 1] <- rev(bad_bounds[, 1])
+      ncdf4::ncvar_put(nc, "time_bounds", bad_bounds)
+    }
+    if (damage == "wrong endpoint") ncdf4::ncvar_put(nc, "precipitation_time", bounds[2, ] + 1)
+    if (damage == "wrong start") {
+      bad_bounds[1, 2] <- bad_bounds[1, 2] + 1
+      ncdf4::ncvar_put(nc, "time_bounds", bad_bounds)
+    }
+    if (damage == "missing bounds") {
+      bad_bounds[1, 1] <- NA_real_
+      ncdf4::ncvar_put(nc, "time_bounds", bad_bounds)
+    }
+    if (damage == "wrong units") ncdf4::ncatt_put(nc, "time_bounds", "units", "hours since 1970-01-01")
+    ncdf4::nc_close(nc)
+    expect_false(.valid_reanalysis_file(damaged, nominal[-1], 38, -121, identity), info = damage)
+  }
   expect_true(all(file.exists(file.path(cache, files$key))))
   expect_error(cae_build_reanalysis_drivers(sites, files, 2024, 2024, out, cache), "coverage incomplete")
 })
