@@ -19,7 +19,7 @@ For a broader data-access guide, see
 Requirements:
 
 - R >= 4.1
-- GDAL >= 3.4
+- R-linked GDAL >= 3.9 for remote Zarr reads
 - internet connection
 - R packages:
   - `sf`, `stars`, `dplyr`, `ggplot2` (and their dependencies)
@@ -42,7 +42,7 @@ library(caladaptaer)
 
 ## Fetch a time series at a point
 
-`cae_fetch_point()` reads the grid and extracts data from the grid cell that is
+`cae_fetch_point()` reads a bounded WRF window and extracts data from the cell that is
 closest to the provided longitude and latitude.
 
 The following example reads one summer day in Fresno in 2050 under SSP3-7.0:
@@ -80,9 +80,8 @@ ggplot2::ggplot(ts, ggplot2::aes(x = time_local, y = temp_c)) +
 
 ## Extract many locations in one read
 
-Use `cae_fetch_points()` to extract data from multiple locations in a single
-read. This function reads the grid from S3 once and extracts every location
-locally.
+Use `cae_fetch_points()` for multiple locations. WRF reads are grouped into
+bounded spatial windows, sharing source reads among nearby or duplicate cells.
 
 ```{r}
 #| message: true
@@ -99,6 +98,23 @@ mp <- cae_fetch_points("t2",
 )
 head(mp, 8)
 ```
+
+## ERA5-driven WRF reanalysis
+
+Use `ERA5` / `reanalysis` for the cataloged ERA5-driven WRF reanalysis:
+
+```{r}
+#| eval: false
+reanalysis <- cae_fetch_point("t2", "ERA5", "reanalysis",
+    lon = -121.5, lat = 38.5, resolution = "d03",
+    start_time = "2016-06-01", n_timesteps = 3)
+```
+
+Catalog coverage and direct UCLA ERA5-driven WRF reanalysis-file coverage
+differ. Use the
+[Data Access guide](data_access.qmd) to inspect them before requesting a period.
+Source leap days are retained where present and left absent where missing;
+caladaptaer does not interpolate or fill gaps.
 
 ## Where to go next
 

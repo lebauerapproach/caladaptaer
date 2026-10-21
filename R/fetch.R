@@ -6,10 +6,12 @@
 
 #' @param variable character; variable name (e.g. "t2", "prec", "psfc").
 #'   Use cae_variables() to see what's available.
-#' @param model character; GCM name (e.g. "CESM2", "MPI-ESM1-2-HR").
+#' @param model character; model or reanalysis source identifier
+#'   (e.g. `"CESM2"`, `"MPI-ESM1-2-HR"`, or `"ERA5"`).
 #'   Use cae_models() to see options.
-#' @param scenario character; SSP experiment (e.g. "ssp370", "ssp245",
-#'   "historical"). Use cae_scenarios() to see options.
+#' @param scenario character; experiment identifier (e.g. `"ssp370"`,
+#'   `"ssp245"`, `"historical"`, or `"reanalysis"`).
+#'   Use cae_scenarios() to see options.
 #' @param timescale character; temporal resolution. One of "1hr", "day", "mon".
 #'   Default "1hr".
 #' @param resolution character; spatial grid. One of "d01" (45km),
@@ -30,7 +32,7 @@
 #' t2 <- cae_fetch("t2", model = "CESM2", scenario = "ssp370",
 #'                n_timesteps = 24)
 #'
-#' # Read a month of daily precipitation from LOCA2
+#' # Read a month of daily precipitation from LOCA2-Hybrid
 #' pr <- cae_fetch("pr", model = "EC-Earth3", scenario = "ssp370",
 #'                timescale = "day", resolution = "d03",
 #'                start_time = "2050-01-01", end_time = "2050-01-31")

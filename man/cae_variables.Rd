@@ -7,7 +7,8 @@
 cae_variables(activity = NULL, timescale = NULL)
 }
 \arguments{
-\item{activity}{character; "WRF" or "LOCA2" or NULL for both.}
+\item{activity}{character; catalog identifier \code{"WRF"} or \code{"LOCA2"}
+(LOCA2-Hybrid), or \code{NULL} for both.}
 
 \item{timescale}{character; "1hr", "day", "mon", or NULL for all.}
 }

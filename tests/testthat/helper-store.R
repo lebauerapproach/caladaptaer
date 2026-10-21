@@ -18,4 +18,3 @@ make_weather_store <- function(times) {
   ncdf4::nc_close(nc)
   list(path = f, x = xs, y = ys, values = values)
 }
-

@@ -14,7 +14,7 @@ subset and returns either a `stars` grid or a `data.frame`.
 
 - Discovers available models, scenarios, variables, and resolutions from the
   CAE catalog.
-- Reads WRF and LOCA2 climate projections into R.
+- Reads WRF and LOCA2-Hybrid climate projections into R.
 - Extracts time series for one or many locations.
 - Builds CF-1.8 NetCDF meteorological driver files from hourly WRF data.
 

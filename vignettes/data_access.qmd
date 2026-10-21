@@ -70,7 +70,7 @@ The products differ in ways that matter for downstream analysis:
 | Product | Time step | Time domain | Ensemble | Use when |
 |---|---|---|---|---|
 | WRF CMIP6 | Hourly | 1980--2014 historical GCM runs; 2015--2100 SSP runs | Smaller GCM ensemble; SSP3-7.0 is broadest, with additional CESM2 scenarios | Analyses requiring sub-daily meteorology, pressure, radiation, wind, or historical/future simulations from the same downscaling framework. |
-| WRF-ERA5 historical reconstruction | Hourly | 1980--2020 | Single reanalysis-driven run | Historical analyses requiring an observation-constrained reconstruction rather than a future climate scenario. |
+| WRF-ERA5 reanalysis | Hourly | Query the selected Zarr store and reanalysis-file listings separately | Single reanalysis-driven run | Historical analyses requiring an observation-constrained reconstruction rather than a future climate scenario. |
 | LOCA2-Hybrid | Daily | 1950--2014 historical GCM runs; 2015--2100 SSP runs | Broader GCM and SSP coverage | Analyses requiring a larger daily ensemble or daily temperature and precipitation extremes, without hourly driver variables. |
 
 WRF CMIP6 provides historical and future simulations at the same spatial
@@ -141,7 +141,7 @@ library(sf)
 library(maps)
 ```
 
-The Zarr driver requires GDAL 3.4 or newer:
+Remote Zarr reads require R-linked GDAL 3.9 or newer:
 
 ```{r}
 sf::sf_extSoftVersion()["GDAL"]
@@ -161,13 +161,17 @@ names(cat)
 head(cat)
 ```
 
-The columns of the catalog follow CMIP6 naming. All functions use this vocabulary:
+The columns of the catalog follow CMIP6 naming. The `model` argument filters
+`source_id`, including reanalysis sources such as `"ERA5"`; `scenario` filters
+`experiment_id`, including `"historical"` and `"reanalysis"` as well as SSPs.
+Availability depends on the selected product and source. All functions use
+this vocabulary:
 
 | Column | Meaning | Examples |
 |--------|---------|----------|
-| `activity_id` | Downscaling method | WRF, LOCA2 |
-| `source_id` | Parent GCM | CESM2, MIROC6, EC-Earth3 |
-| `experiment_id` | Scenario | ssp370, ssp245, historical |
+| `activity_id` | Catalog downscaling identifier | `WRF`, `LOCA2` (LOCA2-Hybrid) |
+| `source_id` | Model or reanalysis source | `CESM2`, `MIROC6`, `ERA5` |
+| `experiment_id` | Experiment identifier | `ssp370`, `historical`, `reanalysis` |
 | `table_id` | Temporal resolution | 1hr, day, mon |
 | `variable_id` | Variable short name | t2, prec, pr, tasmax |
 | `grid_label` | Spatial grid | d01 (45 km), d02 (9 km), d03 (3 km) |
@@ -177,8 +181,8 @@ The columns of the catalog follow CMIP6 naming. All functions use this vocabular
 ### Models, scenarios, variables
 
 Three helper functions summarize common catalog fields. Each takes an
-`activity` of `"WRF"` or `"LOCA2"`; `NULL`, the default, returns both
-activities.
+`activity` of `"WRF"` or `"LOCA2"` (LOCA2-Hybrid); `NULL`, the default,
+returns both activities.
 
 #### Models
 
@@ -188,7 +192,7 @@ For example, list the models available for WRF:
 cae_models(activity = "WRF")
 ```
 
-Or LOCA2:
+Or LOCA2-Hybrid (catalog identifier `"LOCA2"`):
 
 ```{r}
 cae_models(activity = "LOCA2")
@@ -312,13 +316,13 @@ plot(st_geometry(ca_wrf), add = TRUE, border = "black", lwd = 1.5)
 ```
 
 To fetch data at 9 or 3 km resolution, use `resolution = "d02"` or
-`resolution = "d03"`, respectively. Finer grids require more memory and longer
-read times. A single 45 km timestep is approximately 0.3 MB; a single 3 km
-timestep is approximately 150 MB.
+`resolution = "d03"`, respectively. Full-domain reads at finer grids can require substantial memory and transfer.
+Use point extraction when only selected locations are needed; transfer depends
+on source chunk layout, not just the number of returned values.
 
 ### Fetching a time series from a point
 
-`cae_fetch_point()` reads the grid and pulls the time series at the nearest
+`cae_fetch_point()` reads a bounded WRF window and returns the series at the nearest
 cell to a `lon`/`lat`. The transform from WGS84 to the WRF Lambert grid is
 handled internally. The following example reads a summer day at Fresno:
 
@@ -356,10 +360,10 @@ ggplot2::ggplot(ts, ggplot2::aes(x = time_local, y = temp_c)) +
 
 ### Fetching many points at once
 
-The `cae_fetch_points()` function reads the grid from S3 once and extracts
-every site locally in a single pass. It takes a `data.frame` with `lon` and
+The `cae_fetch_points()` function groups WRF locations into bounded spatial
+windows and reuses shared-cell reads. It takes a `data.frame` with `lon` and
 `lat` columns and an optional `site_id`, and returns a `data.frame` with
-`site_id`, `lon`, `lat`, `time`, and `value` columns.
+`site_id`, `time`, and `value` columns.
 
 ```{r}
 #| message: true
@@ -415,6 +419,53 @@ for (i in seq_along(wrf_370)) {
 }
 legend("topright", legend = wrf_370, col = cols, lwd = 2, cex = 0.7, bty = "n")
 ```
+
+## Source coverage, native cells, and calendars
+
+The availability table above summarizes products rather than guaranteeing every
+model/scenario/grid combination. Query `cae_search()` for cataloged products;
+use `cae_reference_grid()` and its `source_time_start` / `source_time_end`
+attributes to inspect the selected WRF store. UCLA ERA5-driven WRF reanalysis files
+use `cae_reanalysis_files()` and are not indexed by the CADCAT Zarr catalog.
+Directory year labels are not guarantees of calendar-year coverage.
+
+```{r}
+#| eval: false
+grid <- cae_reference_grid(model = "ERA5", scenario = "reanalysis", resolution = "d03")
+attr(grid, "source_time_start")
+attr(grid, "source_time_end")
+mapping <- cae_grid_cells(sites, grid)
+files <- cae_reanalysis_files("2022-12-31 23:00:00", "2023-01-01 01:00:00", "d03")
+```
+
+`cae_reference_grid()` reads geometry and coordinate metadata, without climate
+arrays. `cae_grid_cells()` preserves site rows and adds 1-based indices,
+source-grid cell IDs, and WGS84 centers. Reuse a mapping across products only
+after checking that their native geometry agrees. These projected indices are
+not a latitude/longitude naming convention.
+
+Date requests select actual stored records. Date-only bounds mean midnight,
+not the entire named day; daily source records need not occur at midnight.
+Use explicit timestamps or `n_timesteps` when selecting daily records.
+Some WRF stores omit February 29;
+others retain it. The package keeps those distinctions and source missing
+values. It never inserts records or rounds historical internal timestamps to
+nominal filename hours. The POSIXct interface rejects calendar dates it cannot
+represent rather than silently converting them. Calendar harmonization belongs
+to downstream analysis or model interfaces.
+
+For repeated large WRF requests, `cae_stage_zarr()` copies the needed chunks and
+coordinate metadata into a reusable local store. Pass its returned path through
+`source`; a named list of variable-to-store paths supports multiple stores.
+Staging keeps original remote identity in a small manifest. Downloads use
+temporary filenames and are renamed only after completion, so failed transfers
+cannot be reused as completed chunks. Existing sources are retained.
+
+Exports record original source identifiers, catalog applicability, requested
+product and period, actual coverage, calendar/time units, and processing history.
+The retrieved object carries this information in its `cae_provenance` attribute.
+Local caller inputs without source metadata are marked unknown, not attributed
+to CADCAT. See the [driver guide](met_drivers.qmd) for bulk exports and cleanup.
 
 ## Where to go next
 

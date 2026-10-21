@@ -7,7 +7,8 @@ California's repository of downscaled CMIP6 climate projections.
 
 `caladaptaer` reads WRF dynamically downscaled (hourly, 3/9/45 km) and
 LOCA2-Hybrid statistically downscaled (daily, 3 km) climate data directly from
-AWS S3 Zarr stores. It does not require Python, an API key, or authentication.
+AWS S3 Zarr stores and public UCLA ERA5-driven WRF reanalysis files.
+It does not require Python, an API key, or authentication.
 
 ## Quick start
 
@@ -23,7 +24,7 @@ remotes::install_github("lebauerapproach/caladaptaer")
 ```r
 library(caladaptaer)
 
-# What WRF-downscaled climate models are available?
+# Which WRF model and reanalysis sources are available?
 cae_models(activity = "WRF")
 
 # What variables are available for WRF on a 1hr timescale?
@@ -43,9 +44,10 @@ plot(ts$time, ts$value - 273.15, type = "l",
 
 ## Available data
 
-| Dataset      | Resolution    | Temporal | GCMs      | SSPs                                       | Period    |
+| Dataset      | Resolution    | Temporal | Models / sources | Experiments | Period    |
 | ------------ | ------------- | -------- | --------- | ------------------------------------------ | --------- |
 | WRF CMIP6    | 45 / 9 / 3 km | Hourly   | 8 models  | SSP3-7.0 (all); SSP2-4.5, SSP5-8.5 (CESM2) | 1980-2100 |
+| WRF-ERA5 | 45 / 9 / 3 km | Hourly | One reanalysis-driven realization | `reanalysis` | Query source coverage |
 | LOCA2-Hybrid | 3 km          | Daily    | 15 models | SSP2-4.5, SSP3-7.0, SSP5-8.5               | 1950-2100 |
 
 WRF data are produced by the UCLA Center for Climate Science (Rahimi et al.
@@ -55,14 +57,14 @@ products are hosted on AWS S3 by the Cal-Adapt Analytics Engine.
 ## Requirements
 
 - R >= 4.1
-- GDAL >= 3.4 for the Zarr driver; check with `sf::sf_extSoftVersion()`
+- R-linked GDAL >= 3.9 for remote Zarr reads; check with `sf::sf_extSoftVersion()`
 - Internet access to AWS S3 (us-west-2 region)
 
 ## How it works
 
 1. Downloads the [CADCAT intake-ESM catalog](https://cadcat.s3-us-west-2.amazonaws.com/cae-zarr.csv) (a CSV table indexing all Zarr stores)
 2. Filters to the requested model / scenario / variable / resolution
-3. Reads the Zarr store from S3 via GDAL's `/vsis3/` virtual filesystem using `stars::read_mdim()`
+3. Reads the Zarr store from S3 via GDAL's `/vsis3/` virtual filesystem using the GDAL multidimensional API
 4. Returns a `stars` object with full spatial and temporal metadata
 
 ## License
@@ -80,4 +82,55 @@ BSD 3-Clause
 Date selections follow stored time coordinates, including omitted leap days.
 No missing hours or leap days are inserted. Outputs produced with arithmetic
 time indexing for no-leap WRF sources must be regenerated: their values may
-have been shifted relative to their date labels (see issue #22).
+have been shifted relative to their date labels (see [issue #22](https://github.com/lebauerapproach/caladaptaer/issues/22)).
+
+
+## Reanalysis data, mapping, and local reuse
+
+ERA5-driven WRF uses `model = "ERA5"`, `scenario = "reanalysis"`:
+
+```r
+reanalysis <- cae_fetch_point("t2", "ERA5", "reanalysis",
+                              lon = -121.5, lat = 38.5,
+                              resolution = "d03", start_time = "2016-06-01",
+                              n_timesteps = 3)
+```
+
+Use `cae_search()` and `cae_check_variables()` to check catalog combinations.
+Availability differs by model, scenario, variable, and grid: a scenario at 45 km
+is not necessarily available at 3 km. The
+[official data documentation](https://analytics.cal-adapt.org/data-tools/data-documentation/climate-model-sims.html)
+and [catalog](https://cadcat.s3-us-west-2.amazonaws.com/cae-zarr.csv) remain authoritative.
+
+```r
+sites <- data.frame(site_id = c("a", "b"), lon = -121.5, lat = 38.5)
+grid <- cae_reference_grid(model = "ERA5", scenario = "reanalysis", resolution = "d03")
+mapping <- cae_grid_cells(sites, grid)
+# Source-grid indices identify cells; cell_lon/cell_lat are their WGS84 centers.
+store <- cae_stage_zarr("t2", "CESM2", "ssp370", sites, "source-cache",
+                        "2024-06-01", "2024-06-01 02:00:00", resolution = "d03")
+values <- cae_fetch_points("t2", "CESM2", "ssp370", sites, resolution = "d03",
+                           start_time = "2024-06-01", n_timesteps = 3, source = store)
+```
+
+WRF point requests use bounded windows. Sites sharing a native cell reuse its
+weather while retaining their identifiers. Cell IDs are meaningful within the
+identified source grid; verify geometry before sharing mappings across products.
+Staging preserves source chunks and metadata, reuses existing chunks, and makes
+new files available only after their downloads finish.
+
+For reanalysis periods beyond cataloged Zarr coverage, `cae_reanalysis_files()`
+lists UCLA's ERA5-driven WRF reanalysis files.
+`cae_build_reanalysis_drivers()` downloads and exports those files, retaining
+sources by default. Both APIs currently support this product only, rather than
+GCM historical simulations or other reanalyses. `retain_source = FALSE`
+discards only its own temporary downloads after all requested cells are read;
+it never removes pre-existing cached sources. A full-year listing must include
+the preceding hour for precipitation. Missing coverage stops the affected year.
+See the [driver guide](vignettes/met_drivers.qmd) for examples and storage behavior.
+
+`cae_build_met_drivers()` exports cataloged WRF data by site and year, with
+bounded cell batches, optional chunk caching, and validation before reusing
+outputs. Exports preserve missing values and native calendars, record CF/ACDD
+provenance, and document unit conversions. They do not provide model-specific
+calendar conversion or gap filling.

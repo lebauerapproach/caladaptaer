@@ -2,18 +2,20 @@
 % Please edit documentation in R/catalog.R
 \name{cae_scenarios}
 \alias{cae_scenarios}
-\title{List available scenarios (SSPs)}
+\title{List available experiment identifiers}
 \usage{
 cae_scenarios(activity = NULL, model = NULL)
 }
 \arguments{
-\item{activity}{character; "WRF" or "LOCA2" or NULL for both.}
+\item{activity}{character; catalog identifier \code{"WRF"} or \code{"LOCA2"}
+(LOCA2-Hybrid), or \code{NULL} for both.}
 
-\item{model}{character; filter to a specific GCM. NULL for all.}
+\item{model}{character; filter to a model or reanalysis source identifier
+(\code{source_id}), such as \code{"CESM2"} or \code{"ERA5"}. \code{NULL} returns all.}
 }
 \value{
 character vector of experiment_id values
 }
 \description{
-List available scenarios (SSPs)
+List available experiment identifiers
 }

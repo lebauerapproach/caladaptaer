@@ -52,10 +52,12 @@ cae_catalog <- function(refresh = FALSE) {
 }
 
 
-#' List available climate models
+#' List available model and reanalysis source identifiers
 #'
-#' @param activity character; "WRF" or "LOCA2" or NULL for both.
-#' @return character vector of model names (source_id values)
+#' @param activity character; catalog identifier `"WRF"` or `"LOCA2"`
+#'   (LOCA2-Hybrid), or `NULL` for both.
+#' @return character vector of model and reanalysis source identifiers
+#'   (`source_id` values).
 #' @export
 cae_models <- function(activity = NULL) {
   cat <- cae_catalog()
@@ -66,10 +68,12 @@ cae_models <- function(activity = NULL) {
 }
 
 
-#' List available scenarios (SSPs)
+#' List available experiment identifiers
 #'
-#' @param activity character; "WRF" or "LOCA2" or NULL for both.
-#' @param model character; filter to a specific GCM. NULL for all.
+#' @param activity character; catalog identifier `"WRF"` or `"LOCA2"`
+#'   (LOCA2-Hybrid), or `NULL` for both.
+#' @param model character; filter to a model or reanalysis source identifier
+#'   (`source_id`), such as `"CESM2"` or `"ERA5"`. `NULL` returns all.
 #' @return character vector of experiment_id values
 #' @export
 cae_scenarios <- function(activity = NULL, model = NULL) {
@@ -82,7 +86,8 @@ cae_scenarios <- function(activity = NULL, model = NULL) {
 
 #' List available variables
 #'
-#' @param activity character; "WRF" or "LOCA2" or NULL for both.
+#' @param activity character; catalog identifier `"WRF"` or `"LOCA2"`
+#'   (LOCA2-Hybrid), or `NULL` for both.
 #' @param timescale character; "1hr", "day", "mon", or NULL for all.
 #' @return character vector of variable_id values
 #' @export
@@ -99,9 +104,12 @@ cae_variables <- function(activity = NULL, timescale = NULL) {
 #' Filter the Cal-Adapt catalog by any combination of metadata fields.
 #' All filters are combined with AND logic.
 #'
-#' @param activity character; "WRF" or "LOCA2"
-#' @param model character; GCM source_id (e.g. "CESM2", "MIROC6")
-#' @param scenario character; experiment_id (e.g. "ssp370", "historical")
+#' @param activity character; catalog identifier `"WRF"` or `"LOCA2"`
+#'   (LOCA2-Hybrid).
+#' @param model character; model or reanalysis source identifier (`source_id`),
+#'   e.g. `"CESM2"`, `"MIROC6"`, or `"ERA5"`.
+#' @param scenario character; experiment identifier (`experiment_id`),
+#'   e.g. `"ssp370"`, `"historical"`, or `"reanalysis"`.
 #' @param variable character; variable_id (e.g. "t2", "prec")
 #' @param timescale character; table_id (e.g. "1hr", "day", "mon")
 #' @param resolution character; grid_label (e.g. "d01" for 45km,
@@ -138,8 +146,10 @@ cae_search <- function(activity = NULL, model = NULL, scenario = NULL,
 #' Reports which of the 8 CF-standard met variables are directly
 #' available and which need derivation (e.g. prec from rainc + rainnc).
 #'
-#' @param model character; GCM name
-#' @param scenario character; SSP experiment
+#' @param model character; model or reanalysis source identifier,
+#'   e.g. `"CESM2"` or `"ERA5"`.
+#' @param scenario character; experiment identifier,
+#'   e.g. `"ssp370"`, `"historical"`, or `"reanalysis"`.
 #' @param timescale character; temporal resolution. Default "1hr".
 #' @param resolution character; grid label. Default "d01".
 #' @return A data.frame with columns: variable, available, derivable, note
