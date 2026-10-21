@@ -19,3 +19,4 @@
 ^docs$
 ^pkgdown$
 ^build_site\.sh$
+^\.git$

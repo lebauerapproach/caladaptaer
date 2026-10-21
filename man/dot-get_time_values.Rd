@@ -14,7 +14,7 @@ POSIXct vector of time values
 }
 \description{
 Extracts POSIXct time values from the time dimension. Uses the
-explicit values set by .decode_time_dimension() if available,
+explicit stored time coordinates when available,
 otherwise falls back to reconstructing from offset + delta.
 }
 \keyword{internal}
