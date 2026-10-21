@@ -94,11 +94,20 @@ cae_write_cf_netcdf <- function(var_list, outfile, dt_seconds = 3600,
   # get time info from the first variable
   time_vals <- .get_time_values(var_list[[1]])
   n_time <- length(time_vals)
+  if (!all(vapply(var_list, function(x) identical(.get_time_values(x), time_vals), logical(1)))) {
+    stop("Variable timestamps differ")
+  }
 
   # get spatial info -- extract point values if single-point
   # (for gridded output this writes the full grid)
   first_var <- var_list[[1]]
   dims <- stars::st_dimensions(first_var)
+  aligned <- vapply(var_list, function(x) {
+    identical(dim(x[[1]]), dim(first_var[[1]])) &&
+      isTRUE(all.equal(stars::st_dimensions(x), dims, tolerance = 0))
+  }, logical(1))
+  if (!all(aligned)) stop("Variable spatial dimensions, coordinates, or CRS differ")
+  provenance <- .combine_provenance(var_list)
 
   # apply unit conversions and extract raw arrays
   converted <- list()
@@ -133,7 +142,7 @@ cae_write_cf_netcdf <- function(var_list, outfile, dt_seconds = 3600,
   converted$wind_speed <- .compute_wind_speed(raw_u10, raw_v10)
 
   # write NetCDF
-  .write_cf_nc(converted, time_vals, dims, outfile)
+  .write_cf_nc(converted, time_vals, dims, outfile, provenance)
 
   invisible(outfile)
 }
@@ -141,13 +150,11 @@ cae_write_cf_netcdf <- function(var_list, outfile, dt_seconds = 3600,
 
 #' Write CF-compliant NetCDF from converted data
 #' @keywords internal
-.write_cf_nc <- function(converted, time_vals, dims, outfile) {
+.write_cf_nc <- function(converted, time_vals, dims, outfile, provenance = NULL) {
 
   # define time dimension
-  time_origin <- as.POSIXct("1970-01-01", tz = "UTC")
-  time_secs <- as.numeric(difftime(time_vals, time_origin, units = "secs"))
-  time_dim <- ncdf4::ncdim_def("time", "seconds since 1970-01-01 00:00:00",
-                                time_secs, unlim = TRUE)
+  encoding <- .export_time(time_vals, provenance)
+  time_dim <- ncdf4::ncdim_def("time", encoding$units, encoding$values, unlim = TRUE)
 
   # figure out spatial dims from the first variable
   arr <- converted[[1]]
@@ -173,10 +180,8 @@ cae_write_cf_netcdf <- function(var_list, outfile, dt_seconds = 3600,
 
   } else {
     # gridded output -- 3D (x, y, time)
-    x_vals <- seq(dims$x$offset, by = dims$x$delta,
-                  length.out = dims$x$to)
-    y_vals <- seq(dims$y$offset, by = dims$y$delta,
-                  length.out = dims$y$to)
+    x_vals <- stars::st_get_dimension_values(dims, "x")
+    y_vals <- stars::st_get_dimension_values(dims, "y")
     x_dim <- ncdf4::ncdim_def("x", "m", x_vals)
     y_dim <- ncdf4::ncdim_def("y", "m", y_vals)
 
@@ -189,18 +194,21 @@ cae_write_cf_netcdf <- function(var_list, outfile, dt_seconds = 3600,
     })
     names(nc_vars) <- names(converted)
 
+    crs <- sf::st_crs(dims$x$refsys)
+    if (is.na(crs)) stop("Source grid CRS is missing")
+    nc_vars <- c(nc_vars, list(ncdf4::ncvar_def("crs", "", list(), prec = "integer")))
     nc <- ncdf4::nc_create(outfile, nc_vars)
     on.exit(ncdf4::nc_close(nc), add = TRUE)
+
+    ncdf4::ncatt_put(nc, "crs", "crs_wkt", crs$wkt)
+    ncdf4::ncatt_put(nc, "crs", "spatial_ref", crs$wkt)
+    for (vname in names(converted)) ncdf4::ncatt_put(nc, vname, "grid_mapping", "crs")
 
     for (vname in names(converted)) {
       ncdf4::ncvar_put(nc, vname, converted[[vname]])
     }
   }
 
-  # global attributes
-  ncdf4::ncatt_put(nc, 0, "Conventions", "CF-1.8")
-  ncdf4::ncatt_put(nc, 0, "source", "Cal-Adapt Analytics Engine (CADCAT)")
-  ncdf4::ncatt_put(nc, 0, "created_by", "caladaptaer")
-  ncdf4::ncatt_put(nc, 0, "history",
-                    paste("Created", Sys.time(), "by caladaptaer"))
+  .write_provenance(nc, provenance, time_vals,
+    "CF export: precipitation mm per timestep to kg m-2 s-1; mixing ratio to specific humidity; wind speed from u10/v10")
 }

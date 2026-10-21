@@ -4,7 +4,15 @@
 \alias{.write_site_cf_nc}
 \title{Write a single-site CF-standard NetCDF file}
 \usage{
-.write_site_cf_nc(converted, time_vals, lat, lon, outfile, year)
+.write_site_cf_nc(
+  converted,
+  time_vals,
+  lat,
+  lon,
+  outfile,
+  year,
+  provenance = NULL
+)
 }
 \arguments{
 \item{converted}{named list of CF variable names -> numeric vectors}
@@ -18,6 +26,8 @@
 \item{outfile}{character; output file path}
 
 \item{year}{integer; reference year for time origin}
+
+\item{provenance}{Optional source metadata carried by retrieved objects.}
 }
 \description{
 Creates a CF-1.8 compliant NetCDF with latitude, longitude, and

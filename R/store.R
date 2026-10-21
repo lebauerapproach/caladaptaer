@@ -53,6 +53,9 @@
   if (anyNA(times) || any(diff(as.numeric(times)) <= 0)) {
     stop("Store timestamps must be known and strictly increasing")
   }
+  meta$calendar <- calendar
+  meta$time_units <- encoding
+  meta$time_values <- as.numeric(axis)
   meta$times <- times
   meta$path <- path
   meta$variable <- variable
@@ -140,6 +143,7 @@
   result <- stars::st_as_stars(stats::setNames(list(arr), variable), dimensions = dims)
   if (!is.null(units) && nzchar(units)) result[[1]] <- units::set_units(result[[1]], units, mode = "standard")
   if (!is.na(meta$srs)) result <- sf::st_set_crs(result, meta$srs)
+  attr(result, "cae_provenance") <- .source_provenance(path, variable, meta, selection$time)
   result
 }
 
@@ -188,7 +192,13 @@
   a <- .deaccumulate_precip(a)
   dims <- stars::st_dimensions(a)
   dims$time <- stars::st_dimensions(time = .get_time_values(a)[-1], point = TRUE)$time
-  stars::st_as_stars(list(prec = a[[1]][, , -1, drop = FALSE]), dimensions = dims)
+  out <- stars::st_as_stars(list(prec = a[[1]][, , -1, drop = FALSE]), dimensions = dims)
+  p <- .combine_provenance(list(a, b))
+  p$times <- p$times[-1]
+  p$time_values <- p$time_values[-1]
+  p$history <- c(p$history, "Derived precipitation increments from rainc + rainnc with counter-reset handling")
+  attr(out, "cae_provenance") <- p
+  out
 }
 
 #' Get WRF grid geometry without reading climate values

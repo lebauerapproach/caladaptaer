@@ -4,7 +4,7 @@
 \alias{.write_cf_nc}
 \title{Write CF-compliant NetCDF from converted data}
 \usage{
-.write_cf_nc(converted, time_vals, dims, outfile)
+.write_cf_nc(converted, time_vals, dims, outfile, provenance = NULL)
 }
 \description{
 Write CF-compliant NetCDF from converted data
