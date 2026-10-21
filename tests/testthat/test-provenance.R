@@ -58,3 +58,53 @@ test_that("grid exports preserve subset coordinates and CRS", {
   expect_equal(sf::st_crs(ncdf4::ncatt_get(nc, "crs", "crs_wkt")$value), sf::st_crs(x))
   ncdf4::nc_close(nc)
 })
+
+
+test_that("CF exports reject misaligned spatial data before writing", {
+  times <- as.POSIXct("2024-01-01", tz = "UTC") + 0:1 * 3600
+  f <- make_weather_store(times)
+  path <- tempfile(fileext = ".nc")
+  on.exit(unlink(c(f$path, path)))
+  x <- cae_fetch("t2", "CESM2", "historical", source = f$path)
+  variables <- stats::setNames(rep(list(x), nrow(.wrf_cf_map)), .wrf_cf_map$wrf_name)
+  for (change in c("coordinates", "CRS", "shape")) {
+    changed <- variables
+    if (change == "shape") {
+      changed$psfc <- x[1, 1:2, , ]
+    } else {
+      dims <- stars::st_dimensions(x)
+      if (change == "coordinates") dims$x$offset <- dims$x$offset + 3000
+      if (change == "CRS") dims$x$refsys <- dims$y$refsys <- sf::st_crs(32610)$wkt
+      stars::st_dimensions(changed$psfc) <- dims
+    }
+    expect_error(cae_write_cf_netcdf(changed, path), "spatial dimensions")
+    expect_false(file.exists(path))
+  }
+})
+
+
+test_that("CF exports reject conflicting source identity and calendars", {
+  times <- as.POSIXct("2024-01-01", tz = "UTC") + 0:1 * 3600
+  f <- make_weather_store(times)
+  path <- tempfile(fileext = ".nc")
+  on.exit(unlink(c(f$path, path)))
+  x <- cae_fetch("t2", "CESM2", "historical", source = f$path)
+  p <- attr(x, "cae_provenance")
+  p$member <- "r1i1p1f1"
+  attr(x, "cae_provenance") <- p
+  variables <- stats::setNames(rep(list(x), nrow(.wrf_cf_map)), .wrf_cf_map$wrf_name)
+  conflicts <- list(model = "ERA5", scenario = "reanalysis", member = "r2i1p1f1",
+                    resolution = "d02", calendar = "365_day")
+  for (field in names(conflicts)) {
+    changed <- variables
+    other <- p
+    other[[field]] <- conflicts[[field]]
+    attr(changed$psfc, "cae_provenance") <- other
+    expect_error(cae_write_cf_netcdf(changed, path), paste0("provenance: ", field))
+    expect_false(file.exists(path))
+  }
+  cae_write_cf_netcdf(variables, path)
+  nc <- ncdf4::nc_open(path)
+  expect_equal(ncdf4::ncatt_get(nc, 0, "scenario")$value, "historical")
+  ncdf4::nc_close(nc)
+})

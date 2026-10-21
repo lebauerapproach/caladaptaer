@@ -102,6 +102,12 @@ cae_write_cf_netcdf <- function(var_list, outfile, dt_seconds = 3600,
   # (for gridded output this writes the full grid)
   first_var <- var_list[[1]]
   dims <- stars::st_dimensions(first_var)
+  aligned <- vapply(var_list, function(x) {
+    identical(dim(x[[1]]), dim(first_var[[1]])) &&
+      isTRUE(all.equal(stars::st_dimensions(x), dims, tolerance = 0))
+  }, logical(1))
+  if (!all(aligned)) stop("Variable spatial dimensions, coordinates, or CRS differ")
+  provenance <- .combine_provenance(var_list)
 
   # apply unit conversions and extract raw arrays
   converted <- list()
@@ -136,7 +142,7 @@ cae_write_cf_netcdf <- function(var_list, outfile, dt_seconds = 3600,
   converted$wind_speed <- .compute_wind_speed(raw_u10, raw_v10)
 
   # write NetCDF
-  .write_cf_nc(converted, time_vals, dims, outfile, .combine_provenance(var_list))
+  .write_cf_nc(converted, time_vals, dims, outfile, provenance)
 
   invisible(outfile)
 }

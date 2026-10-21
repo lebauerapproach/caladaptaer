@@ -29,6 +29,11 @@
   ps <- lapply(objects, function(x) attr(x, "cae_provenance"))
   ps <- Filter(Negate(is.null), ps)
   if (!length(ps)) return(NULL)
+  for (name in c("model", "scenario", "member", "resolution", "calendar")) {
+    values <- unique(unlist(lapply(ps, `[[`, name), use.names = FALSE))
+    values <- values[!is.na(values) & nzchar(values) & values != "unknown"]
+    if (length(values) > 1L) stop("Conflicting source provenance: ", name)
+  }
   out <- ps[[1]]
   for (name in c("source", "variable", "history")) {
     out[[name]] <- unique(unlist(lapply(ps, `[[`, name), use.names = FALSE))
