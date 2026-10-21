@@ -7,7 +7,7 @@
 
 .store_metadata <- function(path, variable) {
   key <- paste(path, variable, sep = "|")
-  if (exists(key, .store_metadata_cache, inherits = FALSE)) {
+  if (startsWith(path, "s3://") && exists(key, .store_metadata_cache, inherits = FALSE)) {
     return(get(key, .store_metadata_cache, inherits = FALSE))
   }
   .setup_s3_env()

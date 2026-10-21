@@ -13,7 +13,10 @@ cae_build_met_drivers(
   outdir,
   resolution = "d01",
   overwrite = FALSE,
-  verbose = TRUE
+  verbose = TRUE,
+  cache_dir = NULL,
+  batch_size = 64L,
+  source = NULL
 )
 }
 \arguments{
@@ -38,15 +41,19 @@ See \code{cae_scenarios()} for options.}
 \item{overwrite}{logical; overwrite existing files? Default \code{FALSE}.}
 
 \item{verbose}{logical; print progress messages? Default \code{TRUE}.}
+
+\item{cache_dir}{Optional source chunk cache; NULL reads remotely.}
+
+\item{batch_size}{Maximum sites held in memory together (default 64).}
+
+\item{source}{Optional local source store/file, primarily for offline reuse.}
 }
 \value{
 A data.frame with columns \code{site_id}, \code{year}, \code{file} (invisibly).
 }
 \description{
-Fetches WRF data from S3 once per variable per year and extracts all
-sites in a single vectorized call via \code{\link[=cae_fetch_points]{cae_fetch_points()}}, then writes
-one CF-compliant NetCDF per site per year. For N sites, 8 variables,
-and Y years this makes 8*Y S3 requests regardless of N.
+Extracts WRF data in bounded site batches, optionally staging reusable
+source chunks locally, and writes one CF NetCDF per site per year.
 }
 \details{
 Output files follow the PEcAn CF Meteorology convention and can be
