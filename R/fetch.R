@@ -145,16 +145,16 @@ cae_fetch <- function(variable, model, scenario,
       delta <- arr[,,2:nt] - arr[,,1:(nt-1)]
       # resets: large negative diff means counter was reset to ~0
       # and re-accumulated; the post-reset value is the increment
-      reset_mask <- delta < -0.01
+      reset_mask <- !is.na(delta) & delta < -0.01
       if (any(reset_mask)) {
         delta[reset_mask] <- arr[,,2:nt][reset_mask]
       }
       # clamp remaining float-precision negatives
-      delta[delta < 0] <- 0
-      arr[,,1] <- 0
+      delta[which(delta < 0)] <- 0
+      arr[,,1] <- ifelse(is.na(arr[,,1]), NA_real_, 0)
       arr[,,2:nt] <- delta
     } else {
-      arr[] <- 0
+      arr[!is.na(arr)] <- 0
     }
   } else {
     # 1D vector (single-point extraction or flat array)
@@ -162,14 +162,14 @@ cae_fetch <- function(variable, model, scenario,
     nt <- length(v)
     if (nt > 1) {
       delta <- diff(v)
-      reset_mask <- delta < -0.01
+      reset_mask <- !is.na(delta) & delta < -0.01
       if (any(reset_mask)) {
         delta[reset_mask] <- v[-1][reset_mask]
       }
-      delta[delta < 0] <- 0
-      arr <- c(0, delta)
+      delta[which(delta < 0)] <- 0
+      arr <- c(if (is.na(v[1])) NA_real_ else 0, delta)
     } else {
-      arr <- 0
+      arr <- if (is.na(v[1])) NA_real_ else 0
     }
   }
 
